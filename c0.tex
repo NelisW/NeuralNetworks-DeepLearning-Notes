@@ -3,7 +3,7 @@
 \chapter*{What this book is about}
 
 
-Neural Networks and Deep Learning is a free online book. The book will teach you about: 
+Neural Networks and Deep Learning is a free online book \cite{Nielsen2015}. The book will teach you about: 
 \begin{enumerate}
 \item  Neural networks, a beautiful biologically-inspired programming paradigm which enables a computer to learn from observational data 
 
@@ -30,7 +30,7 @@ This means the book is emphatically not a tutorial in how to use some particular
 
 We'll learn the core principles behind neural networks and deep learning by attacking a concrete problem: the problem of teaching a computer to recognize handwritten digits. This problem is extremely difficult to solve using the conventional approach to programming. And yet, as we'll see, it can be solved pretty well using a simple neural network, with just a few tens of lines of code, and no special libraries. What's more, we'll improve the program through many iterations, gradually incorporating more and more of the core ideas about neural networks and deep learning.
 
-This hands-on approach means that you'll need some programming experience to read the book. But you don't need to be a professional programmer. I've written the code in Python (version 2.7\footnote{Converted to Python 3 in this document}), which, even if you don't program in Python, should be easy to understand with just a little effort. Through the course of the book we will develop a little neural network library, which you can use to experiment and to build understanding. All the code is available for download here. Once you've finished the book, or as you read it, you can easily pick up one of the more feature-complete neural network libraries intended for use in production.
+This hands-on approach means that you'll need some programming experience to read the book. But you don't need to be a professional programmer. I've written the code in Python (version 2.7\footnote{Converted to Python 3 in this document}), which, even if you don't program in Python, should be easy to understand with just a little effort. Through the course of the book we will develop a little neural network library, which you can use to experiment and to build understanding. All the code is available for download from github \cite{Nielsengithub2019}. Once you've finished the book, or as you read it, you can easily pick up one of the more feature-complete neural network libraries intended for use in production.
 
 On a related note, the mathematical requirements to read the book are modest. There is some mathematics in most chapters, but it's usually just elementary algebra and plots of functions, which I expect most readers will be okay with. I occasionally use more advanced mathematics, but have structured the material so you can follow even if some mathematical details elude you. The one chapter which uses heavier mathematics extensively is Chapter~\ref{sec:UsingNeuralNetsTorRcognizeHandWrittenDigits}, which requires a little multivariable calculus and linear algebra. If those aren't familiar, I begin Chapter~\ref{sec:UsingNeuralNetsTorRcognizeHandWrittenDigits} with a discussion of how to navigate the mathematics. If you're finding it really heavy going, you can simply skip to the summary of the chapter's main results. In any case, there's no need to worry about this at the outset.
 
@@ -54,17 +54,23 @@ Of course, you may not have such a project in mind, at least up front. That's fi
 \section*{Frequently Asked Questions}
 \label{sec:FrequentlyAskedQuestions}
 
+\begin{enumerate}
 
+\item
 Is there a pdf or print version of the book available, or planned? There's no pdf or print version available, nor planned.
 
+\item
 People sometimes suggest that it would be easy to convert the book to pdf or print. However, the book contains dozens of interactive JavaScript elements, and the narrative often depends on the reader interacting with those elements in some way. Doing the "easy" conversion would result in a poor quality product. Of course, those interactive parts could be rewritten to make sense in static form, but doing it well would be a big job.
 
+\item
 Can you help me with a mathematical problem, or with debugging my work? No. I suggest chatting about your problem with friends or colleagues. If that's no help, try an appropriate online forum to ask your question.
 
+\item
 Do you have solutions to the exercises and problems? Sorry, no.
 
+\item
 I'd like to do a translation into another language. Is that okay? It's fine under the terms of the book's license (see the page footer for details), provided: (1) you're not doing it for a product which is commercial in some way (e.g., you intend to sell it); and (2) you acknowledge me as the original author. I'd also appreciate a link, of course. If you have a commercial interest, please get in touch so we can discuss (mn@michaelnielsen.org).
-
+\end{enumerate}
 
 \section*{Acknowledgements}
 
@@ -72,7 +78,7 @@ The book grew out of a set of notes I prepared for an online study group on neur
 
 \section*{Attribution and License}
 
-In academic work, please cite this book as: Michael A. Nielsen, ``Neural Networks and Deep Learning'', Determination Press, 2015 
+In academic work, please cite this book \cite{Nielsen2015} as: Michael A. Nielsen, ``Neural Networks and Deep Learning'', Determination Press, 2015 
 
 This work is licensed under a Creative Commons Attribution-NonCommercial 3.0 Unported License. This means you're free to copy, share, and build on this book, but not to sell it. If you're interested in commercial use, please contact me. 
 

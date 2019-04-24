@@ -240,3 +240,5 @@ TSWLatexianTemp*
 
 # generated if using elsarticle.cls
 *.spl
+/NN-DL-Nielsen.pdf
+/archive/~$ural-Networks-and-Deep-Learning-Michael-Nielsen-2018.docx

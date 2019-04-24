@@ -1,0 +1,211 @@
+\setcounter{section}{0}
+\setcounter{secnumdepth}{6}
+
+
+% commands not part of the style
+\newcommand{\mypersec}{\si{\meter\per\second}}
+\newcommand{\mympersecsq}{\si{\meter\per\second\squared}}
+\newcommand{\mydegpersec}{\si{\degree\per\second}}
+\newcommand{\mykm}{\si{\kilo\metre}}
+\newcommand{\mym}{\si{\metre}}
+\newcommand{\mymm}{\si{\milli\metre}}
+\newcommand{\myum}{\si{\micro\metre}}
+\newcommand{\myms}{\si{\milli\second}}
+\newcommand{\myus}{\si{\micro\second}}
+\newcommand{\myuw}{\si{\micro\watt}}
+\newcommand{\myua}{\si{\micro\ampere}}
+\newcommand{\myusr}{\si{\micro\steradian}}
+\newcommand{\onetwo}{1\nobreak--\nobreak2~\si{\micro\metre}}
+\newcommand{\onethree}{1\nobreak--\nobreak3~\si{\micro\metre}}
+\newcommand{\pbsband}{1.5\nobreak--\nobreak2.5~\si{\micro\metre}}
+\newcommand{\threefive}{3\nobreak--\nobreak5~\si{\micro\metre}}
+\newcommand{\eighttwelve}{8\nobreak--\nobreak12~\si{\micro\metre}}
+\newcommand{\greencode}{Green Code}
+\newcommand{\ossim}{OSSIM}
+\newcommand{\redcode}{Red Code}
+\newcommand{\pinkcode}{Pink Code}
+\newcommand{\bluecode}{Blue Code}
+\newcommand{\modtran}{\textsc{Modtran}}
+\newcommand{\poledit}{{\sf Poledit}}
+\newcommand{\mydegree}{\si{\degree}}
+\newcommand{\mymthreedb}{$-$3~dB}
+\newcommand{\mymaththreedb}{-3\;{\rm dB}}
+\newcommand{\deestarunits}{\si{\centi\meter\sqrt{\hertz}\per\watt}}
+\newcommand{\Unl}[1]{\ensuremath{\underline{#1}}}
+
+\definecolor{LightGrey}{rgb}{0.96,0.96,0.96}
+\definecolor{LightGrey}{rgb}{0.95,0.95,0.95}
+\definecolor{light-gray}{gray}{0.95}
+\definecolor{half-gray}{gray}{0.75}
+\definecolor{LightRed}{rgb}{1.0,0.9,0.9}
+
+\newcommand{\colheightrule}{\rule[-2mm]{0mm}{6.5mm}}
+\newcommand{\marginnote}[1]{ \marginpar{{\scriptsize #1}}}
+\newcommand{\CJWpar}[2]{\parbox{#1}{\rule{0cm}{4mm}#2\rule[-2mm]{0cm}{4mm}}}
+\newcommand{\HiLite}[1]{\fcolorbox{red}{red}{#1}}
+\newcommand{\res}{\marginpar{$\ast$}}
+\newcommand{\spec}[1]{\fcolorbox{half-gray}{light-gray}{#1}}
+%\newcommand{\TBC}[1]{\fcolorbox{black}{yellow}{#1}}
+
+\newcommand{\TBC}[1]{%
+    \par
+    \noindent
+    \begin{minipage}{1.0\linewidth}
+      \begin{tcolorbox}[colback=purple!5, colframe=purple!95!black, coltext=black,
+        coltitle=white, fonttitle=\bfseries, title={To be completed},%
+        left=0mm, right=0mm, top=0mm, bottom=0mm,%
+        before=\vspace{2pt}, after=\vspace{2pt}]
+        % \setlength{\parskip}{0.5em} \vspace{-0.5em}
+        \setlength{\parindent}{1em} \noindent
+        #1
+      \end{tcolorbox}
+    \end{minipage}
+}
+
+\newcommand{\TBCNOTOCTO}[1]{%
+   \par
+    \noindent
+    \begin{minipage}{1.0\linewidth}
+      \begin{tcolorbox}[colback=yellow!5, colframe=yellow!95!black, coltext=black,
+        coltitle=white, fonttitle=\bfseries, title={To be completed, not in OCTO},%
+        left=0mm, right=0mm, top=0mm, bottom=0mm,%
+        before=\vspace{2pt}, after=\vspace{2pt}]
+        % \setlength{\parskip}{0.5em} \vspace{-0.5em}
+        \setlength{\parindent}{1em} \noindent
+        #1
+      \end{tcolorbox}
+    \end{minipage} 
+}
+
+
+\newcommand{\Optional}{\textbf{Optional.\ }}
+\newcommand{\Desirable}{\textbf{Desirable.\ }}
+\newcommand{\Mandatory}{\textbf{Mandatory.\ }}
+
+\newcommand*\diff{\mathop{}\!\mathrm{d}}
+\newcommand*\Diff[1]{\mathop{}\!\mathrm{d^#1}}
+\newcommand*\euler{\mathop{}\!\mathrm{e}}
+\newcommand*\imag{\mathop{}\!\mathrm{j}}
+
+
+% set up the listings environment
+%\begin{lstlisting}[hkey=value list]
+%code here
+%\end{lstlisting}
+%\lstinline[hkey=value list]<character>source code<same character>
+%\lstinputlisting[lastline=4]{listings.sty}
+
+%\lstdefinelanguage{none}{identifierstyle=}
+
+% set up listings package details
+\lstloadlanguages{TeX,C++,XML,Python}
+
+
+%\lstset{ %
+\lstdefinestyle{ossimstyle}{
+language=,                % choose the language of the code
+upquote=true, % gives the upquote instead of the curly quote
+basicstyle=\ttfamily\footnotesize,       % the size of the fonts that are used for the code
+                  % alternative ((basicstyle=\ttfamily\fontsize{7}{10}\selectfont]))
+numbers=none,                   % where to put the line-numbers
+showspaces=false,               % show spaces adding particular underscores
+showstringspaces=false,         % underline spaces within strings
+showtabs=false,                 % show tabs within strings adding particular underscores
+breaklines=true,        % sets automatic line breaking
+breakatwhitespace=false,    % sets if automatic breaks should only happen at whitespace
+prebreak=\raisebox{0ex}[0ex][0ex]{$\dlsh$}, % add linebreak symbol
+captionpos=b,                   % sets the caption-position to bottom
+frame=none,                   % 'lines' or 'none' adds a frame around the code
+tabsize=2,              % sets default tabsize to 2 spaces
+%escapeinside={\%}{)},          % if you want to add a comment within your code
+%escapeinside={\%*}{*)},          % if you want to add LaTeX within your code
+%backgroundcolor=\color{LightGrey},  % choose the background color,  add \usepackage{color}
+framesep=1pt,
+xleftmargin=0pt,
+xrightmargin=0pt,
+captionpos=t,                    % sets the caption-position to top
+%deletekeywords={...},            % if you want to delete keywords from the given language
+numberbychapter=false,
+}
+
+
+% make inline listing larger than display
+%https://latex.org/forum/viewtopic.php?t=2072
+\makeatletter
+\lst@AddToHook{TextStyle}{\let\lst@basicstyle\ttfamily\large\fontfamily{pcr}\selectfont}
+\makeatother
+
+\lstset{style=ossimstyle}
+
+
+\lstdefinestyle{pythonstyle}{
+  backgroundcolor=\color{LightGrey},  % choose the background colour,  add \usepackage{color}
+  language=Python,
+}
+
+\lstdefinestyle{cppstyle}{
+  backgroundcolor=\color{LightGrey},  % choose the background colour,  add \usepackage{color}
+  language=C++,
+}
+
+\lstdefinestyle{xmlstyle}{
+  backgroundcolor=\color{LightGrey},  % choose the background colour,  add \usepackage{color}
+  language=XML,
+}
+
+\lstdefinestyle{nonestyle}{
+  backgroundcolor=\color{LightGrey},  % choose the background colour,  add \usepackage{color}
+}
+
+\renewcommand{\arraystretch}{1.5}
+
+\newcommand{\myhline}{\ \hrulefill \ }
+
+%\minipsize{90mm}{some text}
+\newcommand{\minipsize}[2]{\begin{minipage}[t]{#1}\begin{flushleft}#2\end{flushleft}\end{minipage}}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%\usepackage{etoolbox}
+%\makeatletter
+%\patchcmd{\thebibliography}{%
+%  \chapter{\bibname}\@mkboth{\MakeUppercase\bibname}{\MakeUppercase\bibname}}{%
+%  \chapter{References}}{}{}
+%\makeatother
+
+%\bibliographystyle{plain}
+%\bibliographystyle{acm}
+\bibliographystyle{bib/dpsscjw}
+
+\newcommand{\tabrule}{\rule[-2mm]{0mm}{6mm}}
+
+%% Symbols used in missile dynamics
+%% See ../Missile Airframe-Guidance Models/c03_01.tex for definitions
+\newcommand{\fax}{\ensuremath{f_\mathrm{ax}}}
+\newcommand{\fay}{\ensuremath{f_\mathrm{ay}}}
+\newcommand{\faz}{\ensuremath{f_\mathrm{az}}}
+\newcommand{\fth}{\ensuremath{f_\mathrm{th}}}
+\newcommand{\ribi}{\ensuremath{r_{ib}^i}}
+\newcommand{\vibi}{\ensuremath{v_{ib}^i}}
+\newcommand{\cib}{\ensuremath{C_i^b}}
+\newcommand{\wibb}{\ensuremath{\omega_{ib}^b}}
+\newcommand{\Wibb}{\ensuremath{\Omega_{ib}^b}}
+\newcommand{\qdyn}{\ensuremath{q_\mathrm{dyn}}}
+\newcommand{\sref}{\ensuremath{S_\mathrm{ref}}}
+\newcommand{\vsound}{\ensuremath{v_\mathrm{s}}}
+\newcommand{\nbt}{\ensuremath{\hat{t}}}
+\newcommand{\tburn}{\ensuremath{t_\mathrm{burn}}}
+\newcommand{\tign}{\ensuremath{t_\mathrm{ign}}}
+\newcommand{\alphamax}{\ensuremath{\alpha_\mathrm{max}}}
+\newcommand{\cazero}{\ensuremath{C_{A_0}}}
+\newcommand{\cabase}{\ensuremath{C_{A_\mathrm{base}}}}
+\newcommand{\cainc}{\ensuremath{C_{A_i}}}
+\newcommand{\caincfull}{\ensuremath{C_{A_{if}}}}
+\newcommand{\caincempty}{\ensuremath{C_{A_{ie}}}}
+\newcommand{\cn}{\ensuremath{C_N}}
+\newcommand{\cnfull}{\ensuremath{C_{N_f}}}
+\newcommand{\cnempty}{\ensuremath{C_{N_e}}}
+\newcommand{\xref}{\ensuremath{X_\mathrm{ref}}}
+\newcommand{\czalpha}{\ensuremath{{C_{Z_\alpha}}}}
+\newcommand{\chk}{$\times$}
+

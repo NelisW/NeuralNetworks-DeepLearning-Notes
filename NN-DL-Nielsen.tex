@@ -36,6 +36,8 @@
 \usepackage{graphicx}
 %\usepackage{lastpage}
 
+\input{commands.tex}
+
 %\ifx\pdfoutput\undefined
 %\usepackage{pstcol}
 %\else
@@ -89,8 +91,6 @@ showstringspaces=false
 \DeclareCaptionFormat{listing}{\colorbox[cmyk]{0.43, 0.35, 0.35,0.01}{\parbox{\textwidth}{\hspace{15pt}#1#2#3}}}
 \captionsetup[lstlisting]{format=listing,labelfont=white,textfont=white, singlelinecheck=false, margin=0pt, font={bf,footnotesize}}
 
-\newcommand{\TBC}[1]{\fcolorbox{black}{yellow}{#1}}
-
 \newcommand*{\titleTH}{\begingroup%
 \raggedleft
 \vspace*{\baselineskip}
@@ -108,7 +108,7 @@ http://neuralnetworksanddeeplearning.com/index.html
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % files making up this document
 
-\includeonly{c0,c1,c2,c3,c4,c5,c6c7,c8}
+\includeonly{c0,c1,c2,c3,c4,c5,c6,c7,c8}
 
 %\includeonly{c1}
 
@@ -116,12 +116,12 @@ http://neuralnetworksanddeeplearning.com/index.html
 \titleTH
 \include{c0} % front matter
 \include{c1} %
-\include{c2} %
-\include{c3} %
-\include{c4} %
-\include{c5} %
-\include{c6} %
-\include{c7} %
+%\include{c2} %
+%\include{c3} %
+%\include{c4} %
+%\include{c5} %
+%\include{c6} %
+%\include{c7} %
 \include{c8} %
 
 
