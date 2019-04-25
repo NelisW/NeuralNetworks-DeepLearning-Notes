@@ -120,7 +120,7 @@ Up to now I've been drawing inputs like $x_1$ and $x_2$ as variables floating to
 This notation for input perceptrons, in which we have an output, but no inputs, 
 
 {\centering
-\includegraphics[width=0.9\textwidth,]{pic/inputnode}
+\includegraphics[width=0.2\textwidth,]{pic/inputnode}
 \par}
 
 is a shorthand. It doesn't actually mean a perceptron with no inputs. To see this, suppose we did have a perceptron with no inputs. Then the weighted sum $\sum_{j} w_{j} x_{j}$ would always be zero, and so the perceptron would output 1 if b$>$0, and 0 if b$\leq$0. That is, the perceptron would simply output a fixed value, not the desired value ($x_1$, in the example above). It's better to think of the input perceptrons as not really being perceptrons at all, but rather special units which are simply defined to output the desired values, $x_1$,$x_2$,$\ldots$.
@@ -136,45 +136,97 @@ However, the situation is better than this view suggests. It turns out that we c
 
 Learning algorithms sound terrific. But how can we devise such algorithms for a neural network? Suppose we have a network of perceptrons that we'd like to use to learn to solve some problem. For example, the inputs to the network might be the raw pixel data from a scanned, handwritten image of a digit. And we'd like the network to learn weights and biases so that the output from the network correctly classifies the digit. To see how learning might work, suppose we make a small change in some weight (or bias) in the network. What we'd like is for this small change in weight to cause only a small corresponding change in the output from the network. As we'll see in a moment, this property will make learning possible. Schematically, here's what we want (obviously this network is too simple to do handwriting recognition!):
 
+{\centering
+\includegraphics[width=0.7\textwidth,]{pic/simpleperceptron02}
+\par}
+
 If it were true that a small change in a weight (or bias) causes only a small change in output, then we could use this fact to modify the weights and biases to get our network to behave more in the manner we want. For example, suppose the network was mistakenly classifying an image as an ``8'' when it should be a ``9''. We could figure out how to make a small change in the weights and biases so the network gets a little closer to classifying the image as a ``9''. And then we'd repeat this, changing the weights and biases over and over to produce better and better output. The network would be learning.
-The problem is that this isn't what happens when our network contains perceptrons. In fact, a small change in the weights or bias of any single perceptron in the network can sometimes cause the output of that perceptron to completely flip, say from 0 to 1
-. That flip may then cause the behaviour of the rest of the network to completely change in some very complicated way. So while your ``9'' might now be classified correctly, the behaviour of the network on all the other images is likely to have completely changed in some hard-to-control way. That makes it difficult to see how to gradually modify the weights and biases so that the network gets closer to the desired behaviour. Perhaps there's some clever way of getting around this problem. But it's not immediately obvious how we can get a network of perceptrons to learn.
-We can overcome this problem by introducing a new type of artificial neuron called a sigmoid neuron. Sigmoid neurons are similar to perceptrons, but modified so that small changes in their weights and bias cause only a small change in their output. That's the crucial fact which will allow a network of sigmoid neurons to learn.
+
+The problem is that this isn't what happens when our network contains perceptrons. In fact, a small change in the weights or bias of any single perceptron in the network can sometimes cause the output of that perceptron to completely flip, say from 0 to 1. That flip may then cause the behaviour of the rest of the network to completely change in some very complicated way. So while your ``9'' might now be classified correctly, the behaviour of the network on all the other images is likely to have completely changed in some hard-to-control way. That makes it difficult to see how to gradually modify the weights and biases so that the network gets closer to the desired behaviour. Perhaps there's some clever way of getting around this problem. But it's not immediately obvious how we can get a network of perceptrons to learn.
+
+We can overcome this problem by introducing a new type of artificial neuron called a \textit{sigmoid} neuron. Sigmoid neurons are similar to perceptrons, but modified so that small changes in their weights and bias cause only a small change in their output. That's the crucial fact which will allow a network of sigmoid neurons to learn.
 Okay, let me describe the sigmoid neuron. We'll depict sigmoid neurons in the same way we depicted perceptrons: 
 
-Just like a perceptron, the sigmoid neuron has inputs, $x_1$,$x_2$,?. But instead of being just 0 or 1, these inputs can also take on any values between 0 and 1. So, for instance, 0.638? is a valid input for a sigmoid neuron. Also just like a perceptron, the sigmoid neuron has weights for each input, $w_1$,$w_2$,?, and an overall bias, b. But the output is not 0 or 1. Instead, it's ?(w?x+b), where ? is called the sigmoid function* *Incidentally, ? is sometimes called the logistic function, and this new class of neurons called logistic neurons. It's useful to remember this terminology, since these terms are used by many people working with neural nets. However, we'll stick with the sigmoid terminology., and is defined by: 
+{\centering
+\includegraphics[width=0.5\textwidth,]{pic/sigmoidneuron01}
+\par}
 
-
-To put it all a little more explicitly, the output of a sigmoid neuron with inputs $x_1$,$x_2$,?, weights $w_1$,$w_2$,?, and bias b is 
-
+Just like a perceptron, the sigmoid neuron has inputs, $x_1$,$x_2$,$\ldots$. But instead of being just 0 or 1, these inputs can also take on any values between 0 and 1. So, for instance, 0.638? is a valid input for a sigmoid neuron. Also just like a perceptron, the sigmoid neuron has weights for each input, $w_1$,$w_2$,,$\ldots$, and an overall bias, $b$. But the output is not 0 or 1. Instead, it's $\sigma(w \cdot x+b)$, where $\sigma()$ is called the \textit{sigmoid function}\footnote{Incidentally, $\sigma()$ is sometimes called the logistic function, and this new class of neurons called logistic neurons. It's useful to remember this terminology, since these terms are used by many people working with neural nets. However, we'll stick with the sigmoid terminology.}, and is defined by: 
+\begin{equation}
+\sigma(z) \equiv \frac{1}{1+e^{-z}}\label{eq:sigmoidfunction}
+\end{equation}
+To put it all a little more explicitly, the output of a sigmoid neuron with inputs $x_1$,$x_2$,$\ldots$, weights $w_1$,$w_2$,$\ldots$, and bias $b$ is 
+\begin{equation}
+\frac{1}{1+\exp \left(-\sum_{j} w_{j} x_{j}-b\right)}
+\end{equation}
 At first sight, sigmoid neurons appear very different to perceptrons. The algebraic form of the sigmoid function may seem opaque and forbidding if you're not already familiar with it. In fact, there are many similarities between perceptrons and sigmoid neurons, and the algebraic form of the sigmoid function turns out to be more of a technical detail than a true barrier to understanding.
-To understand the similarity to the perceptron model, suppose z?w?x+b is a large positive number. Then e?z?0 and so ?(z)?1. In other words, when z=w?x+b is large and positive, the output from the sigmoid neuron is approximately 1, just as it would have been for a perceptron. Suppose on the other hand that z=w?x+b is very negative. Then e?z??, and ?(z)?0. So when z=w?x+b is very negative, the behaviour of a sigmoid neuron also closely approximates a perceptron. It's only when w?x+b is of modest size that there's much deviation from the perceptron model.
-What about the algebraic form of ?? How can we understand that? In fact, the exact form of ? isn't so important - what really matters is the shape of the function when plotted. Here's the shape:
+
+To understand the similarity to the perceptron model, suppose $z \equiv w \cdot x+b$ is a large positive number. Then $e^{-z} \approx 0$ and so $\sigma(z) \approx 1$. In other words, when $z=w \cdot x+b$ is large and positive, the output from the sigmoid neuron is approximately 1, just as it would have been for a perceptron. Suppose on the other hand that $z \equiv w \cdot x+b$ is very negative. Then $e^{-z} \rightarrow \infty$, and $\sigma(z) \approx 0$. So when $z \equiv w \cdot x+b$ is very negative, the behaviour of a sigmoid neuron also closely approximates a perceptron. It's only when $w \cdot x+b$ is of modest size that there's much deviation from the perceptron model.
+
+What about the algebraic form of $\sigma$? How can we understand that? In fact, the exact form of $\sigma$ isn't so important - what really matters is the shape of the function when plotted. Here's the shape:
+
+{\centering
+\includegraphics[width=0.5\textwidth,]{pic/sigmoidfunction01}
+\par}
 
 This shape is a smoothed out version of a step function:
 
+{\centering
+\includegraphics[width=0.5\textwidth,]{pic/stepfunction01}
+\par}
 
-If ? had in fact been a step function, then the sigmoid neuron would be a perceptron, since the output would be 1 or 0 depending on whether w?x+b was positive or negative. By using the actual ? function we get, as already implied above, a smoothed out perceptron. Indeed, it's the smoothness of the ? function that is the crucial fact, not its detailed form. The smoothness of ? means that small changes ?wj in the weights and ?b in the bias will produce a small change ?output in the output from the neuron. In fact, calculus tells us that ?output is well approximated by 
 
-where the sum is over all the weights, wj, and ?output/?wj and ?output/?b denote partial derivatives of the output with respect to wj and b, respectively. Don't panic if you're not comfortable with partial derivatives! While the expression above looks complicated, with all the partial derivatives, it's actually saying something very simple (and which is very good news):  ?output is a linear function of the changes ?wj and ?b in the weights and bias. This linearity makes it easy to choose small changes in the weights and biases to achieve any desired small change in the output. So while sigmoid neurons have much of the same qualitative behaviour as perceptrons, they make it much easier to figure out how changing the weights and biases will change the output.
-If it's the shape of ? which really matters, and not its exact form, then why use the particular form used for ? in Equation (3)? In fact, later in the book we will occasionally consider neurons where the output is f(w?x+b) for some other activation function f(?). The main thing that changes when we use a different activation function is that the particular values for the partial derivatives in Equation (5) change. It turns out that when we compute those partial derivatives later, using ? will simplify the algebra, simply because exponentials have lovely properties when differentiated. In any case, ? is commonly-used in work on neural nets, and is the activation function we'll use most often in this book.
+If $\sigma$ had in fact been a step function, then the sigmoid neuron would be a perceptron, since the output would be 1 or 0 depending on whether $w \cdot x+b$ was positive or negative. By using the actual $\sigma$ function we get, as already implied above, a smoothed out perceptron. Indeed, it's the smoothness of the $\sigma$ function that is the crucial fact, not its detailed form. The smoothness of $\sigma$ means that small changes $\Delta w_j$ in the weights and $\Delta b$ in the bias will produce a small change $\Delta\textrm{output}$ in the output from the neuron. In fact, calculus tells us that $\Delta\textrm{output}$ is well approximated by 
+\begin{equation}
+\Delta \textrm { output } \approx \sum_{j} \frac{\partial \textrm { output }}{\partial w_{j}} \Delta w_{j}+\frac{\partial \textrm { output }}{\partial b} \Delta b
+\label{eq:partialderivsigmoid}
+\end{equation}
+where the sum is over all the weights, $w_j$, and $\partial\textrm{output}/\partial w_j$ and $\partial\textrm{output}/\partial b$ denote partial derivatives of the output with respect to $w_j$ and $b$, respectively. Don't panic if you're not comfortable with partial derivatives! While the expression above looks complicated, with all the partial derivatives, it's actually saying something very simple (and which is very good news):  $\Delta\textrm{output}$  is a linear function of the changes $\Delta w_j$ and $\Delta b$ in the weights and bias. This linearity makes it easy to choose small changes in the weights and biases to achieve any desired small change in the output. So while sigmoid neurons have much of the same qualitative behaviour as perceptrons, they make it much easier to figure out how changing the weights and biases will change the output.
+
+If it's the shape of $\sigma$ which really matters, and not its exact form, then why use the particular form used for $\sigma$ in Equation~\ref{eq:sigmoidfunction}? In fact, later in the book we will occasionally consider neurons where the output is $f(w \cdot x+b)$ for some other activation function $f(\cdot)$. The main thing that changes when we use a different activation function is that the particular values for the partial derivatives in Equation~\ref{eq:partialderivsigmoid} change. It turns out that when we compute those partial derivatives later, using $\sigma$ will simplify the algebra, simply because exponentials have lovely properties when differentiated. In any case, $\sigma$ is commonly-used in work on neural nets, and is the activation function we'll use most often in this book.
+
 How should we interpret the output from a sigmoid neuron? Obviously, one big difference between perceptrons and sigmoid neurons is that sigmoid neurons don't just output 0 or 1. They can have as output any real number between 0 and 1, so values such as 0.173? and 0.689? are legitimate outputs. This can be useful, for example, if we want to use the output value to represent the average intensity of the pixels in an image input to a neural network. But sometimes it can be a nuisance. Suppose we want the output from the network to indicate either ``the input image is a 9'' or ``the input image is not a 9''. Obviously, it'd be easiest to do this if the output was a 0 or a 1, as in a perceptron. But in practice we can set up a convention to deal with this, for example, by deciding to interpret any output of at least 0.5 as indicating a ``9'', and any output less than 0.5 as indicating ``not a 9''. I'll always explicitly state when we're using such a convention, so it shouldn't cause any confusion.
-Exercises
-* Sigmoid neurons simulating perceptrons, part I Suppose we take all the weights and biases in a network of perceptrons, and multiply them by a positive constant, c>0.
+
+\section{Exercises}
+\begin{enumerate}
+\item \textbf{Sigmoid neurons simulating perceptrons, part I} Suppose we take all the weights and biases in a network of perceptrons, and multiply them by a positive constant, $c>0$.
 Show that the behaviour of the network doesn't change.
-*  Sigmoid neurons simulating perceptrons, part II Suppose we have the same setup as the last problem - a network of perceptrons. Suppose also that the overall input to the network of perceptrons has been chosen. We won't need the actual input value, we just need the input to have been fixed. Suppose the weights and biases are such that w?x+b?0 for the input x to any particular perceptron in the network. Now replace all the perceptrons in the network by sigmoid neurons, and multiply the weights and biases by a positive constant c>0. Show that in the limit as c?? the behaviour of this network of sigmoid neurons is exactly the same as the network of perceptrons. How can this fail when w?x+b=0 for one of the perceptrons? 
-The architecture of neural networks
+
+\item \textbf{Sigmoid neurons simulating perceptrons, part II} Suppose we have the same setup as the last problem - a network of perceptrons. Suppose also that the overall input to the network of perceptrons has been chosen. We won't need the actual input value, we just need the input to have been fixed. Suppose the weights and biases are such that $w \cdot x+b \neq 0$ for the input $x$ to any particular perceptron in the network. Now replace all the perceptrons in the network by sigmoid neurons, and multiply the weights and biases by a positive constant $c>0$. Show that in the limit as $c \rightarrow \infty$ the behaviour of this network of sigmoid neurons is exactly the same as the network of perceptrons. How can this fail when $w \cdot x+b=0$ for one of the perceptrons?
+\end{enumerate}
+ 
+
+\section{The architecture of neural networks}
+
 In the next section I'll introduce a neural network that can do a pretty good job classifying handwritten digits. In preparation for that, it helps to explain some terminology that lets us name different parts of a network. Suppose we have the network: 
 
-As mentioned earlier, the leftmost layer in this network is called the input layer, and the neurons within the layer are called input neurons. The rightmost or output layer contains the output neurons, or, as in this case, a single output neuron. The middle layer is called a hidden layer, since the neurons in this layer are neither inputs nor outputs. The term ``hidden'' perhaps sounds a little mysterious - the first time I heard the term I thought it must have some deep philosophical or mathematical significance - but it really means nothing more than ``not an input or an output''. The network above has just a single hidden layer, but some networks have multiple hidden layers. For example, the following four-layer network has two hidden layers: 
+{\centering
+\includegraphics[width=0.6\textwidth,]{pic/three-layer-nn01}
+\par}
 
-Somewhat confusingly, and for historical reasons, such multiple layer networks are sometimes called multilayer perceptrons or MLPs, despite being made up of sigmoid neurons, not perceptrons. I'm not going to use the MLP terminology in this book, since I think it's confusing, but wanted to warn you of its existence.
-The design of the input and output layers in a network is often straightforward. For example, suppose we're trying to determine whether a handwritten image depicts a ``9'' or not. A natural way to design the network is to encode the intensities of the image pixels into the input neurons. If the image is a 64 by 64 greyscale image, then we'd have 4,096=64?64 input neurons, with the intensities scaled appropriately between 0 and 1. The output layer will contain just a single neuron, with output values of less than 0.5 indicating ``input image is not a 9'', and values greater than 0.5 indicating ``input image is a 9''.
+
+As mentioned earlier, the leftmost layer in this network is called the \textit{input} layer, and the neurons within the layer are called input neurons. The rightmost or output layer contains the \textit{output} neurons, or, as in this case, a single output neuron. The middle layer is called a \textit{hidden} layer, since the neurons in this layer are neither inputs nor outputs. The term ``hidden'' perhaps sounds a little mysterious - the first time I heard the term I thought it must have some deep philosophical or mathematical significance - but it really means nothing more than ``not an input or an output''. The network above has just a single hidden layer, but some networks have multiple hidden layers. For example, the following four-layer network has two hidden layers: 
+
+{\centering
+\includegraphics[width=0.8\textwidth,]{pic/four-layer-nn01}
+\par}
+
+
+
+Somewhat confusingly, and for historical reasons, such multiple layer networks are sometimes called \textit{multilayer perceptrons} or \textit{MLPs}, despite being made up of sigmoid neurons, not perceptrons. I'm not going to use the \textit{MLP} terminology in this book, since I think it's confusing, but wanted to warn you of its existence.
+
+The design of the input and output layers in a network is often straightforward. For example, suppose we're trying to determine whether a handwritten image depicts a ``9'' or not. A natural way to design the network is to encode the intensities of the image pixels into the input neurons. If the image is a 64 by 64 greyscale image, then we'd have 4,096=64$\times$64 input neurons, with the intensities scaled appropriately between 0 and 1. The output layer will contain just a single neuron, with output values of less than 0.5 indicating ``input image is not a 9'', and values greater than 0.5 indicating ``input image is a 9''.
+
 While the design of the input and output layers of a neural network is often straightforward, there can be quite an art to the design of the hidden layers. In particular, it's not possible to sum up the design process for the hidden layers with a few simple rules of thumb. Instead, neural networks researchers have developed many design heuristics for the hidden layers, which help people get the behaviour they want out of their nets. For example, such heuristics can be used to help determine how to trade off the number of hidden layers against the time required to train the network. We'll meet several such design heuristics later in this book. 
-Up to now, we've been discussing neural networks where the output from one layer is used as input to the next layer. Such networks are called feedforward neural networks. This means there are no loops in the network - information is always fed forward, never fed back. If we did have loops, we'd end up with situations where the input to the ? function depended on the output. That'd be hard to make sense of, and so we don't allow such loops.
-However, there are other models of artificial neural networks in which feedback loops are possible. These models are called recurrent neural networks. The idea in these models is to have neurons which fire for some limited duration of time, before becoming quiescent. That firing can stimulate other neurons, which may fire a little while later, also for a limited duration. That causes still more neurons to fire, and so over time we get a cascade of neurons firing. Loops don't cause problems in such a model, since a neuron's output only affects its input at some later time, not instantaneously.
+
+Up to now, we've been discussing neural networks where the output from one layer is used as input to the next layer. Such networks are called \textit{feedforward} neural networks. This means there are no loops in the network - information is always fed forward, never fed back. If we did have loops, we'd end up with situations where the input to the $\sigma$ function depended on the output. That'd be hard to make sense of, and so we don't allow such loops.
+
+However, there are other models of artificial neural networks in which feedback loops are possible. These models are called recurrent neural networks\cite{WikiPediaRNN2019}. The idea in these models is to have neurons which fire for some limited duration of time, before becoming quiescent. That firing can stimulate other neurons, which may fire a little while later, also for a limited duration. That causes still more neurons to fire, and so over time we get a cascade of neurons firing. Loops don't cause problems in such a model, since a neuron's output only affects its input at some later time, not instantaneously.
+
 Recurrent neural nets have been less influential than feedforward networks, in part because the learning algorithms for recurrent nets are (at least to date) less powerful. But recurrent networks are still extremely interesting. They're much closer in spirit to how our brains work than feedforward networks. And it's possible that recurrent networks can solve important problems which can only be solved with great difficulty by feedforward networks. However, to limit our scope, in this book we're going to concentrate on the more widely-used feedforward networks.
-A simple network to classify handwritten digits
+
+\section{A simple network to classify handwritten digits}
+
 Having defined neural networks, let's return to handwriting recognition. We can split the problem of recognizing handwritten digits into two sub-problems. First, we'd like a way of breaking an image containing many digits into a sequence of separate images, each containing a single digit. For example, we'd like to break the image
 
 into six separate images,
