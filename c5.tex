@@ -66,7 +66,7 @@ for each neuron, i.e., the rate of change of the cost with respect to the neuron
 To keep the diagram simple, I've shown just the top six neurons in the two hidden layers. I've omitted the input neurons, since they've got no weights or biases to learn. I've also omitted the output neurons, since we're doing layer-wise comparisons, and it makes most sense to compare layers with the same number of neurons. The results are plotted at the very beginning of training, i.e., immediately after the network is initialized. Here they are* *The data plotted is generated using the program generate_gradient.py. The same program is also used to generate the results quoted later in this section.:
 The network was initialized randomly, and so it's not surprising that there's a lot of variation in how rapidly the neurons learn. Still, one thing that jumps out is that the bars in the second hidden layer are mostly much larger than the bars in the first hidden layer. As a result, the neurons in the second hidden layer will learn quite a bit faster than the neurons in the first hidden layer. Is this merely a coincidence, or are the neurons in the second hidden layer likely to learn faster than neurons in the first hidden layer in general?
 To determine whether this is the case, it helps to have a global way of comparing the speed of learning in the first and second hidden layers. To do this, let's denote the gradient as ?lj=?C/?blj
-, i.e., the gradient for the jth neuron in the lth layer* *Back in Chapter 2 we referred to this as the error, but here we'll adopt the informal term ``gradient". I say ``informal'' because of course this doesn't explicitly include the partial derivatives of the cost with respect to the weights, ?C/?w.. We can think of the gradient ?1 as a vector whose entries determine how quickly the first hidden layer learns, and ?2 as a vector whose entries determine how quickly the second hidden layer learns. We'll then use the lengths of these vectors as (rough!) global measures of the speed at which the layers are learning. So, for instance, the length ??1? measures the speed at which the first hidden layer is learning, while the length ??2?
+, i.e., the gradient for the jth neuron in the lth layer* *Back in Chapter 2 we referred to this as the error, but here we'll adopt the informal term ``gradient''. I say ``informal'' because of course this doesn't explicitly include the partial derivatives of the cost with respect to the weights, ?C/?w.. We can think of the gradient ?1 as a vector whose entries determine how quickly the first hidden layer learns, and ?2 as a vector whose entries determine how quickly the second hidden layer learns. We'll then use the lengths of these vectors as (rough!) global measures of the speed at which the layers are learning. So, for instance, the length ??1? measures the speed at which the first hidden layer is learning, while the length ??2?
 measures the speed at which the second hidden layer is learning.
 With these definitions, and in the same configuration as was plotted above, we find ??1?=0.07?
 and ??2?=0.31?
@@ -93,7 +93,7 @@ network for the MNIST problem. The random initialization means the first layer t
 What's causing the vanishing gradient problem? Unstable gradients in deep neural nets
 To get insight into why the vanishing gradient problem occurs, let's consider the simplest deep neural network: one with just a single neuron in each layer. Here's a network with three hidden layers: 
 
-Here, $w_1$,w2,?
+Here, $w_1$,$w_2$,?
 are the weights, b1,b2,? are the biases, and C is some cost function. Just to remind you how this works, the output aj from the jth neuron is ?(zj), where ? is the usual sigmoid activation function, and zj=wjaj?1+bj is the weighted input to the neuron. I've drawn the cost C at the end to emphasize that the cost is a function of the network's output, a4
 : if the actual output from the network is close to the desired output, then the cost will be low, while if it's far away, the cost will be high.
 We're going to study the gradient ?C/?b1
@@ -113,21 +113,21 @@ in the bias b1. That will set off a cascading series of changes in the rest of t
 This suggests that we can figure out an expression for the gradient ?C/?b1
 by carefully tracking the effect of each step in this cascade.
 To do this, let's think about how ?b1
-causes the output a1 from the first hidden neuron to change. We have a1=?(z1)=?(w1a0+b1), so 
-?a1?=??(w1a0+b1)?b1?b1??(z1)?b1.(115)(116)
-That ??(z1) term should look familiar: it's the first term in our claimed expression for the gradient ?C/?b1. Intuitively, this term converts a change ?b1 in the bias into a change ?a1 in the output activation. That change ?a1 in turn causes a change in the weighted input z2=w2a1+b2 to the second hidden neuron: 
-?z2?=?z2?a1?a1w2?a1.(117)(118)
+causes the output a1 from the first hidden neuron to change. We have a1=?(z1)=?($w_1$a0+b1), so 
+?a1?=??($w_1$a0+b1)?b1?b1??(z1)?b1.(115)(116)
+That ??(z1) term should look familiar: it's the first term in our claimed expression for the gradient ?C/?b1. Intuitively, this term converts a change ?b1 in the bias into a change ?a1 in the output activation. That change ?a1 in turn causes a change in the weighted input z2=$w_2$a1+b2 to the second hidden neuron: 
+?z2?=?z2?a1?a1$w_2$?a1.(117)(118)
 Combining our expressions for ?z2 and ?a1, we see how the change in the bias b1 propagates along the network to affect z2: 
-?z2???(z1)w2?b1.(119)
+?z2???(z1)$w_2$?b1.(119)
 Again, that should look familiar: we've now got the first two terms in our claimed expression for the gradient ?C/?b1
 .
 We can keep going in this fashion, tracking the way changes propagate through the rest of the network. At each neuron we pick up a ??(zj)
 term, and through each weight we pick up a wj term. The end result is an expression relating the final change ?C in cost to the initial change ?b1 in the bias: 
-?C???(z1)w2??(z2)???(z4)?C?a4?b1.(120)
+?C???(z1)$w_2$??(z2)???(z4)?C?a4?b1.(120)
 Dividing by ?b1 we do indeed get the desired expression for the gradient: 
-?C?b1=??(z1)w2??(z2)???(z4)?C?a4.(121)
+?C?b1=??(z1)$w_2$??(z2)???(z4)?C?a4.(121)
 Why the vanishing gradient problem occurs: To understand why the vanishing gradient problem occurs, let's explicitly write out the entire expression for the gradient: 
-?C?b1=??(z1)w2??(z2)w3??(z3)w4??(z4)?C?a4.(122)
+?C?b1=??(z1)$w_2$??(z2)$w_3$??(z3)w4??(z4)?C?a4.(122)
 Excepting the very last term, this expression is a product of terms of the form wj??(zj). To understand how each of those terms behave, let's look at a plot of the function ??
 : 
 -4-3-2-1012340.000.050.100.150.200.25
@@ -144,8 +144,8 @@ Of course, this is an informal argument, not a rigorous proof that the vanishing
 could grow during training. If they do, it's possible the terms wj??(zj) in the product will no longer satisfy |wj??(zj)|<1/4. Indeed, if the terms get large enough - greater than 1
 - then we will no longer have a vanishing gradient problem. Instead, the gradient will actually grow exponentially as we move backward through the layers. Instead of a vanishing gradient problem, we'll have an exploding gradient problem.
 The exploding gradient problem: Let's look at an explicit example where exploding gradients occur. The example is somewhat contrived: I'm going to fix parameters in the network in just the right way to ensure we get an exploding gradient. But even though the example is contrived, it has the virtue of firmly establishing that exploding gradients aren't merely a hypothetical possibility, they really can happen.
-There are two steps to getting an exploding gradient. First, we choose all the weights in the network to be large, say $w_1$=w2=w3=w4=100
-. Second, we'll choose the biases so that the ??(zj) terms are not too small. That's actually pretty easy to do: all we need do is choose the biases to ensure that the weighted input to each neuron is zj=0 (and so ??(zj)=1/4). So, for instance, we want z1=w1a0+b1=0. We can achieve this by setting b1=?100?a0. We can use the same idea to select the other biases. When we do this, we see that all the terms wj??(zj) are equal to 100?14=25
+There are two steps to getting an exploding gradient. First, we choose all the weights in the network to be large, say $w_1$=$w_2$=$w_3$=w4=100
+. Second, we'll choose the biases so that the ??(zj) terms are not too small. That's actually pretty easy to do: all we need do is choose the biases to ensure that the weighted input to each neuron is zj=0 (and so ??(zj)=1/4). So, for instance, we want z1=$w_1$a0+b1=0. We can achieve this by setting b1=?100?a0. We can use the same idea to select the other biases. When we do this, we see that all the terms wj??(zj) are equal to 100?14=25
 . With these choices we get an exploding gradient.
 The unstable gradient problem: The fundamental problem here isn't so much the vanishing gradient problem or the exploding gradient problem. It's that the gradient in early layers is the product of terms from all the later layers. When there are many layers, that's an intrinsically unstable situation. The only way all layers can learn at close to the same speed is if all those products of terms come close to balancing out. Without some mechanism or underlying reason for that balancing to occur, it's highly unlikely to happen simply by chance. In short, the real problem here is that neural networks suffer from an unstable gradient problem. As a result, if we use standard gradient-based learning techniques, different layers in the network will tend to learn at wildly different speeds.
 Exercise
@@ -160,7 +160,7 @@ Problems
 2|w|ln(|w|(1+1?4/|w|?????????)2?1).(123)
 (3) Show numerically that the above expression bounding the width of the range is greatest at |w|?6.9, where it takes a value ?0.45
 *  . And so even given that everything lines up just perfectly, we still have a fairly narrow range of input activations which can avoid the vanishing gradient problem.
-*  Identity neuron: Consider a neuron with a single input, x, a corresponding weight, $w_1$, a bias b, and a weight $w_2$ on the output. Show that by choosing the weights and bias appropriately, we can ensure $w_2$?(w1x+b)?x for x?[0,1]. Such a neuron can thus be used as a kind of identity neuron, that is, a neuron whose output is the same (up to rescaling by a weight factor) as its input. Hint: It helps to rewrite x=1/2+?, to assume $w_1$ is small, and to use a Taylor series expansion in $w_1$?
+*  Identity neuron: Consider a neuron with a single input, x, a corresponding weight, $w_1$, a bias b, and a weight $w_2$ on the output. Show that by choosing the weights and bias appropriately, we can ensure $w_2$?($w_1$x+b)?x for x?[0,1]. Such a neuron can thus be used as a kind of identity neuron, that is, a neuron whose output is the same (up to rescaling by a weight factor) as its input. Hint: It helps to rewrite x=1/2+?, to assume $w_1$ is small, and to use a Taylor series expansion in $w_1$?
 * . 
 Unstable gradients in more complex networks
 We've been studying toy networks, with just one neuron in each hidden layer. What about more complex deep networks, with many neurons in each hidden layer?
@@ -180,7 +180,7 @@ In this chapter we've focused on vanishing gradients - and, more generally, unst
 As a first example, in 2010 Glorot and Bengio* *Understanding the difficulty of training deep feedforward neural networks, by Xavier Glorot and Yoshua Bengio (2010). See also the earlier discussion of the use of sigmoids in Efficient BackProp, by Yann LeCun, L?on Bottou, Genevieve Orr and Klaus-Robert M?ller (1998). found evidence suggesting that the use of sigmoid activation functions can cause problems training deep networks. In particular, they found evidence that the use of sigmoids will cause the activations in the final hidden layer to saturate near 0
 early in training, substantially slowing down learning. They suggested some alternative activation functions, which appear not to suffer as much from this saturation problem.
 As a second example, in 2013 Sutskever, Martens, Dahl and Hinton* *On the importance of initialization and momentum in deep learning, by Ilya Sutskever, James Martens, George Dahl and Geoffrey Hinton (2013). studied the impact on deep learning of both the random weight initialization and the momentum schedule in momentum-based stochastic gradient descent. In both cases, making good choices made a substantial difference in the ability to train deep networks.
-These examples suggest that ``What makes deep networks hard to train?" is a complex question. In this chapter, we've focused on the instabilities associated to gradient-based learning in deep networks. The results in the last two paragraphs suggest that there is also a role played by the choice of activation function, the way weights are initialized, and even details of how learning by gradient descent is implemented. And, of course, choice of network architecture and other hyper-parameters is also important. Thus, many factors can play a role in making deep networks hard to train, and understanding all those factors is still a subject of ongoing research. This all seems rather downbeat and pessimism-inducing. But the good news is that in the next chapter we'll turn that around, and develop several approaches to deep learning that to some extent manage to overcome or route around all these challenges.
+These examples suggest that ``What makes deep networks hard to train?'' is a complex question. In this chapter, we've focused on the instabilities associated to gradient-based learning in deep networks. The results in the last two paragraphs suggest that there is also a role played by the choice of activation function, the way weights are initialized, and even details of how learning by gradient descent is implemented. And, of course, choice of network architecture and other hyper-parameters is also important. Thus, many factors can play a role in making deep networks hard to train, and understanding all those factors is still a subject of ongoing research. This all seems rather downbeat and pessimism-inducing. But the good news is that in the next chapter we'll turn that around, and develop several approaches to deep learning that to some extent manage to overcome or route around all these challenges.
 
 
 \end{lstlisting}
