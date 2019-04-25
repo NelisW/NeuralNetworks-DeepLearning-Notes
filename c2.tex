@@ -25,7 +25,7 @@ With these notations in mind, Equation (23) can be rewritten in the beautiful an
 
 This expression gives us a much more global way of thinking about how the activations in one layer relate to activations in the previous layer: we just apply the weight matrix to the activations, then add the bias vector, and finally apply the ? function* 
 
-*By the way, it's this expression that motivates the quirk in the wljk notation mentioned earlier. If we used j to index the input neuron, and k to index the output neuron, then we'd need to replace the weight matrix in Equation (25) by the transpose of the weight matrix. That's a small change, but annoying, and we'd lose the easy simplicity of saying (and thinking) "apply the weight matrix to the activations".
+*By the way, it's this expression that motivates the quirk in the wljk notation mentioned earlier. If we used j to index the input neuron, and k to index the output neuron, then we'd need to replace the weight matrix in Equation (25) by the transpose of the weight matrix. That's a small change, but annoying, and we'd lose the easy simplicity of saying (and thinking) ``apply the weight matrix to the activations".
 
 That global view is often easier and more succinct (and involves fewer indices!) than the neuron-by-neuron view we've taken to now. Think of it as a way of escaping index hell, while remaining precise about what's going on. The expression is also useful in practice, because most matrix libraries provide fast ways of implementing matrix multiplication, vector addition, and vectorization. Indeed, the code in the last chapter made implicit use of this expression to compute the behaviour of the network.
 When using Equation (25) to compute al, we compute the intermediate quantity zl?wlal?1+bl along the way. This quantity turns out to be useful enough to be worth naming: we call zl the weighted input to the neurons in layer l. We'll make considerable use of the weighted input zl later in the chapter. Equation (25) is sometimes written in terms of the weighted input, as al=?(zl). It's also worth noting that zl has components , that is, zlj is just the weighted input to the activation function for neuron j in layer l
@@ -60,7 +60,7 @@ of neuron j in layer l by
 As per our usual conventions, we use ?l to denote the vector of errors associated with layer l. Backpropagation will give us a way of computing ?l for every layer, and then relating those errors to the quantities of real interest, ?C/?wljk and ?C/?blj
 .
 You might wonder why the demon is changing the weighted input zlj
-. Surely it'd be more natural to imagine the demon changing the output activation alj, with the result that we'd be using ?C?alj as our measure of error. In fact, if you do this things work out quite similarly to the discussion below. But it turns out to make the presentation of backpropagation a little more algebraically complicated. So we'll stick with ?lj=?C?zlj as our measure of error* *In classification problems like MNIST the term "error" is sometimes used to mean the classification failure rate. E.g., if the neural net correctly classifies 96.0 percent of the digits, then the error is 4.0 percent. Obviously, this has quite a different meaning from our ?
+. Surely it'd be more natural to imagine the demon changing the output activation alj, with the result that we'd be using ?C?alj as our measure of error. In fact, if you do this things work out quite similarly to the discussion below. But it turns out to make the presentation of backpropagation a little more algebraically complicated. So we'll stick with ?lj=?C?zlj as our measure of error* *In classification problems like MNIST the term ``error'' is sometimes used to mean the classification failure rate. E.g., if the neural net correctly classifies 96.0 percent of the digits, then the error is 4.0 percent. Obviously, this has quite a different meaning from our ?
 vectors. In practice, you shouldn't have trouble telling which meaning is intended in any given usage..
 Plan of attack: Backpropagation is based around four fundamental equations. Together, those equations give us a way of computing both the error ?l
 and the gradient of the cost function. I state the four equations below. Be warned, though: you shouldn't expect to instantaneously assimilate the equations. Such an expectation will lead to disappointment. In fact, the backpropagation equations are so rich that understanding them well requires considerable time and patience as you gradually delve deeper into the equations. The good news is that such patience is repaid many times over. And so the discussion in this section is merely a beginning, helping you on the way to a thorough understanding of the equations.
@@ -191,7 +191,7 @@ class Network(object):
     def update_mini_batch(self, mini_batch, eta):
         """Update the network's weights and biases by applying
         gradient descent using backpropagation to a single mini batch.
-        The "mini_batch" is a list of tuples "(x, y)", and "eta"
+        The ``mini_batch'' is a list of tuples "(x, y)", and ``eta"
         is the learning rate."""
         nabla_b = [np.zeros(b.shape) for b in self.biases]
         nabla_w = [np.zeros(w.shape) for w in self.weights]
@@ -210,9 +210,9 @@ class Network(object):
 ...
    def backprop(self, x, y):
         """Return a tuple "(nabla_b, nabla_w)" representing the
-        gradient for the cost function C_x.  "nabla_b" and
-        "nabla_w" are layer-by-layer lists of numpy arrays, similar
-        to "self.biases" and "self.weights"."""
+        gradient for the cost function C_x.  ``nabla_b'' and
+        ``nabla_w'' are layer-by-layer lists of numpy arrays, similar
+        to ``self.biases'' and ``self.weights"."""
         nabla_b = [np.zeros(b.shape) for b in self.biases]
         nabla_w = [np.zeros(w.shape) for w in self.weights]
         # feedforward
@@ -266,7 +266,7 @@ Problem
 * whose columns are the vectors in the mini-batch. We forward-propagate by multiplying by the weight matrices, adding a suitable matrix for the bias terms, and applying the sigmoid function everywhere. We backpropagate along similar lines. Explicitly write out pseudocode for this approach to the backpropagation algorithm. Modify network.py so that it uses this fully matrix-based approach. The advantage of this approach is that it takes full advantage of modern libraries for linear algebra. As a result it can be quite a bit faster than looping over the mini-batch. (On my laptop, for example, the speedup is about a factor of two when run on MNIST classification problems like those we considered in the last chapter.) In practice, all serious libraries for backpropagation use this fully matrix-based approach or some variant. 
 In what sense is backpropagation a fast algorithm?
 In what sense is backpropagation a fast algorithm? To answer this question, let's consider another approach to computing the gradient. Imagine it's the early days of neural networks research. Maybe it's the 1950s or 1960s, and you're the first person in the world to think of using gradient descent to learn! But to make the idea work you need a way of computing the gradient of the cost function. You think back to your knowledge of calculus, and decide to see if you can use the chain rule to compute the gradient. But after playing around a bit, the algebra looks complicated, and you get discouraged. So you try to find another approach. You decide to regard the cost as a function of the weights C=C(w)
-alone (we'll get back to the biases in a moment). You number the weights w1,w2,?, and want to compute ?C/?wj for some particular weight wj. An obvious way of doing that is to use the approximation 
+alone (we'll get back to the biases in a moment). You number the weights $w_1$,w2,?, and want to compute ?C/?wj for some particular weight wj. An obvious way of doing that is to use the approximation 
 ?C?wj?C(w+?ej)?C(w)?,(46)
 where ?>0 is a small positive number, and ej is the unit vector in the jth direction. In other words, we can estimate ?C/?wj by computing the cost C for two slightly different values of wj, and then applying Equation (46). The same idea will let us compute the partial derivatives ?C/?b
 with respect to the biases.

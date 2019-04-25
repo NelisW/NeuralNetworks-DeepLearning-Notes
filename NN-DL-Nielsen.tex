@@ -3,14 +3,14 @@
 \documentclass[12pt,a4paper,english]{memoir}
 
 % New setup
-\setstocksize{297mm}{210mm}
-\settrimmedsize{11in}{210mm}{*}
+%\setstocksize{297mm}{210mm}
+\settrimmedsize{297mm}{210mm}{*}
 \setlength{\trimtop}{0pt}
 \setlength{\trimedge}{\stockwidth}
 \addtolength{\trimedge}{-\paperwidth}
-\settypeblocksize{9.5in}{40pc}{*}
-\setulmargins{2cm}{*}{*}
-\setlrmargins{1in}{*}{*}
+\settypeblocksize{24cm}{150mm}{*}
+\setulmargins{25mm}{*}{*}
+\setlrmargins{30mm}{*}{*}
 \setmarginnotes{17pt}{51pt}{\onelineskip}
 \setheadfoot{\onelineskip}{2\onelineskip}
 \setheaderspaces{*}{2\onelineskip}{*}
@@ -35,14 +35,10 @@
 
 \usepackage{graphicx}
 %\usepackage{lastpage}
+\usepackage{palatino} 
 
 \input{commands.tex}
 
-%\ifx\pdfoutput\undefined
-%\usepackage{pstcol}
-%\else
-%\usepackage{eso-pic}
-%\fi
 
 %the following is required for carriage return symbol
 %ftp://ftp.botik.ru/rented/znamensk/CTAN/fonts/mathabx/texinputs/mathabx.dcl
@@ -116,12 +112,12 @@ http://neuralnetworksanddeeplearning.com/index.html
 \titleTH
 \include{c0} % front matter
 \include{c1} %
-%\include{c2} %
-%\include{c3} %
-%\include{c4} %
-%\include{c5} %
-%\include{c6} %
-%\include{c7} %
+\include{c2} %
+\include{c3} %
+\include{c4} %
+\include{c5} %
+\include{c6} %
+\include{c7} %
 \include{c8} %
 
 
