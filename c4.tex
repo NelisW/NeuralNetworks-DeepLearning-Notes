@@ -5,6 +5,13 @@
 
 \lstinline{http://neuralnetworksanddeeplearning.com/chap4.html}
 
+\section*{Note on Interactivity}
+
+The original version of this chapter (see the URI above) has interactive graphics where the reader can change values and observe the effect. The \LaTeX{} version does not have the interactivity. You are advised to visit the web page.  Alternatively, the repository that contains the \LaTeX{} source code has a Jupyter notebook with interactive plotting widgets, see \lstinline{code/chapter4-graphics.ipynb}.
+
+
+\section{Neural Net as Function Calculator}
+
 One of the most striking facts about neural networks is that they can compute any function at all. That is, suppose someone hands you some complicated, wiggly function, $f(x)$
 
 {\centering \includegraphics[width=0.4\textwidth,]{pic/wigglyfn01.png} \par}
@@ -62,11 +69,11 @@ To build insight into how to construct a network to compute $f$, let's start wit
 
 {\centering \includegraphics[width=0.4\textwidth,]{pic/wigglyfn06.png} \par}
 
-To get a feel for how components in the network work, let's focus on the top hidden neuron. In the original HTML version of this document, this diagram is shown, 
+To get a feel for how components in the network work, let's focus on the top hidden neuron. In the diagram below\footnote{This only works in the HTML version or the Jupyter notebook.}, click on the weight, $w$, and drag the mouse a little ways to the right to increase $w$. You can immediately see how the function computed by the top hidden neuron changes:
 
 {\centering \includegraphics[width=\textwidth,]{pic/wigglyfn07.png} \par}
 
-and reader can click on the weight, $w$, and drag the mouse a little ways to the right to increase $w$. This \LaTeX{} version does not have interactivity, so the graphs are precomputed, using Equation~\ref{eq:c01-03-sigmoidfunction} and following code to obtain the graphs shown below.
+The \LaTeX{} version does not have interactivity, so the graphs are pre-computed, using Equation~\ref{eq:c01-03-sigmoidfunction} and following code to obtain the graphs shown below.
 
 \begin{lstlisting}
 x = np.linspace(0,1,300)
@@ -85,6 +92,18 @@ Observe how the output (vertical axis) changes as $w$ changes (downward in the s
 
 As we learnt earlier in the book, what's being computed by the hidden neuron is $\sigma (wx+b)$, where $\sigma(z)=1/(1+e^{-z})$ is the sigmoid function. Up to now, we've made frequent use of this algebraic form. But for the proof of universality we will obtain more insight by ignoring the algebra entirely, and instead manipulating and observing the shape shown in the graph. This won't just give us a better feel for what's going on, it will also give us a proof\footnote{Strictly speaking, the visual approach I'm taking isn't what's traditionally thought of as a proof. But I believe the visual approach gives more insight into why the result is true than a traditional proof. And, of course, that kind of insight is the real purpose behind a proof. Occasionally, there will be small gaps in the reasoning I present: places where I make a visual argument that is plausible, but not quite rigorous. If this bothers you, then consider it a challenge to fill in the missing steps. But don't lose sight of the real purpose: to understand why the universality theorem is true.} of universality that applies to activation functions other than the sigmoid function.
 
+To get started on this proof, try clicking on the bias, $b$, in the diagram above, and dragging to the right to increase it. You'll see that as the bias increases the graph moves to the left, but its shape doesn't change.
+
+Next, click and drag to the left in order to decrease the bias. You'll see that as the bias decreases the graph moves to the right, but, again, its shape doesn't change.
+
+Next, decrease the weight to around 2 or 3. You'll see that as you decrease the weight, the curve broadens out. You might need to change the bias as well, in order to keep the curve in-frame.
+
+Finally, increase the weight up past $w=100$. As you do, the curve gets steeper, until eventually it begins to look like a step function. Try to adjust the bias so the step occurs near $x=0.3$. The following short clip shows what your result should look like 
+
+[see the HTML page for the video].
+
+
+
 In the set of graphs above and below, observe  that as the bias $b$ increases/decreases the graph moves to the left/right, but its shape doesn't change.
 Next observe the effect of changing the weight $w$: the curve broadens or narrows. As $w$ increases the curve becomes narrower and steeper.
 
@@ -101,11 +120,9 @@ We can simplify our analysis quite a bit by increasing the weight so much that t
 It's actually quite a bit easier to work with step functions than general sigmoid functions. The reason is that in the output layer we add up contributions from all the hidden neurons. It's easy to analyze the sum of a bunch of step functions, but rather more difficult to reason about what happens when you add up a bunch of sigmoid shaped curves. And so it makes things much easier to assume that our hidden neurons are outputting step functions. More concretely, we do this by fixing the weight w
 to be some very large value, and then setting the position of the step by modifying the bias. Of course, treating the output as a step function is an approximation, but it's a very good approximation, and for now we'll treat it as exact. I'll come back later to discuss the impact of deviations from this approximation.
 
-
-
 At what value of $x$ does the step occur? Put another way, how does the position of the step depend upon the weight and bias?
 
-To answer this question, visit the HTML page for this chapter and try modifying the weight and bias in the diagram above (you may need to scroll back a bit). Can you figure out how the position of the step depends on $w$ and $b$? With a little work you should be able to convince yourself that the position of the step is \textit{proportional} to $b$, and \textit{inversely proportional} to $w$.
+To answer this question, visit the HTML page for this chapter or open the Jupyter notebook, and try modifying the weight and bias in the diagram above (you may need to scroll back a bit). Can you figure out how the position of the step depends on $w$ and $b$? With a little work you should be able to convince yourself that the position of the step is \textit{proportional} to $b$, and \textit{inversely proportional} to $w$.
 In fact, the step is at position $s=-b/w$, as you can see by modifying the weight and bias in the following diagram:
 
 {\centering \includegraphics[width=\textwidth,]{pic/wigglyfn09.png} \par}
@@ -125,40 +142,52 @@ Up to now we've been focusing on the output from just the top hidden neuron. Let
 
 What's being plotted on the right is the weighted output $w_1a_1+w_2a_2$ from the hidden layer. Here, $a_1$ and $a_2$ are the outputs from the top and bottom hidden neurons, respectively\footnote{Note, by the way, that the output from the whole network is $\sigma(w_1a_1+w_2a_2+b)$, where $b$ is the bias on the output neuron. Obviously, this isn't the same as the weighted output from the hidden layer, which is what we're plotting here. We're going to focus on the weighted output from the hidden layer right now, and only later will we think about how that relates to the output from the whole network.}. These outputs are denoted with $a$s because they're often known as the neurons' activations.
 
-Try increasing and decreasing the step point $s_1$ of the top hidden neuron. Get a feel for how this changes the weighted output from the hidden layer. It's particularly worth understanding what happens when $s_1$ goes past $s_2$. 
+Try increasing and decreasing the step point $s_1$ of the top hidden neuron. Get a feel for how this changes the weighted output from the hidden layer. It's particularly worth understanding what happens when $s_1$ goes past $s_2$.  You'll see that the graph changes shape when this happens, since we have moved from a situation where the top hidden neuron is the first to be activated to a situation where the bottom hidden neuron is the first to be activated.
 
-\begin{lstlisting}
+{\centering \includegraphics[width=\textwidth,]{pic/wigglyfn12.png} \par}
 
+{\centering \includegraphics[width=\textwidth,]{pic/wigglyfn13.png} \par}
 
-You'll see that the graph changes shape when this happens, since we have moved from a situation where the top hidden neuron is the first to be activated to a situation where the bottom hidden neuron is the first to be activated.
-Similarly, try manipulating the step point s2
-of the bottom hidden neuron, and get a feel for how this changes the combined output from the hidden neurons.
+Similarly, try manipulating the step point s2 of the bottom hidden neuron, and get a feel for how this changes the combined output from the hidden neurons.
 Try increasing and decreasing each of the output weights. Notice how this rescales the contribution from the respective hidden neurons. What happens when one of the weights is zero?
-Finally, try setting $w_1$
-to be 0.8 and $w_2$ to be ?0.8. You get a ``bump'' function, which starts at point s1, ends at point s2, and has height 0.8
-. For instance, the weighted output might look like this:
 
-Of course, we can rescale the bump to have any height at all. Let's use a single parameter, h
-, to denote the height. To reduce clutter I'll also remove the ``s1=?'' and ``$w_1$=?
-" notations.
-Try changing the value of h
-up and down, to see how the height of the bump changes. Try changing the height so it's negative, and observe what happens. And try changing the step points to see how that changes the shape of the bump.
-You'll notice, by the way, that we're using our neurons in a way that can be thought of not just in graphical terms, but in more conventional programming terms, as a kind of if-then-else statement, e.g.:
+Finally, try setting w1 to be 0.8 and w2 to be -0.8. You get a ``bump'' function, which starts at point s1, ends at point s2, and has height 0.8.
+ For instance, the weighted output might look like this:
+
+{\centering \includegraphics[width=\textwidth,]{pic/wigglyfn14.png} \par}
+
+Of course, we can rescale the bump to have any height at all. Let's use a single parameter, $h$, to denote the height. To reduce clutter I'll also remove the ``s1=$\ldots$'' and ``$w_1$=$\ldots$'' notations.
+Try changing the value of $h$ up and down, to see how the height of the bump changes. Try changing the height so it's negative, and observe what happens. And try changing the step points to see how that changes the shape of the bump.
+
+You'll notice, by the way, that we're using our neurons in a way that can be thought of not just in graphical terms, but in more conventional programming terms, as a kind of \lstinline{if-then-else} statement, e.g.:
+\begin{lstlisting}
     if input >= step point:
         add 1 to the weighted output
     else:
         add 0 to the weighted output
-For the most part I'm going to stick with the graphical point of view. But in what follows you may sometimes find it helpful to switch points of view, and think about things in terms of if-then-else.
+\end{lstlisting}
+
+
+For the most part I'm going to stick with the graphical point of view. But in what follows you may sometimes find it helpful to switch points of view, and think about things in terms of \lstinline{if-then-else}.
+
+
 We can use our bump-making trick to get two bumps, by gluing two pairs of hidden neurons together into the same network:
-I've suppressed the weights here, simply writing the h values for each pair of hidden neurons. Try increasing and decreasing both h
-values, and observe how it changes the graph. Move the bumps around by changing the step points.
+
+{\centering \includegraphics[width=\textwidth,]{pic/wigglyfn15.png} \par}
+
+I've suppressed the weights here, simply writing the $h$ values for each pair of hidden neurons. Try increasing and decreasing both $h$ values, and observe how it changes the graph. Move the bumps around by changing the step points.
+
 More generally, we can use this idea to get as many peaks as we want, of any height. In particular, we can divide the interval [0,1]
-up into a large number, N, of subintervals, and use N pairs of hidden neurons to set up peaks of any desired height. Let's see how this works for N=5
-. That's quite a few neurons, so I'm going to pack things in a bit. Apologies for the complexity of the diagram: I could hide the complexity by abstracting away further, but I think it's worth putting up with a little complexity, for the sake of getting a more concrete feel for how these networks work.
-You can see that there are five pairs of hidden neurons. The step points for the respective pairs of neurons are 0,1/5, then 1/5,2/5, and so on, out to 4/5,5/5
-. These values are fixed - they make it so we get five evenly spaced bumps on the graph.
-Each pair of neurons has a value of h
-associated to it. Remember, the connections output from the neurons have weights h and ?h (not marked). Click on one of the h
+up into a large number, $N$, of subintervals, and use $N$ pairs of hidden neurons to set up peaks of any desired height. Let's see how this works for $N=5$. That's quite a few neurons, so I'm going to pack things in a bit. Apologies for the complexity of the diagram: I could hide the complexity by abstracting away further, but I think it's worth putting up with a little complexity, for the sake of getting a more concrete feel for how these networks work.
+
+
+{\centering \includegraphics[width=\textwidth,]{pic/wigglyfn16.png} \par}
+
+You can see that there are five pairs of hidden neurons. The step points for the respective pairs of neurons are 0,1/5, then 1/5,2/5, and so on, out to 4/5,5/5. These values are fixed - they make it so we get five evenly spaced bumps on the graph.
+\begin{lstlisting}
+
+
+Each pair of neurons has a value of $h$ associated to it. Remember, the connections output from the neurons have weights h and ?h (not marked). Click on one of the h
 values, and drag the mouse to the right or left to change the value. As you do so, watch the function change. By changing the output weights we're actually designing the function!
 Contrariwise, try clicking on the graph, and dragging up or down to change the height of any of the bump functions. As you change the heights, you can see the corresponding change in h
 values. And, although it's not shown, there is also a change in the corresponding output weights, which are +h and ?h
