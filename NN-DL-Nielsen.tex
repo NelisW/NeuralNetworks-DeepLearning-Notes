@@ -37,6 +37,8 @@
 %\usepackage{lastpage}
 \usepackage{palatino} 
 
+\usepackage{tcolorbox} % for box-style TBC
+
 \input{commands.tex}
 
 
@@ -50,42 +52,6 @@
       }{}
 \DeclareSymbolFont{mathb}{U}{mathb}{m}{n}
 \DeclareMathSymbol{\dlsh}{3}{mathb}{"EA}
-
-\lstset{
-upquote=true, % gives the upquote instead of the curly quote
-basicstyle=\footnotesize\ttfamily,
-%numbers=left,
-numberstyle=\tiny,
-%stepnumber=2,
-numbersep=5pt,
-tabsize=2,
-extendedchars=true,
-breaklines=true,
-keywordstyle=\color{red},
-frame=b,
-stringstyle=\color{white}\ttfamily,
-showspaces=false,
-showtabs=false,   
-xleftmargin=17pt,
-framexleftmargin=17pt,
-framexrightmargin=5pt,
-framexbottommargin=4pt,
-%backgroundcolor=\color{lightgray},
-showstringspaces=false
-}
-
-\lstloadlanguages{% Check Documentation for further languages ...
-		%C
-		%C++
-		%XML
-		TeX
-		%Matlab
- }
-%\DeclareCaptionFont{blue}{\color{blue}}
-%\captionsetup[lstlisting]{singlelinecheck=false, labelfont={blue}, textfont={blue}}
-\DeclareCaptionFont{white}{\color{white}}
-\DeclareCaptionFormat{listing}{\colorbox[cmyk]{0.43, 0.35, 0.35,0.01}{\parbox{\textwidth}{\hspace{15pt}#1#2#3}}}
-\captionsetup[lstlisting]{format=listing,labelfont=white,textfont=white, singlelinecheck=false, margin=0pt, font={bf,footnotesize}}
 
 \newcommand*{\titleTH}{\begingroup%
 \raggedleft
@@ -104,7 +70,7 @@ http://neuralnetworksanddeeplearning.com/index.html
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % files making up this document
 
-\includeonly{c0,c1,c2,c3,c4,c5,c6,c7,c8}
+\includeonly{c0,c1,c2,c3,c4,c5,c6,c7,c8,ca}
 
 %\includeonly{c1}
 
@@ -112,13 +78,15 @@ http://neuralnetworksanddeeplearning.com/index.html
 \titleTH
 \include{c0} % front matter
 \include{c1} %
-%\include{c2} %
-%\include{c3} %
-%\include{c4} %
-%\include{c5} %
-%\include{c6} %
-%\include{c7} %
+\include{c2} %
+\include{c3} %
+\include{c4} %
+\include{c5} %
+\include{c6} %
+\include{c7} %
 \include{c8} %
+\appendix
+\include{ca} %
 
 
 

@@ -11,7 +11,7 @@ One of the most striking facts about neural networks is that they can compute an
 No matter what the function, there is guaranteed to be a neural network so that for every possible input, x
 , the value f(x)
 (or some close approximation) is output from the network, e.g.:
-This result holds even if the function has many inputs, f=f($x_1$,?,xm)
+This result holds even if the function has many inputs, f=f($x_1$,$\ldots$,xm)
 , and many outputs. For instance, here's a network computing a function with m=3 inputs and n=2
 outputs:
 This result tells us that neural networks have a kind of universality. No matter what function we want to compute, we know that there is a neural network which can do the job.
@@ -251,8 +251,8 @@ everywhere else.
 By gluing together many such networks we can get as many towers as we want, and so approximate an arbitrary function of three variables. Exactly the same idea works in m
 dimensions. The only change needed is to make the output bias (?m+1/2)h
 , in order to get the right kind of sandwiching behavior to level the plateau.
-Okay, so we now know how to use neural networks to approximate a real-valued function of many variables. What about vector-valued functions f($x_1$,?,xm)?Rn
-? Of course, such a function can be regarded as just n separate real-valued functions, f1($x_1$,?,xm),f2($x_1$,?,xm), and so on. So we create a network approximating f1, another network for f2
+Okay, so we now know how to use neural networks to approximate a real-valued function of many variables. What about vector-valued functions f($x_1$,$\ldots$,xm)?Rn
+? Of course, such a function can be regarded as just n separate real-valued functions, f1($x_1$,$\ldots$,xm),f2($x_1$,$\ldots$,xm), and so on. So we create a network approximating f1, another network for f2
 , and so on. And then we simply glue all the networks together. So that's also easy to cope with.
 Problem
 * We've seen how to use networks with two hidden layers to approximate an arbitrary function. Can you find a proof showing that it's possible with just a single hidden layer? As a hint, try working in the case of just two input variables, and showing that: (a) it's possible to get step functions not just in the x

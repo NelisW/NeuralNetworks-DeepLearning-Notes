@@ -2,7 +2,7 @@
 
 
 
-\chapter{Using Neural Nets to Recognize Handwritten Digits}
+\chapter{Neural Nets Recognizing Handwritten Digits}
 \label{sec:UsingNeuralNetsTorRcognizeHandWrittenDigits}
 
 The human visual system is one of the wonders of the world. Consider the following sequence of handwritten digits: 
@@ -153,11 +153,13 @@ Okay, let me describe the sigmoid neuron. We'll depict sigmoid neurons in the sa
 
 Just like a perceptron, the sigmoid neuron has inputs, $x_1$,$x_2$,$\ldots$. But instead of being just 0 or 1, these inputs can also take on any values between 0 and 1. So, for instance, 0.638? is a valid input for a sigmoid neuron. Also just like a perceptron, the sigmoid neuron has weights for each input, $w_1$,$w_2$,,$\ldots$, and an overall bias, $b$. But the output is not 0 or 1. Instead, it's $\sigma(w \cdot x+b)$, where $\sigma()$ is called the \textit{sigmoid function}\footnote{Incidentally, $\sigma()$ is sometimes called the logistic function, and this new class of neurons called logistic neurons. It's useful to remember this terminology, since these terms are used by many people working with neural nets. However, we'll stick with the sigmoid terminology.}, and is defined by: 
 \begin{equation}
-\sigma(z) \equiv \frac{1}{1+e^{-z}}\label{eq:sigmoidfunction}
+\sigma(z) \equiv \frac{1}{1+e^{-z}}
+\label{eq:c01-03-sigmoidfunction}
 \end{equation}
 To put it all a little more explicitly, the output of a sigmoid neuron with inputs $x_1$,$x_2$,$\ldots$, weights $w_1$,$w_2$,$\ldots$, and bias $b$ is 
 \begin{equation}
 \frac{1}{1+\exp \left(-\sum_{j} w_{j} x_{j}-b\right)}
+\label{eq:ch01-04-sigmoidoutput}
 \end{equation}
 At first sight, sigmoid neurons appear very different to perceptrons. The algebraic form of the sigmoid function may seem opaque and forbidding if you're not already familiar with it. In fact, there are many similarities between perceptrons and sigmoid neurons, and the algebraic form of the sigmoid function turns out to be more of a technical detail than a true barrier to understanding.
 
@@ -180,15 +182,15 @@ If $\sigma$ had in fact been a step function, then the sigmoid neuron would be a
  By using the actual $\sigma$ function we get, as already implied above, a smoothed out perceptron. Indeed, it's the smoothness of the $\sigma$ function that is the crucial fact, not its detailed form. The smoothness of $\sigma$ means that small changes $\Delta w_j$ in the weights and $\Delta b$ in the bias will produce a small change $\Delta\textrm{output}$ in the output from the neuron. In fact, calculus tells us that $\Delta\textrm{output}$ is well approximated by 
 \begin{equation}
 \Delta \textrm { output } \approx \sum_{j} \frac{\partial \textrm { output }}{\partial w_{j}} \Delta w_{j}+\frac{\partial \textrm { output }}{\partial b} \Delta b
-\label{eq:partialderivsigmoid}
+\label{eq:c01-05-partialderivsigmoid}
 \end{equation}
 where the sum is over all the weights, $w_j$, and $\partial\textrm{output}/\partial w_j$ and $\partial\textrm{output}/\partial b$ denote partial derivatives of the output with respect to $w_j$ and $b$, respectively. Don't panic if you're not comfortable with partial derivatives! While the expression above looks complicated, with all the partial derivatives, it's actually saying something very simple (and which is very good news):  $\Delta\textrm{output}$  is a linear function of the changes $\Delta w_j$ and $\Delta b$ in the weights and bias. This linearity makes it easy to choose small changes in the weights and biases to achieve any desired small change in the output. So while sigmoid neurons have much of the same qualitative behaviour as perceptrons, they make it much easier to figure out how changing the weights and biases will change the output.
 
-If it's the shape of $\sigma$ which really matters, and not its exact form, then why use the particular form used for $\sigma$ in Equation~\ref{eq:sigmoidfunction}? In fact, later in the book we will occasionally consider neurons where the output is $f(w \cdot x+b)$ for some other activation function $f(\cdot)$. The main thing that changes when we use a different activation function is that the particular values for the partial derivatives in Equation~\ref{eq:partialderivsigmoid} change. It turns out that when we compute those partial derivatives later, using $\sigma$ will simplify the algebra, simply because exponentials have lovely properties when differentiated. In any case, $\sigma$ is commonly-used in work on neural nets, and is the activation function we'll use most often in this book.
+If it's the shape of $\sigma$ which really matters, and not its exact form, then why use the particular form used for $\sigma$ in Equation~\ref{eq:c01-03-sigmoidfunction}? In fact, later in the book we will occasionally consider neurons where the output is $f(w \cdot x+b)$ for some other activation function $f(\cdot)$. The main thing that changes when we use a different activation function is that the particular values for the partial derivatives in Equation~\ref{eq:c01-05-partialderivsigmoid} change. It turns out that when we compute those partial derivatives later, using $\sigma$ will simplify the algebra, simply because exponentials have lovely properties when differentiated. In any case, $\sigma$ is commonly-used in work on neural nets, and is the activation function we'll use most often in this book.
 
 How should we interpret the output from a sigmoid neuron? Obviously, one big difference between perceptrons and sigmoid neurons is that sigmoid neurons don't just output 0 or 1. They can have as output any real number between 0 and 1, so values such as 0.173? and 0.689? are legitimate outputs. This can be useful, for example, if we want to use the output value to represent the average intensity of the pixels in an image input to a neural network. But sometimes it can be a nuisance. Suppose we want the output from the network to indicate either ``the input image is a 9'' or ``the input image is not a 9''. Obviously, it'd be easiest to do this if the output was a 0 or a 1, as in a perceptron. But in practice we can set up a convention to deal with this, for example, by deciding to interpret any output of at least 0.5 as indicating a ``9'', and any output less than 0.5 as indicating ``not a 9''. I'll always explicitly state when we're using such a convention, so it shouldn't cause any confusion.
 
-\section{Exercises}
+\textbf{Exercise}
 \begin{enumerate}
 \item \textbf{Sigmoid neurons simulating perceptrons, part I} Suppose we take all the weights and biases in a network of perceptrons, and multiply them by a positive constant, $c>0$.
 Show that the behaviour of the network doesn't change.
@@ -285,7 +287,7 @@ Supposing the neural network functions in this way, we can give a plausible expl
 
 Now, with all that said, this is all just a heuristic. Nothing says that the three-layer neural network has to operate in the way I described, with the hidden neurons detecting simple component shapes. Maybe a clever learning algorithm will find some assignment of weights that lets us use only 4 output neurons. But as a heuristic the way of thinking I've described works pretty well, and can save you a lot of time in designing good neural network architectures.
 
-\section{Exercise}
+\textbf{Exercise}
 \begin{enumerate}
 \item 
 There is a way of determining the bitwise representation of a digit by adding an extra layer to the three-layer network above. The extra layer converts the output from the previous layer into a binary representation, as illustrated in the figure below. Find a set of weights and biases for the new output layer. Assume that the first 3 layers of neurons are such that the correct output in the third layer (i.e., the old output layer) has activation at least 0.99, and incorrect outputs have activation less than 0.01. 
@@ -313,13 +315,13 @@ We'll use the notation $x$ to denote a training input. It'll be convenient to re
 What we'd like is an algorithm which lets us find weights and biases so that the output from the network approximates $y=y(x)$ for all training inputs $x$. To quantify how well we're achieving this goal we define a cost function\footnote{Sometimes referred to as a loss or objective function. We use the term cost function throughout this book, but you should note the other terminology, since it's often used in research papers and other discussions of neural networks.}:
 \begin{equation}
 C(w, b) \equiv \frac{1}{2 n} \sum_{x}\parallel y(x)-a\parallel ^{2}.
-\label{eq:MSEcostfunction}
+\label{eq:c01-06-MSEcostfunction}
 \end{equation}
 Here, $w$ denotes the collection of all weights in the network, $b$ all the biases, $n$ is the total number of training inputs, $a$ is the vector of outputs from the network when $x$ is input, and the sum is over all training inputs, $x$. Of course, the output a depends on $x$, $w$ and $b$, but to keep the notation simple I haven't explicitly indicated this dependence. The notation $\parallel v\parallel$ just denotes the usual length function for a vector $v$. We'll call $C$ the \textit{quadratic cost function}; it's also sometimes known as the \textit{mean squared error} or just \textit{MSE}. Inspecting the form of the quadratic cost function, we see that $C(w,b)$ is non-negative, since every term in the sum is non-negative. Furthermore, the cost $C(w,b)$ becomes small, i.e., $C(w,b)\approx 0$, precisely when $y(x)$ is approximately equal to the output, $a$, for all training inputs, $x$. So our training algorithm has done a good job if it can find weights and biases so that $C(w,b)\approx 0$. By contrast, it's not doing so well when $C(w,b)$ is large - that would mean that $y(x)$ is not close to the output a for a large number of inputs. So the aim of our training algorithm will be to minimize the cost $C(w,b)$ as a function of the weights and biases. In other words, we want to find a set of weights and biases which make the cost as small as possible. We'll do that using an algorithm known as \textit{gradient descent}.
 
 Why introduce the quadratic cost? After all, aren't we primarily interested in the number of images correctly classified by the network? Why not try to maximize that number directly, rather than minimizing a proxy measure like the quadratic cost? The problem with that is that the number of images correctly classified is not a smooth function of the weights and biases in the network. For the most part, making small changes to the weights and biases won't cause any change at all in the number of training images classified correctly. That makes it difficult to figure out how to change the weights and biases to get improved performance. If we instead use a smooth cost function like the quadratic cost it turns out to be easy to figure out how to make small changes in the weights and biases so as to get an improvement in the cost. That's why we focus first on minimizing the quadratic cost, and only after that will we examine the classification accuracy.
 
-Even given that we want to use a smooth cost function, you may still wonder why we choose the quadratic function used in Equation~\ref{eq:MSEcostfunction}. Isn't this a rather ad hoc choice? Perhaps if we chose a different cost function we'd get a totally different set of minimizing weights and biases? This is a valid concern, and later we'll revisit the cost function, and make some modifications. However, the quadratic cost function of Equation~\ref{eq:MSEcostfunction} works perfectly well for understanding the basics of learning in neural networks, so we'll stick with it for now.
+Even given that we want to use a smooth cost function, you may still wonder why we choose the quadratic function used in Equation~\ref{eq:c01-06-MSEcostfunction}. Isn't this a rather ad hoc choice? Perhaps if we chose a different cost function we'd get a totally different set of minimizing weights and biases? This is a valid concern, and later we'll revisit the cost function, and make some modifications. However, the quadratic cost function of Equation~\ref{eq:c01-06-MSEcostfunction} works perfectly well for understanding the basics of learning in neural networks, so we'll stick with it for now.
 
 Recapping, our goal in training a neural network is to find weights and biases which minimize the quadratic cost function $C(w,b)$. This is a well-posed problem, but it's got a lot of distracting structure as currently posed - the interpretation of $w$ and $b$ as weights and biases, the $\sigma$ function lurking in the background, the choice of network architecture, MNIST, and so on. It turns out that we can understand a tremendous amount by ignoring most of that structure, and just concentrating on the minimization aspect. So for now we're going to forget all about the specific form of the cost function, the connection to neural networks, and so on. Instead, we're going to imagine that we've simply been given a function of many variables and we want to minimize that function. We're going to develop a technique called \textit{gradient descent} which can be used to solve such minimization problems. Then we'll come back to the specific function we want to minimize for neural networks.
 
@@ -342,7 +344,7 @@ Based on what I've just written, you might suppose that we'll be trying to write
 To make this question more precise, let's think about what happens when we move the ball a small amount $\Delta v_1$ in the $v_1$ direction, and a small amount $\Delta v_2$ in the $v_2$ direction. Calculus tells us that $C$ changes as follows: 
 \begin{equation}
 \Delta C \approx \frac{\partial C}{\partial v_{1}} \Delta v_{1}+\frac{\partial C}{\partial v_{2}} \Delta v_{2}
-\label{eq:deltaC01}
+\label{eq:c01-07-deltaC01}
 \end{equation}
 We're going to find a way of choosing $\Delta v_1$ and $\Delta v_2$ so as to make $\Delta C$ negative; i.e., we'll choose them so the ball is rolling down into the valley. To figure out how to make such a choice it helps to define $\Delta v$ to be the vector of changes in $v$, $\Delta v \equiv\left(\Delta v_{1}, \Delta v_{2}\right)^{T}$, where T is again the transpose operation, turning row vectors into column vectors. We'll also define the \textit{gradient} of $C$ to be the vector of partial derivatives, $\left(\frac{\partial C}{\partial v_{1}}, \frac{\partial C}{\partial v_{2}}\right)^{T}$ . We denote the gradient vector by $\nabla C$, i.e.: 
 \begin{equation}
@@ -350,17 +352,17 @@ We're going to find a way of choosing $\Delta v_1$ and $\Delta v_2$ so as to mak
 \end{equation}
 In a moment we'll rewrite the change $\Delta C$ in terms of $\Delta v$ and the gradient, $\nabla C$. Before getting to that, though, I want to clarify something that sometimes gets people hung up on the gradient. When meeting the $\nabla C$ notation for the first time, people sometimes wonder how they should think about the $\nabla$ symbol. What, exactly, does $\nabla$ mean? In fact, it's perfectly fine to think of $\nabla C$ as a single mathematical object - the vector defined above - which happens to be written using two symbols. In this point of view, $\nabla $ is just a piece of notational flag-waving, telling you ``hey, $\nabla C$ is a gradient vector''. There are more advanced points of view where $\nabla $ can be viewed as an independent mathematical entity in its own right (for example, as a differential operator), but we won't need such points of view.
 
-With these definitions, the expression Equation~\ref{eq:deltaC01} for $\Delta C$ can be rewritten as 
+With these definitions, the expression Equation~\ref{eq:c01-07-deltaC01} for $\Delta C$ can be rewritten as 
 \begin{equation}
 \Delta C \approx \nabla C \cdot \Delta v
-\label{eq:deltaCnabla}
+\label{eq:c01-09-deltaCnabla}
 \end{equation}
 This equation helps explain why $\nabla C$ is called the gradient vector: $\nabla C$ relates changes in $v$ to changes in $C$, just as we'd expect something called a gradient to do. But what's really exciting about the equation is that it lets us see how to choose $\Delta v$ so as to make $\Delta C$ negative. In particular, suppose we choose 
 \begin{equation}
 \Delta v=-\eta \nabla C
-\label{eq:deltavnablac}
+\label{eq:c01-10-deltavnablac}
 \end{equation}
-where $\eta$ is a small, positive parameter (known as the \textit{learning rate}). Then Equation~\ref{eq:deltaCnabla} tells us that $\Delta C \approx-\eta \nabla C \cdot \nabla C=-\eta\parallel\nabla C\parallel^{2}$. Because $\parallel\nabla C\parallel^{2} \geq 0$, this guarantees that $\Delta C\leq 0$, i.e., $C$ will always decrease, never increase, if we change v according to the prescription in Equation~\ref{eq:deltavnablac}. (Within, of course, the limits of the approximation in Equation~\ref{eq:deltaCnabla}). This is exactly the property we wanted! And so we'll take Equation~\ref{eq:deltavnablac} to define the ``law of motion'' for the ball in our gradient descent algorithm. That is, we'll use Equation~\ref{eq:deltavnablac} to compute a value for $\Delta v$, then move the ball's position $v$ by that amount: 
+where $\eta$ is a small, positive parameter (known as the \textit{learning rate}). Then Equation~\ref{eq:c01-09-deltaCnabla} tells us that $\Delta C \approx-\eta \nabla C \cdot \nabla C=-\eta\parallel\nabla C\parallel^{2}$. Because $\parallel\nabla C\parallel^{2} \geq 0$, this guarantees that $\Delta C\leq 0$, i.e., $C$ will always decrease, never increase, if we change v according to the prescription in Equation~\ref{eq:c01-10-deltavnablac}. (Within, of course, the limits of the approximation in Equation~\ref{eq:c01-09-deltaCnabla}). This is exactly the property we wanted! And so we'll take Equation~\ref{eq:c01-10-deltavnablac} to define the ``law of motion'' for the ball in our gradient descent algorithm. That is, we'll use Equation~\ref{eq:c01-10-deltavnablac} to compute a value for $\Delta v$, then move the ball's position $v$ by that amount: 
 \begin{equation}
 v \rightarrow v^{\prime}=v-\eta \nabla C
 \end{equation}
@@ -372,59 +374,118 @@ Summing up, the way the gradient descent algorithm works is to repeatedly comput
 \includegraphics[width=0.8\textwidth,]{pic/valley_with_ball}
 \par}
 
+Notice that with this rule gradient descent doesn't reproduce real physical motion. In real life a ball has momentum, and that momentum may allow it to roll across the slope, or even (momentarily) roll uphill. It's only after the effects of friction set in that the ball is guaranteed to roll down into the valley. By contrast, our rule for choosing $\Delta v$ just says ``go down, right now''. That's still a pretty good rule for finding the minimum!
 
-==================================================================
+To make gradient descent work correctly, we need to choose the learning rate $\eta$ to be small enough that Equation~\ref{eq:c01-09-deltaCnabla} is a good approximation. If we don't, we might end up with $\Delta C>0$, which obviously would not be good! At the same time, we don't want $\eta$ to be too small, since that will make the changes $\Delta v$ tiny, and thus the gradient descent algorithm will work very slowly. In practical implementations, $\eta$ is often varied so that Equation~\ref{eq:c01-09-deltaCnabla} remains a good approximation, but the algorithm isn't too slow. We'll see later how this works. 
 
-
-Notice that with this rule gradient descent doesn't reproduce real physical motion. In real life a ball has momentum, and that momentum may allow it to roll across the slope, or even (momentarily) roll uphill. It's only after the effects of friction set in that the ball is guaranteed to roll down into the valley. By contrast, our rule for choosing ?v just says ``go down, right now''. That's still a pretty good rule for finding the minimum!
-To make gradient descent work correctly, we need to choose the learning rate ? to be small enough that Equation (9) is a good approximation. If we don't, we might end up with ?C>0, which obviously would not be good! At the same time, we don't want ? to be too small, since that will make the changes ?v tiny, and thus the gradient descent algorithm will work very slowly. In practical implementations, ? is often varied so that Equation (9) remains a good approximation, but the algorithm isn't too slow. We'll see later how this works. 
-I've explained gradient descent when C is a function of just two variables. But, in fact, everything works just as well even when C is a function of many more variables. Suppose in particular that C is a function of m variables, v1,?,vm. Then the change ?C in C produced by a small change ?v=(?v1,?,?vm)T is 
-
-where the gradient ?C is the vector 
+I've explained gradient descent when $C$ is a function of just two variables. But, in fact, everything works just as well even when $C$ is a function of many more variables. Suppose in particular that $C$ is a function of $m$ variables, $v_1,\ldots,v_m$. Then the change $\Delta C$ in $C$ produced by a small change $\Delta v=\left(\Delta v_{1}, \dots, \Delta v_{m}\right)^{T}$ is 
+\begin{equation}
+\Delta C \approx \nabla C \cdot \Delta v,
+\label{eq:co1-12-deltaC}
+\end{equation}
+where the gradient $\nabla C$ is the vector 
+\begin{equation}
+\nabla C \equiv\left(\frac{\partial C}{\partial v_{1}}, \ldots, \frac{\partial C}{\partial v_{m}}\right)^{T}.
+\label{eq:c01-13-nablaC}
+\end{equation}
 
 Just as for the two variable case, we can choose 
+\begin{equation}
+\Delta v=-\eta \nabla C,
+\label{eq:c01-14-deltaV}
+\end{equation}
+and we're guaranteed that our (approximate) expression Equation~\ref{eq:co1-12-deltaC} for $\Delta C$ will be negative. This gives us a way of following the gradient to a minimum, even when $C$ is a function of many variables, by repeatedly applying the update rule 
+\begin{equation}
+v \rightarrow v^{\prime}=v-\eta \nabla C
+\label{eq:c01-15-vfromnablaC}
+\end{equation}
+You can think of this update rule as \textit{defining} the gradient descent algorithm. It gives us a way of repeatedly changing the position $v$ in order to find a minimum of the function $C$. The rule doesn't always work - several things can go wrong and prevent gradient descent from finding the global minimum of $C$, a point we'll return to explore in later chapters. But, in practice gradient descent often works extremely well, and in neural networks we'll find that it's a powerful way of minimizing the cost function, and so helping the net learn.
 
-and we're guaranteed that our (approximate) expression (12) for ?C will be negative. This gives us a way of following the gradient to a minimum, even when C is a function of many variables, by repeatedly applying the update rule 
+Indeed, there's even a sense in which gradient descent is the optimal strategy for searching for a minimum. Let's suppose that we're trying to make a move $\Delta v$ in position so as to decrease $C$ as much as possible. This is equivalent to minimizing $\Delta C \approx \nabla C \cdot \Delta v$. We'll constrain the size of the move so that $\parallel\Delta v\parallel=\epsilon$ for some small fixed $\epsilon>0$. In other words, we want a move that is a small step of a fixed size, and we're trying to find the movement direction which decreases $C$ as much as possible. It can be proved that the choice of $\Delta v$ which minimizes $\nabla C \cdot \Delta v$ is $\Delta v=-\eta \nabla C$, where $\eta=\epsilon /\parallel\nabla C\parallel$ is determined by the size constraint $\|\Delta v\|=\epsilon$. So gradient descent can be viewed as a way of taking small steps in the direction which does the most to immediately decrease $C$.
 
-You can think of this update rule as defining the gradient descent algorithm. It gives us a way of repeatedly changing the position v in order to find a minimum of the function C. The rule doesn't always work - several things can go wrong and prevent gradient descent from finding the global minimum of C, a point we'll return to explore in later chapters. But, in practice gradient descent often works extremely well, and in neural networks we'll find that it's a powerful way of minimizing the cost function, and so helping the net learn.
-Indeed, there's even a sense in which gradient descent is the optimal strategy for searching for a minimum. Let's suppose that we're trying to make a move ?v in position so as to decrease C as much as possible. This is equivalent to minimizing ?C??C??v. We'll constrain the size of the move so that ??v?=? for some small fixed ?>0. In other words, we want a move that is a small step of a fixed size, and we're trying to find the movement direction which decreases C as much as possible. It can be proved that the choice of ?v which minimizes ?C??v is ?v=???C, where ?=?/??C? is determined by the size constraint ??v?=?. So gradient descent can be viewed as a way of taking small steps in the direction which does the most to immediately decrease C
-.
-Exercises
-* Prove the assertion of the last paragraph. Hint: If you're not already familiar with the Cauchy-Schwarz inequality, you may find it helpful to familiarize yourself with it.
-* I explained gradient descent when C is a function of two variables, and when it's a function of more than two variables. What happens when C is a function of just one variable? Can you provide a geometric interpretation of what gradient descent is doing in the one-dimensional case? 
-People have investigated many variations of gradient descent, including variations that more closely mimic a real physical ball. These ball-mimicking variations have some advantages, but also have a major disadvantage: it turns out to be necessary to compute second partial derivatives of C, and this can be quite costly. To see why it's costly, suppose we want to compute all the second partial derivatives ?2C/?vj?vk. If there are a million such vj variables then we'd need to compute something like a trillion (i.e., a million squared) second partial derivatives* 
-Still, you get the point.! That's going to be computationally costly. With that said, there are tricks for avoiding this kind of problem, and finding alternatives to gradient descent is an active area of investigation. But in this book we'll use gradient descent (and variations) as our main approach to learning in neural networks.
-How can we apply gradient descent to learn in a neural network? The idea is to use gradient descent to find the weights wk and biases bl which minimize the cost in Equation (6). To see how this works, let's restate the gradient descent update rule, with the weights and biases replacing the variables vj. In other words, our ``position'' now has components wk and bl, and the gradient vector ?C has corresponding components ?C/?wk and ?C/?bl. Writing out the gradient descent update rule in terms of components, we have 
+\textbf{Exercise}
+\begin{enumerate}
+\item
+Prove the assertion of the last paragraph. Hint: If you're not already familiar with the Cauchy-Schwarz inequality \cite{WikiPediaCauchySchwarz2019}, you may find it helpful to familiarize yourself with it.
+\item 
+I explained gradient descent when $C$ is a function of two variables, and when it's a function of more than two variables. What happens when $C$ is a function of just one variable? Can you provide a geometric interpretation of what gradient descent is doing in the one-dimensional case? 
+\end{enumerate}
+
+
+People have investigated many variations of gradient descent, including variations that more closely mimic a real physical ball. These ball-mimicking variations have some advantages, but also have a major disadvantage: it turns out to be necessary to compute second partial derivatives of $C$, and this can be quite costly. To see why it's costly, suppose we want to compute all the second partial derivatives $\partial^{2} C / \partial v_{j} \partial v_{k}$. If there are a million such $v_j$ variables then we'd need to compute something like a trillion (i.e., a million squared) second partial derivatives\footnote{Actually, more like half a trillion, since $\partial^{2} C / \partial v_{j} \partial v_{k}=\partial^{2} C / \partial v_{k} \partial v_{j}$. Still, you get the point.}. 
+ That's going to be computationally costly. With that said, there are tricks for avoiding this kind of problem, and finding alternatives to gradient descent is an active area of investigation. But in this book we'll use gradient descent (and variations) as our main approach to learning in neural networks.
+
+How can we apply gradient descent to learn in a neural network? The idea is to use gradient descent to find the weights $w_k$ and biases $b_l$ which minimize the cost in Equation~\ref{eq:c01-06-MSEcostfunction}. To see how this works, let's restate the gradient descent update rule, with the weights and biases replacing the variables $v_j$. In other words, our ``position'' now has components $w_k$ and $b_l$, and the gradient vector $\nabla C$ has corresponding components $\partial C / \partial w_{k}$ and $\partial C / \partial b_{l}$. Writing out the gradient descent update rule in terms of components, we have 
+\begin{equation}
+w_{k} \rightarrow w_{k}^{\prime}=w_{k}-\eta \frac{\partial C}{\partial w_{k}}
+\label{eq:c01-16-graddescupdate}
+\end{equation}
+\begin{equation}
+b_{l} \rightarrow b_{l}^{\prime}=b_{l}-\eta \frac{\partial C}{\partial b_{l}}.
+\label{eq:c01-17-graddescupdate}
+\end{equation}
 
 By repeatedly applying this update rule we can ``roll down the hill'', and hopefully find a minimum of the cost function. In other words, this is a rule which can be used to learn in a neural network.
-There are a number of challenges in applying the gradient descent rule. We'll look into those in depth in later chapters. But for now I just want to mention one problem. To understand what the problem is, let's look back at the quadratic cost in Equation (6). Notice that this cost function has the form , that is, it's an average over costs  for individual training examples. In practice, to compute the gradient ?C we need to compute the gradients ?Cx separately for each training input, x, and then average them, . Unfortunately, when the number of training inputs is very large this can take a long time, and learning thus occurs slowly.
-An idea called stochastic gradient descent can be used to speed up learning. The idea is to estimate the gradient ?C by computing ?Cx for a small sample of randomly chosen training inputs. By averaging over this small sample it turns out that we can quickly get a good estimate of the true gradient ?C , and this helps speed up gradient descent, and thus learning.
-To make these ideas more precise, stochastic gradient descent works by randomly picking out a small number m of randomly chosen training inputs. We'll label those random training inputs $X_1$,$x_2$,?,Xm, and refer to them as a mini-batch. Provided the sample size m is large enough we expect that the average value of the ?CXj will be roughly equal to the average over all ?Cx, that is, 
 
-where the second sum is over the entire set of training data. Swapping sides we get 
+There are a number of challenges in applying the gradient descent rule. We'll look into those in depth in later chapters. But for now I just want to mention one problem. To understand what the problem is, let's look back at the quadratic cost in Equation~\ref{eq:c01-06-MSEcostfunction}. Notice that this cost function has the form $C=\frac{1}{n} \sum_{x} C_{x}$, that is, it's an average over costs $C_{x} \equiv \frac{\parallel y(x)-a \parallel ^{2}}{2}$ for individual training examples. In practice, to compute the gradient $\nabla C$ we need to compute the gradients $\nabla C_{x}$ separately for each training input, $x$, and then average them, $\nabla C=\frac{1}{n} \sum_{x} \nabla C_{x}$. Unfortunately, when the number of training inputs is very large this can take a long time, and learning thus occurs slowly.
 
+An idea called \textit{stochastic gradient descent} can be used to speed up learning. The idea is to estimate the gradient $\nabla C$ by computing $\nabla C_x$ for a small sample of randomly chosen training inputs. By averaging over this small sample it turns out that we can quickly get a good estimate of the true gradient $\nabla C$ , and this helps speed up gradient descent, and thus learning.
+
+To make these ideas more precise, stochastic gradient descent works by randomly picking out a small number $m$ of randomly chosen training inputs. We'll label those random training inputs $X_1$,$x_2$,$\ldots$,$X_m$, and refer to them as a \textit{mini-batch}. Provided the sample size $m$ is large enough we expect that the average value of the $\nabla C_{X_j}$ will be roughly equal to the average over all $\nabla C_{x}$, that is, 
+\begin{equation}
+\frac{\sum_{j=1}^{m} \nabla C_{X_{j}}}{m} \approx \frac{\sum_{x} \nabla C_{x}}{n}=\nabla C.
+\label{eq:c01-18-nablaC}
+\end{equation}
+where the second sum is over the entire set of training data. 
+
+Swapping sides we get 
+\begin{equation}
+\nabla C \approx \frac{1}{m} \sum_{j=1}^{m} \nabla C_{X_{j}}
+\label{eq:c01-19-nablaC}
+\end{equation}
 confirming that we can estimate the overall gradient by computing gradients just for the randomly chosen mini-batch. 
-To connect this explicitly to learning in neural networks, suppose wk and bl denote the weights and biases in our neural network. Then stochastic gradient descent works by picking out a randomly chosen mini-batch of training inputs, and training with those, 
 
-where the sums are over all the training examples Xj in the current mini-batch. Then we pick out another randomly chosen mini-batch and train with those. And so on, until we've exhausted the training inputs, which is said to complete an epoch of training. At that point we start over with a new training epoch.
-Incidentally, it's worth noting that conventions vary about scaling of the cost function and of mini-batch updates to the weights and biases. In Equation (6) we scaled the overall cost function by a factor 1n. People sometimes omit the 1n, summing over the costs of individual training examples instead of averaging. This is particularly useful when the total number of training examples isn't known in advance. This can occur if more training data is being generated in real time, for instance. And, in a similar way, the mini-batch update rules (20) and (21) sometimes omit the 1/m term out the front of the sums. Conceptually this makes little difference, since it's equivalent to rescaling the learning rate ?. But when doing detailed comparisons of different work it's worth watching out for.
-We can think of stochastic gradient descent as being like political polling: it's much easier to sample a small mini-batch than it is to apply gradient descent to the full batch, just as carrying out a poll is easier than running a full election. For example, if we have a training set of size n=60,000, as in MNIST, and choose a mini-batch size of (say) m=10, this means we'll get a factor of 6,000 speedup in estimating the gradient! Of course, the estimate won't be perfect - there will be statistical fluctuations - but it doesn't need to be perfect: all we really care about is moving in a general direction that will help decrease C, and that means we don't need an exact computation of the gradient. In practice, stochastic gradient descent is a commonly used and powerful technique for learning in neural networks, and it's the basis for most of the learning techniques we'll develop in this book.
-Exercise
-* An extreme version of gradient descent is to use a mini-batch size of just 1. That is, given a training input, x , we update our weights and biases according to the rules wk?w?k=wk???Cx/?wk and bl?b?l=bl???Cx/?bl. Then we choose another training input, and update the weights and biases again. And so on, repeatedly. This procedure is known as online, on-line, or incremental learning. In online learning, a neural network learns from just one training input at a time (just as human beings do). Name one advantage and one disadvantage of online learning, compared to stochastic gradient descent with a mini-batch size of, say, 20. 
-Let me conclude this section by discussing a point that sometimes bugs people new to gradient descent. In neural networks the cost Cis, of course, a function of many variables - all the weights and biases - and so in some sense defines a surface in a very high-dimensional space. Some people get hung up thinking: ``Hey, I have to be able to visualize all these extra dimensions''. And they may start to worry: ``I can't think in four dimensions, let alone five (or five million)". Is there some special ability they're missing, some ability that ``real'' supermathematicians have? Of course, the answer is no. Even most professional mathematicians can't visualize four dimensions especially well, if at all. The trick they use, instead, is to develop other ways of representing what's going on. That's exactly what we did above: we used an algebraic (rather than visual) representation of ?C to figure out how to move so as to decrease C. People who are good at thinking in high dimensions have a mental library containing many different techniques along these lines; our algebraic trick is just one example. Those techniques may not have the simplicity we're accustomed to when visualizing three dimensions, but once you build up a library of such techniques, you can get pretty good at thinking in high dimensions. I won't go into more detail here, but if you're interested then you may enjoy reading this discussion of some of the techniques professional mathematicians use to think in high dimensions. While some of the techniques discussed are quite complex, much of the best content is intuitive and accessible, and could be mastered by anyone.
-Implementing our network to classify digits
-Alright, let's write a program that learns how to recognize handwritten digits, using stochastic gradient descent and the MNIST training data. We'll do this with a short Python (2.7) program, just 74 lines of code! The first thing we need is to get the MNIST data. If you're a git user then you can obtain the data by cloning the code repository for this book,
-git clone https://github.com/mnielsen/neural-networks-and-deep-learning.git
-If you don't use git then you can download the data and code here.
-Incidentally, when I described the MNIST data earlier, I said it was split into 60,000 training images, and 10,000 test images. That's the official MNIST description. Actually, we're going to split the data a little differently. We'll leave the test images as is, but split the 60,000-image MNIST training set into two parts: a set of 50,000 images, which we'll use to train our neural network, and a separate 10,000 image validation set. We won't use the validation data in this chapter, but later in the book we'll find it useful in figuring out how to set certain hyper-parameters of the neural network - things like the learning rate, and so on, which aren't directly selected by our learning algorithm. Although the validation data isn't part of the original MNIST specification, many people use MNIST in this fashion, and the use of validation data is common in neural networks. When I refer to the ``MNIST training data'' from now on, I'll be referring to our 50,000 image data set, not the original 60,000 image data set* 
+To connect this explicitly to learning in neural networks, suppose $w_k$ and $b_l$ denote the weights and biases in our neural network. Then stochastic gradient descent works by picking out a randomly chosen mini-batch of training inputs, and training with those, 
+\begin{equation}
+w_{k} \rightarrow w_{k}^{\prime}=w_{k}-\frac{\eta}{m} \sum_{j} \frac{\partial C_{X_{j}}}{\partial w_{k}}
+\label{eq:c01-20-wkestimate}
+\end{equation}
+\begin{equation}
+b_{l} \rightarrow b_{l}^{\prime}=b_{l}-\frac{\eta}{m} \sum_{j} \frac{\partial C_{X_{j}}}{\partial b_{l}}
+\label{eq:c01-21-blestimate}
+\end{equation}
+where the sums are over all the training examples $X_j$ in the current mini-batch. Then we pick out another randomly chosen mini-batch and train with those. And so on, until we've exhausted the training inputs, which is said to complete an \textit{epoch} of training. At that point we start over with a new training epoch.
+
+Incidentally, it's worth noting that conventions vary about scaling of the cost function and of mini-batch updates to the weights and biases. In Equation~\ref{eq:c01-06-MSEcostfunction} we scaled the overall cost function by a factor $\frac{1}{n}$. People sometimes omit the $\frac{1}{n}$, summing over the costs of individual training examples instead of averaging. This is particularly useful when the total number of training examples isn't known in advance. This can occur if more training data is being generated in real time, for instance. And, in a similar way, the mini-batch update rules Equation~\ref{eq:c01-20-wkestimate} and Equation~\ref{eq:c01-21-blestimate} sometimes omit the  $\frac{1}{m}$ term out the front of the sums. Conceptually this makes little difference, since it's equivalent to rescaling the learning rate $\eta$. But when doing detailed comparisons of different work it's worth watching out for.
 
 
-*As noted earlier, the MNIST data set is based on two data sets collected by NIST, the United States' National Institute of Standards and Technology. To construct MNIST the NIST data sets were stripped down and put into a more convenient format by Yann LeCun, Corinna Cortes, and Christopher J. C. Burges. See this link for more details. The data set in my repository is in a form that makes it easy to load and manipulate the MNIST data in Python. I obtained this particular form of the data from the LISA machine learning laboratory at the University of Montreal (link)..
-Apart from the MNIST data we also need a Python library called Numpy, for doing fast linear algebra. If you don't already have Numpy installed, you can get it here.
+We can think of stochastic gradient descent as being like political polling: it's much easier to sample a small mini-batch than it is to apply gradient descent to the full batch, just as carrying out a poll is easier than running a full election. For example, if we have a training set of size $n$=60,000, as in MNIST, and choose a mini-batch size of (say) $m$=10, this means we'll get a factor of 6,000 speedup in estimating the gradient! Of course, the estimate won't be perfect - there will be statistical fluctuations - but it doesn't need to be perfect: all we really care about is moving in a general direction that will help decrease $C$, and that means we don't need an exact computation of the gradient. In practice, stochastic gradient descent is a commonly used and powerful technique for learning in neural networks, and it's the basis for most of the learning techniques we'll develop in this book.
+
+\textbf{Exercise}
+\begin{enumerate}
+\item 
+ An extreme version of gradient descent is to use a mini-batch size of just 1. That is, given a training input, $x$ , we update our weights and biases according to the rules \\
+ $w_{k} \rightarrow w_{k}^{\prime}=w_{k}-\eta \partial C_{x} / \partial w_{k}$ and $b_{l} \rightarrow b_{l}^{\prime}=b_{l}-\eta \partial C_{x} / \partial b_{l}$\\
+ Then we choose another training input, and update the weights and biases again. And so on, repeatedly. This procedure is known as \textit{online}, \textit{on-line}, or \textit{incremental} learning. In online learning, a neural network learns from just one training input at a time (just as human beings do). Name one advantage and one disadvantage of online learning, compared to stochastic gradient descent with a mini-batch size of, say, 20. 
+
+
+\end{enumerate}
+
+Let me conclude this section by discussing a point that sometimes bugs people new to gradient descent. In neural networks the cost $C$ is, of course, a function of many variables - all the weights and biases - and so in some sense defines a surface in a very high-dimensional space. Some people get hung up thinking: ``Hey, I have to be able to visualize all these extra dimensions''. And they may start to worry: ``I can't think in four dimensions, let alone five (or five million)". Is there some special ability they're missing, some ability that ``real'' supermathematicians have? Of course, the answer is no. Even most professional mathematicians can't visualize four dimensions especially well, if at all. The trick they use, instead, is to develop other ways of representing what's going on. That's exactly what we did above: we used an algebraic (rather than visual) representation of $\Delta C$ to figure out how to move so as to decrease $C$. People who are good at thinking in high dimensions have a mental library containing many different techniques along these lines; our algebraic trick is just one example. Those techniques may not have the simplicity we're accustomed to when visualizing three dimensions, but once you build up a library of such techniques, you can get pretty good at thinking in high dimensions. I won't go into more detail here, but if you're interested then you may enjoy reading this discussion \cite{mathoverflowhighDthink2019} of some of the techniques professional mathematicians use to think in high dimensions. While some of the techniques discussed are quite complex, much of the best content is intuitive and accessible, and could be mastered by anyone.
+
+\section{Implementing our network to classify digits}
+
+Alright, let's write a program that learns how to recognize handwritten digits, using stochastic gradient descent and the MNIST training data. We'll do this with a short Python  program, less than 100 lines of code! The first thing we need is to get the MNIST data. If you're a git user then you can obtain the data by cloning the code repository \cite{Nielsengithub2019} for this book. If you don't use git then you can download the data from the same site here \cite{Nielsengithub2019b}.
+
+Incidentally, when I described the MNIST data earlier, I said it was split into 60,000 training images, and 10,000 test images. That's the official MNIST description. Actually, we're going to split the data a little differently. We'll leave the test images as is, but split the 60,000-image MNIST training set into two parts: a set of 50,000 images, which we'll use to train our neural network, and a separate 10,000 image validation set. We won't use the validation data in this chapter, but later in the book we'll find it useful in figuring out how to set certain hyper-parameters of the neural network - things like the learning rate, and so on, which aren't directly selected by our learning algorithm. Although the validation data isn't part of the original MNIST specification, many people use MNIST in this fashion, and the use of validation data is common in neural networks. When I refer to the ``MNIST training data'' from now on, I'll be referring to our 50,000 image data set, not the original 60,000 image data set\footnote{As noted earlier, the MNIST data set is based on two data sets collected by NIST, the United States' National Institute of Standards and Technology. To construct MNIST the NIST data sets were stripped down and put into a more convenient format by Yann LeCun, Corinna Cortes, and Christopher J. C. Burges. See \cite{LeCun2019} for more details. The data set in my repository is in a form that makes it easy to load and manipulate the MNIST data in Python. I obtained this particular form of the data from the LISA machine learning laboratory at the University of Montreal \cite{LISALabGStart2019}}.
+
+Apart from the MNIST data we also need a Python library called Numpy, for doing fast linear algebra. If you don't already have Numpy installed, See Appendix~\ref{sec:EnvironmentSetup}.
+
 Let me explain the core features of the neural networks code, before giving a full listing, below. The centerpiece is a Network class, which we use to represent a neural network. Here's the code we use to initialize a Network object:
+
+\begin{lstlisting}[language=Python]
 class Network(object):
 
-\begin{lstlisting}
     def __init__(self, sizes):
         self.num_layers = len(sizes)
         self.sizes = sizes
@@ -433,33 +494,44 @@ class Network(object):
                         for x, y in zip(sizes[:-1], sizes[1:])]
 \end{lstlisting}
                         
-In this code, the list sizes contains the number of neurons in the respective layers. So, for example, if we want to create a Network object with 2 neurons in the first layer, 3 neurons in the second layer, and 1 neuron in the final layer, we'd do this with the code: 
+In this code, the list \lstinline{sizes} contains the number of neurons in the respective layers. So, for example, if we want to create a \lstinline{Network} object with 2 neurons in the first layer, 3 neurons in the second layer, and 1 neuron in the final layer, we'd do this with the code: 
+\begin{lstlisting}[language=Python]
 net = Network([2, 3, 1])
+\end{lstlisting}
+The biases and weights in the \lstinline{Network} object are all initialized randomly, using the Numpy \lstinline{np.random.randn} function to generate Gaussian distributions with mean 0 and standard deviation 1. This random initialization gives our stochastic gradient descent algorithm a place to start from. In later chapters we'll find better ways of initializing the weights and biases, but this will do for now. Note that the Network initialization code assumes that the first layer of neurons is an input layer, and omits to set any biases for those neurons, since biases are only ever used in computing the outputs from later layers.
 
-The biases and weights in the Network object are all initialized randomly, using the Numpy np.random.randn function to generate Gaussian distributions with mean 0 and standard deviation 1. This random initialization gives our stochastic gradient descent algorithm a place to start from. In later chapters we'll find better ways of initializing the weights and biases, but this will do for now. Note that the Network initialization code assumes that the first layer of neurons is an input layer, and omits to set any biases for those neurons, since biases are only ever used in computing the outputs from later layers.
-Note also that the biases and weights are stored as lists of Numpy matrices. So, for example net.weights[1] is a Numpy matrix storing the weights connecting the second and third layers of neurons. (It's not the first and second layers, since Python's list indexing starts at 0.) Since net.weights[1] is rather verbose, let's just denote that matrix w. It's a matrix such that wjk is the weight for the connection between the kth neuron in the second layer, and the jth neuron in the third layer. This ordering of the j and k indices may seem strange - surely it'd make more sense to swap the j and k indices around? The big advantage of using this ordering is that it means that the vector of activations of the third layer of neurons is: 
+Note also that the biases and weights are stored as lists of Numpy matrices. So, for example \lstinline{net.weights[1]} is a Numpy matrix storing the weights connecting the second and third layers of neurons. (It's not the first and second layers, since Python's list indexing starts at 0.) Since \lstinline{net.weights[1]} is rather verbose, let's just denote that matrix $w$. It's a matrix such that $w_{jk}$ is the weight for the connection between the $k$\textsuperscript{th} neuron in the second layer, and the $j$\textsuperscript{th} neuron in the third layer. This ordering of the $j$ and $k$ indices may seem strange - surely it'd make more sense to swap the $j$ and $k$ indices around? The big advantage of using this ordering is that it means that the vector of activations of the third layer of neurons is: 
+\begin{equation}
+a^{\prime}=\sigma(w a+b)
+\label{eq:ch01-22}
+\end{equation}
+There's quite a bit going on in this equation, so let's unpack it piece by piece. $a$ is the vector of activations of the second layer of neurons. To obtain $a^\prime$ we multiply a by the weight matrix $w$, and add the vector $b$ of biases. We then apply the function $\sigma$ elementwise to every entry in the vector $wa+b$. (This is called \textit{vectorizing} the function $\sigma$.) It's easy to verify that Equation~\ref{eq:ch01-22} gives the same result as our earlier rule, Equation~\ref{eq:ch01-04-sigmoidoutput}, for computing the output of a sigmoid neuron.
 
-There's quite a bit going on in this equation, so let's unpack it piece by piece. a is the vector of activations of the second layer of neurons. To obtain a? we multiply a by the weight matrix w, and add the vector b of biases. We then apply the function ? elementwise to every entry in the vector wa+b. (This is called vectorizing the function ?.) It's easy to verify that Equation (22) gives the same result as our earlier rule, Equation (4), for computing the output of a sigmoid neuron.
+\textbf{Exercise}
+\begin{enumerate}
+\item  Write out Equation~\ref{eq:ch01-22} in component form, and verify that it gives the same result as Equation~\ref{eq:ch01-04-sigmoidoutput} for computing the output of a sigmoid neuron.
+\end{enumerate} 
 
-Exercise
-* Write out Equation (22) in component form, and verify that it gives the same result as the rule (4) for computing the output of a sigmoid neuron. 
 With all this in mind, it's easy to write code computing the output from a Network instance. We begin by defining the sigmoid function: 
+\begin{lstlisting}[language=Python]
 def sigmoid(z):
     return 1.0/(1.0+np.exp(-z))
+\end{lstlisting}
+Note that when the input $z$ is a vector or Numpy array, Numpy automatically applies the function sigmoid elementwise, that is, in vectorized form.
 
-Note that when the input z is a vector or Numpy array, Numpy automatically applies the function sigmoid elementwise, that is, in vectorized form.
-We then add a feedforward method to the Network class, which, given an input a for the network, returns the corresponding output* 
-*It is assumed that the input a is an (n, 1) Numpy ndarray, not a (n,) vector. Here, n is the number of inputs to the network. If you try to use an (n,) vector as input you'll get strange results. Although using an (n,) vector appears the more natural choice, using an (n, 1) ndarray makes it particularly easy to modify the code to feedforward multiple inputs at once, and that is sometimes convenient. 
-All the method does is applies Equation (22) for each layer: 
+We then add a \lstinline{feedforward} method to the \lstinline{Network} class, which, given an input $a$ for the network, returns the corresponding output\footnote{It is assumed that the input \lstinline{a} is an \lstinline{(n, 1)} Numpy ndarray, not a \lstinline{(n,)} vector. Here, \lstinline{n} is the number of inputs to the network. If you try to use an \lstinline{(n,)} vector as input you'll get strange results. Although using an \lstinline{(n,)} vector appears the more natural choice, using an \lstinline{(n, 1)} ndarray makes it particularly easy to modify the code to feedforward multiple inputs at once, and that is sometimes convenient. }
+All the method does is applies Equation~\ref{eq:ch01-22} for each layer: 
+\begin{lstlisting}[language=Python]
     def feedforward(self, a):
         """Return the output of the network if ``a'' is input."""
         for b, w in zip(self.biases, self.weights):
             a = sigmoid(np.dot(w, a)+b)
         return a
-Of course, the main thing we want our Network objects to do is to learn. To that end we'll give them an SGD method which implements stochastic gradient descent. Here's the code. It's a little mysterious in a few places, but I'll break it down below, after the listing.
+\end{lstlisting}
+Of course, the main thing we want our \lstinline{Network} objects to do is to learn. To that end we'll give them an \lstinline{SGD} method which implements stochastic gradient descent. Here's the code. It's a little mysterious in a few places, but I'll break it down below, after the listing.
 
-\begin{lstlisting}
-    def SGD(self, training_data, epochs, mini_batch_size, eta,
+\begin{lstlisting}[language=Python]
+def SGD(self, training_data, epochs, mini_batch_size, eta,
             test_data=None):
         """Train the neural network using mini-batch stochastic
         gradient descent.  The ``training_data'' is a list of tuples
@@ -479,16 +551,17 @@ Of course, the main thing we want our Network objects to do is to learn. To that
             for mini_batch in mini_batches:
                 self.update_mini_batch(mini_batch, eta)
             if test_data:
-                print ``Epoch {0}: {1} / {2}".format(
-                    j, self.evaluate(test_data), n_test)
+                print('Epoch {0}: {1} / {2}'.format(
+                    j, self.evaluate(test_data), n_test))
             else:
-                print ``Epoch {0} complete''.format(j)
+                print('Epoch {0} complete'.format(j))
 \end{lstlisting}
                 
-The \lstinline{training_data} is a list of tuples (x, y) representing the training inputs and corresponding desired outputs. The variables epochs and \lstinline{mini_batch_size} are what you'd expect - the number of epochs to train for, and the size of the mini-batches to use when sampling. eta is the learning rate, ?. If the optional argument \lstinline{test_data} is supplied, then the program will evaluate the network after each epoch of training, and print out partial progress. This is useful for tracking progress, but slows things down substantially.
+The \lstinline{training_data} is a list of tuples \lstinline{(x, y)} representing the training inputs and corresponding desired outputs. The variables epochs and \lstinline{mini_batch_size} are what you'd expect - the number of epochs to train for, and the size of the mini-batches to use when sampling. \lstinline{eta} is the learning rate, $\eta$. If the optional argument \lstinline{test_data} is supplied, then the program will evaluate the network after each epoch of training, and print out partial progress. This is useful for tracking progress, but slows things down substantially.
+
 The code works as follows. In each epoch, it starts by randomly shuffling the training data, and then partitions it into mini-batches of the appropriate size. This is an easy way of sampling randomly from the training data. Then for each \lstinline{mini_batch} we apply a single step of gradient descent. This is done by the code \lstinline{self.update_mini_batch(mini_batch, eta)}, which updates the network weights and biases according to a single iteration of gradient descent, using just the training data in \lstinline{mini_batch}. Here's the code for the \lstinline{update_mini_batch} method: 
 
-\begin{lstlisting}
+\begin{lstlisting}[language=Python]
     def update_mini_batch(self, mini_batch, eta):
         """Update the network's weights and biases by applying
         gradient descent using backpropagation to a single mini batch.
@@ -508,18 +581,22 @@ The code works as follows. In each epoch, it starts by randomly shuffling the tr
                        
 Most of the work is done by the line 
 
-\begin{lstlisting}
+\begin{lstlisting}[language=Python]
             delta_nabla_b, delta_nabla_w = self.backprop(x, y)
 \end{lstlisting}
 
-This invokes something called the backpropagation algorithm, which is a fast way of computing the gradient of the cost function. So \lstinline{update_mini_batch} works simply by computing these gradients for every training example in the \lstinline{mini_batch}, and then updating \lstinline{self.weights} and \lstinline{self.biases} appropriately.
-I'm not going to show the code for \lstinline{self.backprop} right now. We'll study how backpropagation works in the next chapter, including the code for self.backprop. For now, just assume that it behaves as claimed, returning the appropriate gradient for the cost associated to the training example x.
-Let's look at the full program, including the documentation strings, which I omitted above. Apart from self.backprop the program is self-explanatory - all the heavy lifting is done in \lstinline{self.SGD} and \lstinline{self.update_mini_batch}, which we've already discussed. The \lstinline{self.backprop} method makes use of a few extra functions to help in computing the gradient, namely \lstinline{sigmoid_prime}, which computes the derivative of the ? function, and \lstinline{self.cost_derivative}, which I won't describe here. You can get the gist of these (and perhaps the details) just by looking at the code and documentation strings. We'll look at them in detail in the next chapter. Note that while the program appears lengthy, much of the code is documentation strings intended to make the code easy to understand. In fact, the program contains just 74 lines of non-whitespace, non-comment code. All the code may be found on GitHub here.
+This invokes something called the \textit{backpropagation} algorithm, which is a fast way of computing the gradient of the cost function. So \lstinline{update_mini_batch} works simply by computing these gradients for every training example in the \lstinline{mini_batch}, and then updating \lstinline{self.weights} and \lstinline{self.biases} appropriately.
 
-\begin{verbatim}
+I'm not going to show the code for \lstinline{self.backprop} right now. We'll study how backpropagation works in the next chapter, including the code for self.backprop. For now, just assume that it behaves as claimed, returning the appropriate gradient for the cost associated to the training example \lstinline{x}.
+
+Let's look at the full program, including the documentation strings, which I omitted above. Apart from \lstinline{self.backprop} the program is self-explanatory - all the heavy lifting is done in \lstinline{self.SGD} and \lstinline{self.update_mini_batch}, which we've already discussed. The \lstinline{self.backprop} method makes use of a few extra functions to help in computing the gradient, namely \lstinline{sigmoid_prime}, which computes the derivative of the $\sigma$ function, and \lstinline{self.cost_derivative}, which I won't describe here. You can get the gist of these (and perhaps the details) just by looking at the code and documentation strings. We'll look at them in detail in the next chapter. Note that while the program appears lengthy, much of the code is documentation strings intended to make the code easy to understand. In fact, the program contains just 74 lines of non-whitespace, non-comment code. All the code may be found on GitHub.
+
+
+\begin{lstlisting}[caption={network.py (Python 3.7.1)},label={lst:network.py}, language=Python]
 """
 network.py
 ~~~~~~~~~~
+IT WORKS
 
 A module to implement the stochastic gradient descent learning
 algorithm for a feedforward neural network.  Gradients are calculated
@@ -570,20 +647,26 @@ class Network(object):
         network will be evaluated against the test data after each
         epoch, and partial progress printed out.  This is useful for
         tracking progress, but slows things down substantially."""
-        if test_data: n_test = len(test_data)
+
+        training_data = list(training_data)
         n = len(training_data)
-        for j in xrange(epochs):
+
+        if test_data:
+            test_data = list(test_data)
+            n_test = len(test_data)
+
+        for j in range(epochs):
             random.shuffle(training_data)
             mini_batches = [
                 training_data[k:k+mini_batch_size]
-                for k in xrange(0, n, mini_batch_size)]
+                for k in range(0, n, mini_batch_size)]
             for mini_batch in mini_batches:
                 self.update_mini_batch(mini_batch, eta)
             if test_data:
-                print ``Epoch {0}: {1} / {2}".format(
-                    j, self.evaluate(test_data), n_test)
+                print("Epoch {0}: {1} / {2}".format(
+                    j, self.evaluate(test_data), n_test))
             else:
-                print ``Epoch {0} complete''.format(j)
+                print("Epoch {0} complete".format(j))
 
     def update_mini_batch(self, mini_batch, eta):
         """Update the network's weights and biases by applying
@@ -628,7 +711,7 @@ class Network(object):
         # second-last layer, and so on.  It's a renumbering of the
         # scheme in the book, used here to take advantage of the fact
         # that Python can use negative indices in lists.
-        for l in xrange(2, self.num_layers):
+        for l in range(2, self.num_layers):
             z = zs[-l]
             sp = sigmoid_prime(z)
             delta = np.dot(self.weights[-l+1].transpose(), delta) * sp
@@ -658,26 +741,34 @@ def sigmoid(z):
 def sigmoid_prime(z):
     """Derivative of the sigmoid function."""
     return sigmoid(z)*(1-sigmoid(z))
-\end{verbatim}
-How well does the program recognize handwritten digits? Well, let's start by loading in the MNIST data. I'll do this using a little helper program, \lstinline{mnist_loader.py}, to be described below. We execute the following commands in a Python shell,
-
-\begin{lstlisting}
->>> import mnist_loader
->>> training_data, validation_data, test_data = \
-... mnist_loader.load_data_wrapper()
 \end{lstlisting}
 
-Of course, this could also be done in a separate Python program, but if you're following along it's probably easiest to do in a Python shell. 
-After loading the MNIST data, we'll set up a Network with 30 hidden neurons. We do this after importing the Python program listed above, which is named network,
-\begin{lstlisting}
->>> import network
->>> net = network.Network([784, 30, 10])
+How well does the program recognize handwritten digits? Well,  Execute the code in Listing~\ref{lst:ch01.py}, which does the following:
+
+
+Loading in the MNIST data. I'll do this using a little helper program, \lstinline{mnist_loader.py}, to be described below.
+
+Import the network script shown above and set up a Network with 30 hidden neurons.
+
+Finally, we'll use stochastic gradient descent to learn from the MNIST \lstinline{training_data} over 30 epochs, with a mini-batch size of 10, and a learning rate of $\eta$=3.0, 
+
+\begin{lstlisting}[caption={ch01.py (Python 3.7.1)},label={lst:ch01.py}, language=Python]
+
+# load the MNIST data
+import mnist_loader
+training_data, validation_data, test_data = mnist_loader.load_data_wrapper()
+
+# define the network
+import network
+# the list defines the number of nodes in layers 0, 1, 2.
+net = network.Network([784, 30, 10])
+
+#stochastic gradient descent to learn from the MNIST data
+net.SGD(training_data, epochs=30, mini_batch_size=10, eta=3.0, test_data=test_data)
+
 \end{lstlisting}
-Finally, we'll use stochastic gradient descent to learn from the MNIST \lstinline{training_data} over 30 epochs, with a mini-batch size of 10, and a learning rate of ?=3.0, 
-\begin{lstlisting}
->>> net.SGD(training_data, 30, 10, 3.0, test_data=test_data)
-\end{lstlisting}
-Note that if you're running the code as you read along, it will take some time to execute - for a typical machine (as of 2015) it will likely take a few minutes to run. I suggest you set things running, continue to read, and periodically check the output from the code. If you're in a rush you can speed things up by decreasing the number of epochs, by decreasing the number of hidden neurons, or by using only part of the training data. Note that production code would be much, much faster: these Python scripts are intended to help you understand how neural nets work, not to be high-performance code! And, of course, once we've trained a network it can be run very quickly indeed, on almost any computing platform. For example, once we've learned a good set of weights and biases for a network, it can easily be ported to run in Javascript in a web browser, or as a native app on a mobile device. In any case, here is a partial transcript of the output of one training run of the neural network. The transcript shows the number of test images correctly recognized by the neural network after each epoch of training. As you can see, after just a single epoch this has reached 9,129 out of 10,000, and the number continues to grow,
+
+Note that it will take some time to execute - for a typical machine (as of 2015) it will likely take a few minutes to run. I suggest you set things running, continue to read, and periodically check the output from the code. If you're in a rush you can speed things up by (1) decreasing the number of epochs, (2) by decreasing the number of hidden neurons, or (3) by using only part of the training data. Note that production code would be much, much faster: these Python scripts are intended to help you understand how neural nets work, not to be high-performance code! And, of course, once we've trained a network it can be run very quickly indeed, on almost any computing platform. For example, once we've learned a good set of weights and biases for a network, it can easily be ported to run in Javascript in a web browser, or as a native app on a mobile device. In any case, here is a partial transcript of the output of one training run of the neural network. The transcript shows the number of test images correctly recognized by the neural network after each epoch of training. As you can see, after just a single epoch this has reached 9,129 out of 10,000, and the number continues to grow,
 \begin{lstlisting}
 Epoch 0: 9129 / 10000
 Epoch 1: 9295 / 10000
@@ -687,18 +778,19 @@ Epoch 27: 9528 / 10000
 Epoch 28: 9542 / 10000
 Epoch 29: 9534 / 10000
 \end{lstlisting}
-That is, the trained network gives us a classification rate of about 95 percent - 95.42 percent at its peak ("Epoch 28")! That's quite encouraging as a first attempt. I should warn you, however, that if you run the code then your results are not necessarily going to be quite the same as mine, since we'll be initializing our network using (different) random weights and biases. To generate results in this chapter I've taken best-of-three runs.
-Let's rerun the above experiment, changing the number of hidden neurons to 100. As was the case earlier, if you're running the code as you read along, you should be warned that it takes quite a while to execute (on my machine this experiment takes tens of seconds for each training epoch), so it's wise to continue reading in parallel while the code executes.
+That is, the trained network gives us a classification rate of about 95 percent - 95.42 percent at its peak (Epoch 28)! That's quite encouraging as a first attempt. I should warn you, however, that if you run the code then your results are not necessarily going to be quite the same as mine, since we'll be initializing our network using (different) random weights and biases. To generate results in this chapter I've taken best-of-three runs.
+Let's rerun the above experiment, changing the number of hidden neurons to 100. 
 \begin{lstlisting}
->>> net = network.Network([784, 100, 10])
->>> net.SGD(training_data, 30, 10, 3.0, test_data=test_data)
+net = network.Network([784, 100, 10])
+net.SGD(training_data, 30, 10, 3.0, test_data=test_data)
 \end{lstlisting}
-Sure enough, this improves the results to 96.59 percent. At least in this case, using more hidden neurons helps us get better results* 
-*Reader feedback indicates quite some variation in results for this experiment, and some training runs give results quite a bit worse. Using the techniques introduced in chapter 3 will greatly reduce the variation in performance across different training runs for our networks.
-Of course, to obtain these accuracies I had to make specific choices for the number of epochs of training, the mini-batch size, and the learning rate, ?. As I mentioned above, these are known as hyper-parameters for our neural network, in order to distinguish them from the parameters (weights and biases) learnt by our learning algorithm. If we choose our hyper-parameters poorly, we can get bad results. Suppose, for example, that we'd chosen the learning rate to be ?=0.001,
+Sure enough, this improves the results to 96.59 percent. At least in this case, using more hidden neurons helps us get better results\footnotesize{
+Reader feedback indicates quite some variation in results for this experiment, and some training runs give results quite a bit worse. Using the techniques introduced in Chapter~\ref{sec:ImprovingTheWayNeuralNetworksLearn} will greatly reduce the variation in performance across different training runs for our networks.}.
+
+Of course, to obtain these accuracies I had to make specific choices for the number of epochs of training, the mini-batch size, and the learning rate, $\eta$. As I mentioned above, these are known as hyper-parameters for our neural network, in order to distinguish them from the parameters (weights and biases) learnt by our learning algorithm. If we choose our hyper-parameters poorly, we can get bad results. Suppose, for example, that we'd chosen the learning rate to be $\eta$=0.001,
 \begin{lstlisting}
->>> net = network.Network([784, 100, 10])
->>> net.SGD(training_data, 30, 10, 0.001, test_data=test_data)
+net = network.Network([784, 100, 10])
+net.SGD(training_data, 30, 10, 0.001, test_data=test_data)
 \end{lstlisting}
 The results are much less encouraging,
 \begin{lstlisting}
@@ -710,12 +802,12 @@ Epoch 27: 2101 / 10000
 Epoch 28: 2123 / 10000
 Epoch 29: 2142 / 10000
 \end{lstlisting}
-However, you can see that the performance of the network is getting slowly better over time. That suggests increasing the learning rate, say to ?=0.01. If we do that, we get better results, which suggests increasing the learning rate again. (If making a change improves things, try doing more!) If we do that several times over, we'll end up with a learning rate of something like ?=1.0 (and perhaps fine tune to 3.0), which is close to our earlier experiments. So even though we initially made a poor choice of hyper-parameters, we at least got enough information to help us improve our choice of hyper-parameters.
-In general, debugging a neural network can be challenging. This is especially true when the initial choice of hyper-parameters produces results no better than random noise. Suppose we try the successful 30 hidden neuron network architecture from earlier, but with the learning rate changed to ?=100.0
-: 
+However, you can see that the performance of the network is getting slowly better over time. That suggests increasing the learning rate, say to $\eta$=0.01. If we do that, we get better results, which suggests increasing the learning rate again. (If making a change improves things, try doing more!) If we do that several times over, we'll end up with a learning rate of something like $\eta$=1.0 (and perhaps fine tune to 3.0), which is close to our earlier experiments. So even though we initially made a poor choice of hyper-parameters, we at least got enough information to help us improve our choice of hyper-parameters.
+
+In general, debugging a neural network can be challenging. This is especially true when the initial choice of hyper-parameters produces results no better than random noise. Suppose we try the successful 30 hidden neuron network architecture from earlier, but with the learning rate changed to $\eta$=100.0
 \begin{lstlisting}
->>> net = network.Network([784, 30, 10])
->>> net.SGD(training_data, 30, 10, 100.0, test_data=test_data)
+net = network.Network([784, 30, 10])
+net.SGD(training_data, 30, 10, 100.0, test_data=test_data)
 \end{lstlisting}
 At this point we've actually gone too far, and the learning rate is too high:
 \begin{lstlisting}
@@ -729,15 +821,22 @@ Epoch 28: 982 / 10000
 Epoch 29: 982 / 10000
 \end{lstlisting}
 Now imagine that we were coming to this problem for the first time. Of course, we know from our earlier experiments that the right thing to do is to decrease the learning rate. But if we were coming to this problem for the first time then there wouldn't be much in the output to guide us on what to do. We might worry not only about the learning rate, but about every other aspect of our neural network. We might wonder if we've initialized the weights and biases in a way that makes it hard for the network to learn? Or maybe we don't have enough training data to get meaningful learning? Perhaps we haven't run for enough epochs? Or maybe it's impossible for a neural network with this architecture to learn to recognize handwritten digits? Maybe the learning rate is too low? Or, maybe, the learning rate is too high? When you're coming to a problem for the first time, you're not always sure.
+
 The lesson to take away from this is that debugging a neural network is not trivial, and, just as for ordinary programming, there is an art to it. You need to learn that art of debugging in order to get good results from neural networks. More generally, we need to develop heuristics for choosing good hyper-parameters and a good architecture. We'll discuss all these at length through the book, including how I chose the hyper-parameters above.
-Exercise
-* Try creating a network with just two layers - an input and an output layer, no hidden layer - with 784 and 10 neurons, respectively. Train the network using stochastic gradient descent. What classification accuracy can you achieve? 
+
+\textbf{Exercise}
+\begin{enumerate}
+\item 
+ Try creating a network with just two layers - an input and an output layer, no hidden layer - with 784 and 10 neurons, respectively. Train the network using stochastic gradient descent. What classification accuracy can you achieve? 
+\end{enumerate}
+ 
 Earlier, I skipped over the details of how the MNIST data is loaded. It's pretty straightforward. For completeness, here's the code. The data structures used to store the MNIST data are described in the documentation strings - it's straightforward stuff, tuples and lists of Numpy ndarray objects (think of them as vectors if you're not familiar with ndarrays):
+
 \begin{lstlisting}
+# %load mnist_loader.py
 """
 mnist_loader
 ~~~~~~~~~~~~
-
 A library to load the MNIST image data.  For details of the data
 structures that are returned, see the doc strings for ``load_data``
 and ``load_data_wrapper``.  In practice, ``load_data_wrapper`` is the
@@ -746,7 +845,7 @@ function usually called by our neural network code.
 
 #### Libraries
 # Standard library
-import cPickle
+import pickle
 import gzip
 
 # Third-party libraries
@@ -755,28 +854,24 @@ import numpy as np
 def load_data():
     """Return the MNIST data as a tuple containing the training data,
     the validation data, and the test data.
-
     The ``training_data`` is returned as a tuple with two entries.
     The first entry contains the actual training images.  This is a
     numpy ndarray with 50,000 entries.  Each entry is, in turn, a
     numpy ndarray with 784 values, representing the 28 * 28 = 784
     pixels in a single MNIST image.
-
     The second entry in the ``training_data`` tuple is a numpy ndarray
     containing 50,000 entries.  Those entries are just the digit
     values (0...9) for the corresponding images contained in the first
     entry of the tuple.
-
     The ``validation_data`` and ``test_data`` are similar, except
     each contains only 10,000 images.
-
     This is a nice data format, but for use in neural networks it's
     helpful to modify the format of the ``training_data`` a little.
     That's done in the wrapper function ``load_data_wrapper()``, see
     below.
     """
-    f = gzip.open('../data/mnist.pkl.gz', 'rb')
-    training_data, validation_data, test_data = cPickle.load(f)
+    f = gzip.open('mnist.pkl.gz', 'rb')
+    training_data, validation_data, test_data = pickle.load(f, encoding="latin1")
     f.close()
     return (training_data, validation_data, test_data)
 
@@ -784,19 +879,16 @@ def load_data_wrapper():
     """Return a tuple containing ``(training_data, validation_data,
     test_data)``. Based on ``load_data``, but the format is more
     convenient for use in our implementation of neural networks.
-
     In particular, ``training_data`` is a list containing 50,000
     2-tuples ``(x, y)``.  ``x`` is a 784-dimensional numpy.ndarray
     containing the input image.  ``y`` is a 10-dimensional
     numpy.ndarray representing the unit vector corresponding to the
     correct digit for ``x``.
-
     ``validation_data`` and ``test_data`` are lists containing 10,000
     2-tuples ``(x, y)``.  In each case, ``x`` is a 784-dimensional
     numpy.ndarry containing the input image, and ``y`` is the
     corresponding classification, i.e., the digit values (integers)
     corresponding to ``x``.
-
     Obviously, this means we're using slightly different formats for
     the training data and the validation / test data.  These formats
     turn out to be the most convenient for use in our neural network
@@ -821,43 +913,75 @@ def vectorized_result(j):
     return e
 \end{lstlisting}
 
+ ============================================================
+
 I said above that our program gets pretty good results. What does that mean? Good compared to what? It's informative to have some simple (non-neural-network) baseline tests to compare against, to understand what it means to perform well. The simplest baseline of all, of course, is to randomly guess the digit. That'll be right about ten percent of the time. We're doing much better than that!
-What about a less trivial baseline? Let's try an extremely simple idea: we'll look at how dark an image is. For instance, an image of a 2 will typically be quite a bit darker than an image of a 1, just because more pixels are blackened out, as the following examples illustrate:
 
-This suggests using the training data to compute average darknesses for each digit, 0,1,2,?,9. When presented with a new image, we compute how dark the image is, and then guess that it's whichever digit has the closest average darkness. This is a simple procedure, and is easy to code up, so I won't explicitly write out the code - if you're interested it's in the GitHub repository. But it's a big improvement over random guessing, getting 2,225 of the 10,000 test images correct, i.e., 22.25 percent accuracy.
-It's not difficult to find other ideas which achieve accuracies in the 20 to 50 percent range. If you work a bit harder you can get up over 50 percent. But to get much higher accuracies it helps to use established machine learning algorithms. Let's try using one of the best known algorithms, the support vector machine or SVM. If you're not familiar with SVMs, not to worry, we're not going to need to understand the details of how SVMs work. Instead, we'll use a Python library called scikit-learn, which provides a simple Python interface to a fast C-based library for SVMs known as LIBSVM.
-If we run scikit-learn's SVM classifier using the default settings, then it gets 9,435 of 10,000 test images correct. (The code is available here.) That's a big improvement over our naive approach of classifying an image based on how dark it is. Indeed, it means that the SVM is performing roughly as well as our neural networks, just a little worse. In later chapters we'll introduce new techniques that enable us to improve our neural networks so that they perform much better than the SVM.
-That's not the end of the story, however. The 9,435 of 10,000 result is for scikit-learn's default settings for SVMs. SVMs have a number of tunable parameters, and it's possible to search for parameters which improve this out-of-the-box performance. I won't explicitly do this search, but instead refer you to this blog post by Andreas Mueller if you'd like to know more. Mueller shows that with some work optimizing the SVM's parameters it's possible to get the performance up above 98.5 percent accuracy. In other words, a well-tuned SVM only makes an error on about one digit in 70. That's pretty good! Can neural networks do better?
-In fact, they can. At present, well-designed neural networks outperform every other technique for solving MNIST, including SVMs. The current (2013) record is classifying 9,979 of 10,000 images correctly. This was done by Li Wan, Matthew Zeiler, Sixin Zhang, Yann LeCun, and Rob Fergus. We'll see most of the techniques they used later in the book. At that level the performance is close to human-equivalent, and is arguably better, since quite a few of the MNIST images are difficult even for humans to recognize with confidence, for example:
+What about a less trivial baseline? Let's try an extremely simple idea: we'll look at how \textit{dark} an image is. For instance, an image of a 2 will typically be quite a bit darker than an image of a 1, just because more pixels are blackened out, as the following examples illustrate:
 
-I trust you'll agree that those are tough to classify! With images like these in the MNIST data set it's remarkable that neural networks can accurately classify all but 21 of the 10,000 test images. Usually, when programming we believe that solving a complicated problem like recognizing the MNIST digits requires a sophisticated algorithm. But even the neural networks in the Wan et al paper just mentioned involve quite simple algorithms, variations on the algorithm we've seen in this chapter. All the complexity is learned, automatically, from the training data. In some sense, the moral of both our results and those in more sophisticated papers, is that for some problems: 
-sophisticated algorithm ? simple learning algorithm + good training data. 
-Toward deep learning
+{\centering
+\includegraphics[width=0.3\textwidth,]{pic/digits21}
+\par}
+
+
+This suggests using the training data to compute average darknesses for each digit, 0,1,2,$\ldots$,9. When presented with a new image, we compute how dark the image is, and then guess that it's whichever digit has the closest average darkness. This is a simple procedure, and is easy to code up, so I won't explicitly write out the code - if you're interested it's in the GitHub repository \cite{Nielsengithub2019} But it's a big improvement over random guessing, getting 2,225 of the 10,000 test images correct, i.e., 22.25 percent accuracy.
+
+It's not difficult to find other ideas which achieve accuracies in the 20 to 50 percent range. If you work a bit harder you can get up over 50 percent. But to get much higher accuracies it helps to use established machine learning algorithms. Let's try using one of the best known algorithms, the \textit{support vector machine} or SVM. If you're not familiar with SVMs, not to worry, we're not going to need to understand the details of how SVMs work. Instead, we'll use a Python library called scikit-learn \cite{scikit-learn,scikit-learnwebsite}, which provides a simple Python interface to a fast C-based library for SVMs known as LIBSVM\cite{libsvm}.
+
+If we run scikit-learn's SVM classifier using the default settings, then it gets 9,435 of 10,000 test images correct. (see \cite[mnist\_svm.py]{Nielsengithub2019}). That's a big improvement over our naive approach of classifying an image based on how dark it is. Indeed, it means that the SVM is performing roughly as well as our neural networks, just a little worse. In later chapters we'll introduce new techniques that enable us to improve our neural networks so that they perform much better than the SVM.
+
+That's not the end of the story, however. The 9,435 of 10,000 result is for scikit-learn's default settings for SVMs. SVMs have a number of tunable parameters, and it's possible to search for parameters which improve this out-of-the-box performance. I won't explicitly do this search, but instead refer you to this blog post \cite{Muellermnist2019} by Andreas Mueller if you'd like to know more. Mueller shows that with some work optimizing the SVM's parameters it's possible to get the performance up above 98.5 percent accuracy. In other words, a well-tuned SVM only makes an error on about one digit in 70. That's pretty good! Can neural networks do better?
+
+
+Muellermnist2019
+In fact, they can. At present, well-designed neural networks outperform every other technique for solving MNIST, including SVMs. The current (2013) record is classifying 9,979 of 10,000 images correctly. This was done by Li Wan \cite{wanli2019}, Matthew Zeiler \cite{matthewzeiler2019}, Sixin Zhang, Yann LeCun \cite{yannlecun2019}, and Rob Fergus \cite{RobFergus2019}. We'll see most of the techniques they used later in the book. At that level the performance is close to human-equivalent, and is arguably better, since quite a few of the MNIST images are difficult even for humans to recognize with confidence, for example:
+
+
+{\centering
+\includegraphics[width=0.8\textwidth,]{pic/digits-unreadable}
+\par}
+
+
+
+I trust you'll agree that those are tough to classify! With images like these in the MNIST data set it's remarkable that neural networks can accurately classify all but 21 of the 10,000 test images. Usually, when programming we believe that solving a complicated problem like recognizing the MNIST digits requires a sophisticated algorithm. But even the neural networks in the Wan \textit{et. al.,} paper just mentioned involve quite simple algorithms, variations on the algorithm we've seen in this chapter. All the complexity is learned, automatically, from the training data. In some sense, the moral of both our results and those in more sophisticated papers, is that for some problems: 
+
+sophisticated algorithm $\leq$ simple learning algorithm $+$ good training data. 
+
+\section{Toward deep learning}
+
 While our neural network gives impressive performance, that performance is somewhat mysterious. The weights and biases in the network were discovered automatically. And that means we don't immediately have an explanation of how the network does what it does. Can we find some way to understand the principles by which our network is classifying handwritten digits? And, given such principles, can we do better?
+
 To put these questions more starkly, suppose that a few decades hence neural networks lead to artificial intelligence (AI). Will we understand how such intelligent networks work? Perhaps the networks will be opaque to us, with weights and biases we don't understand, because they've been learned automatically. In the early days of AI research people hoped that the effort to build an AI would also help us understand the principles behind intelligence and, maybe, the functioning of the human brain. But perhaps the outcome will be that we end up understanding neither the brain nor how artificial intelligence works!
-To address these questions, let's think back to the interpretation of artificial neurons that I gave at the start of the chapter, as a means of weighing evidence. Suppose we want to determine whether an image shows a human face or not:
-Credits: 1. Ester Inbar. 2. Unknown. 3. NASA, ESA, G. Illingworth, D. Magee, and P. Oesch (University of California, Santa Cruz), R. Bouwens (Leiden University), and the HUDF09 Team. Click on the images for more details.
+
+To address these questions, let's think back to the interpretation of artificial neurons that I gave at the start of the chapter, as a means of weighing evidence. Suppose we want to determine whether an image shows a human face or not\footnote{Credits: 1. Ester Inbar \cite{wikipediakangeroo2019}. 2. Unknown \cite{wikipediaeinsteinaged32019}. 3. NASA, ESA, G. Illingworth, D. Magee, and P. Oesch (University of California, Santa Cruz), R. Bouwens (Leiden University), and the HUDF09 Team \cite{wikipediahubblexdeepfield2019}}:
+
+
+{\centering
+\includegraphics[height=0.3\textwidth,]{pic/Kangaroo.JPG}
+\includegraphics[height=0.3\textwidth,]{pic/Einstein_crop.jpg}
+\includegraphics[height=0.3\textwidth,]{pic/hubble.jpg}
+\par}
 
 We could attack this problem the same way we attacked handwriting recognition - by using the pixels in the image as input to a neural network, with the output from the network a single neuron indicating either ``Yes, it's a face'' or ``No, it's not a face''.
 Let's suppose we do this, but that we're not using a learning algorithm. Instead, we're going to try to design a network by hand, choosing appropriate weights and biases. How might we go about it? Forgetting neural networks entirely for the moment, a heuristic we could use is to decompose the problem into sub-problems: does the image have an eye in the top left? Does it have an eye in the top right? Does it have a nose in the middle? Does it have a mouth in the bottom middle? Is there hair on top? And so on.
 If the answers to several of these questions are ``yes'', or even just ``probably yes'', then we'd conclude that the image is likely to be a face. Conversely, if the answers to most of the questions are ``no'', then the image probably isn't a face.
 Of course, this is just a rough heuristic, and it suffers from many deficiencies. Maybe the person is bald, so they have no hair. Maybe we can only see part of the face, or the face is at an angle, so some of the facial features are obscured. Still, the heuristic suggests that if we can solve the sub-problems using neural networks, then perhaps we can build a neural network for face-detection, by combining the networks for the sub-problems. Here's a possible architecture, with rectangles denoting the sub-networks. Note that this isn't intended as a realistic approach to solving the face-detection problem; rather, it's to help us build intuition about how networks function. Here's the architecture:
 
+{\centering
+\includegraphics[width=\textwidth,]{pic/tikz14.png}
+\par}
+
 It's also plausible that the sub-networks can be decomposed. Suppose we're considering the question: ``Is there an eye in the top left?'' This can be decomposed into questions such as: ``Is there an eyebrow?''; ``Are there eyelashes?''; ``Is there an iris?''; and so on. Of course, these questions should really include positional information, as well - ``Is the eyebrow in the top left, and above the iris?'', that kind of thing - but let's keep it simple. The network to answer the question ``Is there an eye in the top left?'' can now be decomposed:
 
+{\centering
+\includegraphics[width=\textwidth,]{pic/tikz15.png}
+\par}
+
 Those questions too can be broken down, further and further through multiple layers. Ultimately, we'll be working with sub-networks that answer questions so simple they can easily be answered at the level of single pixels. Those questions might, for example, be about the presence or absence of very simple shapes at particular points in the image. Such questions can be answered by single neurons connected to the raw pixels in the image.
-The end result is a network which breaks down a very complicated question - does this image show a face or not - into very simple questions answerable at the level of single pixels. It does this through a series of many layers, with early layers answering very simple and specific questions about the input image, and later layers building up a hierarchy of ever more complex and abstract concepts. Networks with this kind of many-layer structure - two or more hidden layers - are called deep neural networks.
+
+The end result is a network which breaks down a very complicated question - does this image show a face or not - into very simple questions answerable at the level of single pixels. It does this through a series of many layers, with early layers answering very simple and specific questions about the input image, and later layers building up a hierarchy of ever more complex and abstract concepts. Networks with this kind of many-layer structure - two or more hidden layers - are called \textit{deep neural networks}.
+
 Of course, I haven't said how to do this recursive decomposition into sub-networks. It certainly isn't practical to hand-design the weights and biases in the network. Instead, we'd like to use learning algorithms so that the network can automatically learn the weights and biases - and thus, the hierarchy of concepts - from training data. Researchers in the 1980s and 1990s tried using stochastic gradient descent and backpropagation to train deep networks. Unfortunately, except for a few special architectures, they didn't have much luck. The networks would learn, but very slowly, and in practice often too slowly to be useful.
+
 Since 2006, a set of techniques has been developed that enable learning in deep neural nets. These deep learning techniques are based on stochastic gradient descent and backpropagation, but also introduce new ideas. These techniques have enabled much deeper (and larger) networks to be trained - people now routinely train networks with 5 to 10 hidden layers. And, it turns out that these perform far better on many problems than shallow neural networks, i.e., networks with just a single hidden layer. The reason, of course, is the ability of deep nets to build up a complex hierarchy of concepts. It's a bit like the way conventional programming languages use modular design and ideas about abstraction to enable the creation of complex computer programs. Comparing a deep network to a shallow network is a bit like comparing a programming language with the ability to make function calls to a stripped down language with no ability to make such calls. Abstraction takes a different form in neural networks than it does in conventional programming, but it's just as important.
-
-
-
-
-
-
-
-
-
-
-
 

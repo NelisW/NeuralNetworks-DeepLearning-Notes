@@ -40,7 +40,7 @@ We can see from this graph that when the neuron's output is close to 1
 get very small. This is the origin of the learning slowdown. What's more, as we shall see a little later, the learning slowdown occurs for essentially the same reason in more general neural networks, not just the toy example we've been playing with.
 Introducing the cross-entropy cost function
 How can we address the learning slowdown? It turns out that we can solve the problem by replacing the quadratic cost with a different cost function, known as the cross-entropy. To understand the cross-entropy, let's move a little away from our super-simple toy model. We'll suppose instead that we're trying to train a neuron with several input variables, $x_1$,$x_2$,?
-, corresponding weights $w_1$,$w_2$,?, and a bias, b
+, corresponding weights $w_1$,$w_2$,$\ldots$, and a bias, b
 : 
 
 The output from the neuron is, of course, a=?(z), where z=?jwjxj+b is the weighted sum of the inputs. We define the cross-entropy cost function for this neuron by 
@@ -1144,7 +1144,7 @@ Each technique developed in this chapter is valuable to know in its own right, b
 Variations on stochastic gradient descent
 Stochastic gradient descent by backpropagation has served us well in attacking the MNIST digit classification problem. However, there are many other approaches to optimizing the cost function, and sometimes those other approaches offer performance superior to mini-batch stochastic gradient descent. In this section I sketch two such approaches, the Hessian and momentum techniques.
 Hessian technique: To begin our discussion it helps to put neural networks aside for a bit. Instead, we're just going to consider the abstract problem of minimizing a cost function C
-which is a function of many variables, w=$w_1$,$w_2$,?, so C=C(w). By Taylor's theorem, the cost function can be approximated near a point w by 
+which is a function of many variables, w=$w_1$,$w_2$,$\ldots$, so C=C(w). By Taylor's theorem, the cost function can be approximated near a point w by 
 C(w+?w)=C(w)+?j?C?wj?wj+12?jk?wj?2C?wj?wk?wk+?(103)
 We can rewrite this more compactly as 
 C(w+?w)=C(w)+?C??w+12?wTH?w+?,(104)

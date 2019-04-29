@@ -151,11 +151,11 @@ The backpropagation equations provide us with a way of computing the gradient of
 1. Input x
 : Set the corresponding activation a1
 *  for the input layer. 
-*  Feedforward: For each l=2,3,?,L compute zl=wlal?1+bl and al=?(zl)
+*  Feedforward: For each l=2,3,$\ldots$,L compute zl=wlal?1+bl and al=?(zl)
 *  .
 *  Output error ?L: Compute the vector ?L=?aC???(zL)
 *  .
-*  Backpropagate the error: For each l=L?1,L?2,?,2 compute ?l=((wl+1)T?l+1)???(zl)
+*  Backpropagate the error: For each l=L?1,L?2,$\ldots$,2 compute ?l=((wl+1)T?l+1)???(zl)
 *  .
 *  Output: The gradient of the cost function is given by ?C?wljk=al?1k?lj and ?C?blj=?lj
 5. . 
@@ -173,14 +173,14 @@ training examples, the following algorithm applies a gradient descent learning s
 1. Input a set of training examples
 2. For each training example x
 : Set the corresponding input activation ax,1, and perform the following steps:
-* Feedforward: For each l=2,3,?,L
+* Feedforward: For each l=2,3,$\ldots$,L
 compute zx,l=wlax,l?1+bl and ax,l=?(zx,l)
 *  .
 *  Output error ?x,L: Compute the vector ?x,L=?aCx???(zx,L)
 *  .
-*  Backpropagate the error: For each l=L?1,L?2,?,2 compute ?x,l=((wl+1)T?x,l+1)???(zx,l)
+*  Backpropagate the error: For each l=L?1,L?2,$\ldots$,2 compute ?x,l=((wl+1)T?x,l+1)???(zx,l)
 * *  . 
-*  Gradient descent: For each l=L,L?1,?,2 update the weights according to the rule wl?wl??m?x?x,l(ax,l?1)T, and the biases according to the rule bl?bl??m?x?x,l
+*  Gradient descent: For each l=L,L?1,$\ldots$,2 update the weights according to the rule wl?wl??m?x?x,l(ax,l?1)T, and the biases according to the rule bl?bl??m?x?x,l
 3. .
 Of course, to implement stochastic gradient descent in practice you also need an outer loop generating mini-batches of training examples, and an outer loop stepping through multiple epochs of training. I've omitted those for simplicity. 
 The code for backpropagation
@@ -266,7 +266,7 @@ Problem
 * whose columns are the vectors in the mini-batch. We forward-propagate by multiplying by the weight matrices, adding a suitable matrix for the bias terms, and applying the sigmoid function everywhere. We backpropagate along similar lines. Explicitly write out pseudocode for this approach to the backpropagation algorithm. Modify network.py so that it uses this fully matrix-based approach. The advantage of this approach is that it takes full advantage of modern libraries for linear algebra. As a result it can be quite a bit faster than looping over the mini-batch. (On my laptop, for example, the speedup is about a factor of two when run on MNIST classification problems like those we considered in the last chapter.) In practice, all serious libraries for backpropagation use this fully matrix-based approach or some variant. 
 In what sense is backpropagation a fast algorithm?
 In what sense is backpropagation a fast algorithm? To answer this question, let's consider another approach to computing the gradient. Imagine it's the early days of neural networks research. Maybe it's the 1950s or 1960s, and you're the first person in the world to think of using gradient descent to learn! But to make the idea work you need a way of computing the gradient of the cost function. You think back to your knowledge of calculus, and decide to see if you can use the chain rule to compute the gradient. But after playing around a bit, the algebra looks complicated, and you get discouraged. So you try to find another approach. You decide to regard the cost as a function of the weights C=C(w)
-alone (we'll get back to the biases in a moment). You number the weights $w_1$,$w_2$,?, and want to compute ?C/?wj for some particular weight wj. An obvious way of doing that is to use the approximation 
+alone (we'll get back to the biases in a moment). You number the weights $w_1$,$w_2$,$\ldots$, and want to compute ?C/?wj for some particular weight wj. An obvious way of doing that is to use the approximation 
 ?C?wj?C(w+?ej)?C(w)?,(46)
 where ?>0 is a small positive number, and ej is the unit vector in the jth direction. In other words, we can estimate ?C/?wj by computing the cost C for two slightly different values of wj, and then applying Equation (46). The same idea will let us compute the partial derivatives ?C/?b
 with respect to the biases.
@@ -302,7 +302,7 @@ In fact, it'll cause the following change:
 ?al+1q??al+1q?alj?alj.(49)
 Substituting in the expression from Equation (48), we get: 
 ?al+1q??al+1q?alj?alj?wljk?wljk.(50)
-Of course, the change ?al+1q will, in turn, cause changes in the activations in the next layer. In fact, we can imagine a path all the way through the network from wljk to C, with each change in activation causing a change in the next activation, and, finally, a change in the cost at the output. If the path goes through activations alj,al+1q,?,aL?1n,aLm then the resulting expression is 
+Of course, the change ?al+1q will, in turn, cause changes in the activations in the next layer. In fact, we can imagine a path all the way through the network from wljk to C, with each change in activation causing a change in the next activation, and, finally, a change in the cost at the output. If the path goes through activations alj,al+1q,$\ldots$,aL?1n,aLm then the resulting expression is 
 ?C??C?aLm?aLm?aL?1n?aL?1n?aL?2p??al+1q?alj?alj?wljk?wljk,(51)
 that is, we've picked up a ?a/?a type term for each additional neuron we've passed through, as well as the ?C/?aLm term at the end. This represents the change in C due to changes in the activations along this particular path through the network. Of course, there's many paths by which a change in wljk can propagate to affect the cost, and we've been considering just a single path. To compute the total change in C it is plausible that we should sum over all the possible paths between the weight and the final cost, i.e., 
 ?C??mnp?q?C?aLm?aLm?aL?1n?aL?1n?aL?2p??al+1q?alj?alj?wljk?wljk,(52)

@@ -72,15 +72,21 @@ language=,                % choose the language of the code
 upquote=true, % gives the upquote instead of the curly quote
 basicstyle=\ttfamily\footnotesize,       % the size of the fonts that are used for the code
                   % alternative ((basicstyle=\ttfamily\fontsize{7}{10}\selectfont]))
-numbers=none,                   % where to put the line-numbers
+numbers=none,                   % where to put the line-numbers (normally left)
+numberstyle=\tiny,
+%stepnumber=2,
+numbersep=5pt,
 showspaces=false,               % show spaces adding particular underscores
 showstringspaces=false,         % underline spaces within strings
 showtabs=false,                 % show tabs within strings adding particular underscores
 breaklines=true,        % sets automatic line breaking
 breakatwhitespace=false,    % sets if automatic breaks should only happen at whitespace
+extendedchars=true,
+keywordstyle=\color{red},
 prebreak=\raisebox{0ex}[0ex][0ex]{$\dlsh$}, % add linebreak symbol
 captionpos=b,                   % sets the caption-position to bottom
 frame=none,                   % 'lines' or 'none' adds a frame around the code
+%backgroundcolor=\color{LightGrey},
 tabsize=2,              % sets default tabsize to 2 spaces
 %escapeinside={\%}{)},          % if you want to add a comment within your code
 %escapeinside={\%*}{*)},          % if you want to add LaTeX within your code
@@ -93,11 +99,14 @@ captionpos=t,                    % sets the caption-position to top
 numberbychapter=false,
 }
 
+\DeclareCaptionFont{white}{\color{white}}
+\DeclareCaptionFormat{listing}{\colorbox[cmyk]{0.43, 0.35, 0.35,0.01}{\parbox{\textwidth}{\hspace{15pt}#1#2#3}}}
+\captionsetup[lstlisting]{format=listing,labelfont=white,textfont=white, singlelinecheck=false, margin=0pt, font={bf,footnotesize}}
 
 % make inline listing larger than display
 %https://latex.org/forum/viewtopic.php?t=2072
 \makeatletter
-\lst@AddToHook{TextStyle}{\let\lst@basicstyle\ttfamily\large\fontfamily{pcr}\selectfont}
+\lst@AddToHook{TextStyle}{\let\lst@basicstyle\ttfamily\footnotesize\fontfamily{pcr}\selectfont}
 \makeatother
 
 \lstset{style=ossimstyle}
