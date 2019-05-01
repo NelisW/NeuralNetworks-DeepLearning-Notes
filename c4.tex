@@ -74,21 +74,7 @@ To get a feel for how components in the network work, let's focus on the top hid
 
 {\centering \includegraphics[width=\textwidth,]{pic/wigglyfn07.png} \par}
 
-The \LaTeX{} version does not have interactivity, so the graphs are pre-computed, using Equation~\ref{eq:c01-03-sigmoidfunction} and following code to obtain the graphs shown below.
-
-\begin{lstlisting}
-x = np.linspace(0,1,300)
-p = ryplot.Plotter(1,4,4,figsize=(15,15),doWarning=False)
-ws = [5,10,20,40]
-bs = [-20,-10,-5,-2]
-for iw,w in enumerate(ws):
-    for ib,b in enumerate(bs):
-        y = sigmoid(x,w,b )
-        p.plot(1+ib+iw*len(bs), x, y, f'w={w} b={b}',maxNX=1,maxNY=1,xAxisFmt='%.0f',yAxisFmt='%.0f',pltaxis=[0,1,0,1] )
-\end{lstlisting}
-
-{\centering \includegraphics[width=\textwidth,]{eps/sigmoid4x4plot} \par}
-Observe how the output (vertical axis) changes as $w$ changes (downward in the set of graphs).
+The \LaTeX{} version of the document  does not have interactivity, see Section~\ref{sec:VisualisingWeightandBiasEffects} for statically calculated graphs.
 
 
 As we learnt earlier in the book, what's being computed by the hidden neuron is $\sigma (wx+b)$, where $\sigma(z)=1/(1+e^{-z})$ is the sigmoid function. Up to now, we've made frequent use of this algebraic form. But for the proof of universality we will obtain more insight by ignoring the algebra entirely, and instead manipulating and observing the shape shown in the graph. This won't just give us a better feel for what's going on, it will also give us a proof\footnote{Strictly speaking, the visual approach I'm taking isn't what's traditionally thought of as a proof. But I believe the visual approach gives more insight into why the result is true than a traditional proof. And, of course, that kind of insight is the real purpose behind a proof. Occasionally, there will be small gaps in the reasoning I present: places where I make a visual argument that is plausible, but not quite rigorous. If this bothers you, then consider it a challenge to fill in the missing steps. But don't lose sight of the real purpose: to understand why the universality theorem is true.} of universality that applies to activation functions other than the sigmoid function.
@@ -194,8 +180,11 @@ Contrariwise, try clicking on the graph, and dragging up or down to change the h
 
 In other words, we can directly manipulate the function appearing in the graph on the right, and see that reflected in the $h$ values on the left. A fun thing to do is to hold the mouse button down and drag the mouse from one side of the graph to the other. As you do this you draw out a function, and get to watch the parameters in the neural network adapt.
 
-Time for a challenge.
 
+The \LaTeX{} version of the document  does not have interactivity, see Section~\ref{sec:ApproximatingFunctionswithNeuralNets} for Jupyter notebook code that provides similar interactivity as in the HTML pages.
+
+\textbf{Time for a challenge.
+}
 Let's think back to the function I plotted at the beginning of the chapter.
 
 {\centering \includegraphics[width=0.6\textwidth,]{pic/wigglyfn17} \par}
