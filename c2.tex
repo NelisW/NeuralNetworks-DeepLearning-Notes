@@ -2,25 +2,37 @@
 
 \chapter{How the Backpropagation Algorithm Works}
 
+\begin{lstlisting}
 
-In the last chapter we saw how neural networks can learn their weights and biases using the gradient descent algorithm. There was, however, a gap in our explanation: we didn't discuss how to compute the gradient of the cost function. That's quite a gap! In this chapter I'll explain a fast algorithm for computing such gradients, an algorithm known as backpropagation. 
+In the last chapter we saw how neural networks can learn their weights and biases using the gradient descent algorithm. There was, however, a gap in our explanation: we didn't discuss how to compute the gradient of the cost function. That's quite a gap! In this chapter I'll explain a fast algorithm for computing such gradients, an algorithm known as \textit{backpropagation}. 
+
+
 The backpropagation algorithm was originally introduced in the 1970s, but its importance wasn't fully appreciated until a famous 1986 paper by David Rumelhart, Geoffrey Hinton, and Ronald Williams. That paper describes several neural networks where backpropagation works far faster than earlier approaches to learning, making it possible to use neural nets to solve problems which had previously been insoluble. Today, the backpropagation algorithm is the workhorse of learning in neural networks.
+
 This chapter is more mathematically involved than the rest of the book. If you're not crazy about mathematics you may be tempted to skip the chapter, and to treat backpropagation as a black box whose details you're willing to ignore. Why take the time to study those details?
+
 The reason, of course, is understanding. At the heart of backpropagation is an expression for the partial derivative ?C/?w of the cost function C with respect to any weight w (or bias b) in the network. The expression tells us how quickly the cost changes when we change the weights and biases. And while the expression is somewhat complex, it also has a beauty to it, with each element having a natural, intuitive interpretation. And so backpropagation isn't just a fast algorithm for learning. It actually gives us detailed insights into how changing the weights and biases changes the overall behaviour of the network. That's well worth studying in detail.
+
 With that said, if you want to skim the chapter, or jump straight to the next chapter, that's fine. I've written the rest of the book to be accessible even if you treat backpropagation as a black box. There are, of course, points later in the book where I refer back to results from this chapter. But at those points you should still be able to understand the main conclusions, even if you don't follow all the reasoning.
+
 Warm up: a fast matrix-based approach to computing the output from a neural network
+
 Before discussing backpropagation, let's warm up with a fast matrix-based algorithm to compute the output from a neural network. We actually already briefly saw this algorithm near the end of the last chapter, but I described it quickly, so it's worth revisiting in detail. In particular, this is a good way of getting comfortable with the notation used in backpropagation, in a familiar context.
+
 Let's begin with a notation which lets us refer to weights in the network in an unambiguous way. We'll use wljk to denote the weight for the connection from the kth neuron in the (l?1)th layer to the jth neuron in the lth layer. So, for example, the diagram below shows the weight on a connection from the fourth neuron in the second layer to the second neuron in the third layer of a network: 
 
 This notation is cumbersome at first, and it does take some work to master. But with a little effort you'll find the notation becomes easy and natural. One quirk of the notation is the ordering of the j and k indices. You might think that it makes more sense to use j to refer to the input neuron, and k to the output neuron, not vice versa, as is actually done. I'll explain the reason for this quirk below.
+
 We use a similar notation for the network's biases and activations. Explicitly, we use blj for the bias of the jth neuron in the lth layer. And we use alj for the activation of the jth neuron in the lth layer. The following diagram shows examples of these notations in use: 
 
 With these notations, the activation alj of the jth neuron in the lth layer is related to the activations in the (l?1)th layer by the equation (compare Equation (4) and surrounding discussion in the last chapter) 
 
 where the sum is over all neurons k in the (l?1)th layer. To rewrite this expression in a matrix form we define a weight matrix wl for each layer, l. The entries of the weight matrix wl are just the weights connecting to the lth layer of neurons, that is, the entry in the jth row and kth column is wljk. Similarly, for each layer l we define a bias vector, bl. You can probably guess how this works - the components of the bias vector are just the values blj, one component for each neuron in the lth layer. And finally, we define an activation vector al whose components are the activations alj.
+
 The last ingredient we need to rewrite (23) in a matrix form is the idea of vectorizing a function such as ?. We met vectorization briefly in the last chapter, but to recap, the idea is that we want to apply a function such as ? to every element in a vector v. We use the obvious notation ?(v) to denote this kind of elementwise application of a function. That is, the components of ?(v) are just ?(v)j=?(vj). As an example, if we have the function f(x)=$x_2$ then the vectorized form of f has the effect 
 
 that is, the vectorized f just squares every element of the vector.
+
 With these notations in mind, Equation (23) can be rewritten in the beautiful and compact vectorized form 
 
 This expression gives us a much more global way of thinking about how the activations in one layer relate to activations in the previous layer: we just apply the weight matrix to the activations, then add the bias vector, and finally apply the ? function* 
@@ -28,20 +40,28 @@ This expression gives us a much more global way of thinking about how the activa
 *By the way, it's this expression that motivates the quirk in the wljk notation mentioned earlier. If we used j to index the input neuron, and k to index the output neuron, then we'd need to replace the weight matrix in Equation (25) by the transpose of the weight matrix. That's a small change, but annoying, and we'd lose the easy simplicity of saying (and thinking) ``apply the weight matrix to the activations''.
 
 That global view is often easier and more succinct (and involves fewer indices!) than the neuron-by-neuron view we've taken to now. Think of it as a way of escaping index hell, while remaining precise about what's going on. The expression is also useful in practice, because most matrix libraries provide fast ways of implementing matrix multiplication, vector addition, and vectorization. Indeed, the code in the last chapter made implicit use of this expression to compute the behaviour of the network.
+
 When using Equation (25) to compute al, we compute the intermediate quantity zl?wlal?1+bl along the way. This quantity turns out to be useful enough to be worth naming: we call zl the weighted input to the neurons in layer l. We'll make considerable use of the weighted input zl later in the chapter. Equation (25) is sometimes written in terms of the weighted input, as al=?(zl). It's also worth noting that zl has components , that is, zlj is just the weighted input to the activation function for neuron j in layer l
 .
 The two assumptions we need about the cost function
+
 The goal of backpropagation is to compute the partial derivatives ?C/?w and ?C/?b of the cost function C with respect to any weight w or bias b in the network. For backpropagation to work we need to make two main assumptions about the form of the cost function. Before stating those assumptions, though, it's useful to have an example cost function in mind. We'll use the quadratic cost function from last chapter (c.f. Equation (6)). In the notation of the last section, the quadratic cost has the form 
 
 where: n is the total number of training examples; the sum is over individual training examples, x; y=y(x) is the corresponding desired output; L denotes the number of layers in the network; and aL=aL(x) is the vector of activations output from the network when x is input.
+
 Okay, so what assumptions do we need to make about our cost function, C, in order that backpropagation can be applied? The first assumption we need is that the cost function can be written as an average  over cost functions Cx for individual training examples, x. This is the case for the quadratic cost function, where the cost for a single training example is  This assumption will also hold true for all the other cost functions we'll meet in this book.
+
+
 The reason we need this assumption is because what backpropagation actually lets us do is compute the partial derivatives ?Cx/?w and ?Cx/?b for a single training example. We then recover ?C/?w and ?C/?b by averaging over training examples. In fact, with this assumption in mind, we'll suppose the training example x has been fixed, and drop the x subscript, writing the cost Cx as C. We'll eventually put the x back in, but for now it's a notational nuisance that is better left implicit.
+
 The second assumption we make about the cost is that it can be written as a function of the outputs from the neural network: 
 
 For example, the quadratic cost function satisfies this requirement, since the quadratic cost for a single training example x may be written as 
 
 and thus is a function of the output activations. Of course, this cost function also depends on the desired output y, and you may wonder why we're not regarding the cost also as a function of y. Remember, though, that the input training example x is fixed, and so the output y is also a fixed parameter. In particular, it's not something we can modify by changing the weights and biases in any way, i.e., it's not something which the neural network learns. And so it makes sense to regard C as a function of the output activations aL alone, with y merely a parameter that helps define that function.
+
 The Hadamard product, s?t
+
 The backpropagation algorithm is based on common linear algebraic operations - things like vector addition, multiplying a vector by a matrix, and so on. But one of the operations is a little less commonly used. In particular, suppose s
 and t are two vectors of the same dimension. Then we use s?t to denote the elementwise product of the two vectors. Thus the components of s?t are just (s?t)j=sjtj. As an example, 
 
@@ -204,7 +224,10 @@ class Network(object):
         self.biases = [b-(eta/len(mini_batch))*nb 
                        for b, nb in zip(self.biases, nabla_b)]
 \end{lstlisting}
+
+
 Most of the work is done by the line \lstinline{delta_nabla_b}, \lstinline{delta_nabla_w = self.backprop(x, y)} which uses the backprop method to figure out the partial derivatives ?Cx/?blj and ?Cx/?wljk. The backprop method follows the algorithm in the last section closely. There is one small change - we use a slightly different approach to indexing the layers. This change is made to take advantage of a feature of Python, namely the use of negative list indices to count backward from the end of a list, so, e.g., l[-3] is the third last entry in a list l. The code for backprop is below, together with a few helper functions, which are used to compute the ? function, the derivative ??, and the derivative of the cost function. With these inclusions you should be able to understand the code in a self-contained way. If something's tripping you up, you may find it helpful to consult the original description (and complete listing) of the code. 
+
 \begin{lstlisting}
 class Network(object):
 ...
@@ -258,6 +281,7 @@ def sigmoid_prime(z):
     """Derivative of the sigmoid function."""
     return sigmoid(z)*(1-sigmoid(z))
 \end{lstlisting}
+\begin{lstlisting}
 
 Problem
 
@@ -316,3 +340,5 @@ What about the other mystery - how backpropagation could have been discovered in
 . The clever idea is to switch to using weighted inputs, like zl+1q, as the intermediate variables. If you don't have this idea, and instead continue using the activations al+1q
 , the proof you obtain turns out to be slightly more complex than the proof given earlier in the chapter. - short, but somewhat obscure, because all the signposts to its construction have been removed! I am, of course, asking you to trust me on this, but there really is no great mystery to the origin of the earlier proof. It's just a lot of hard work simplifying the proof I've sketched in this section.
 
+
+\end{lstlisting}
