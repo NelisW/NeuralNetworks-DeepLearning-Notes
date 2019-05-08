@@ -30,8 +30,10 @@
 \usepackage{afterpage}
 \usepackage[T1]{fontenc}
 \usepackage{placeins} % FloatBarrier
+\usepackage[detect-weight]{siunitx} % nice! SI units and print numbers
 
 \usepackage{ifthen}
+\usepackage{bm} % bold math
 
 \usepackage{graphicx}
 %\usepackage{lastpage}
@@ -71,9 +73,9 @@ http://neuralnetworksanddeeplearning.com/index.html
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % files making up this document
 
-\includeonly{c0,c1,c2,c3,c4,c5,c6,c7,c8,ca,cb}
+\includeonly{c0,c1,c2,c3,c4,c5,c6,c7,c8,ca,cb,cc}
 
-%\includeonly{c1}
+\includeonly{cc}
 
 \begin{document}
 \titleTH
@@ -89,6 +91,7 @@ http://neuralnetworksanddeeplearning.com/index.html
 \appendix
 \include{ca} %Environment Setup
 \include{cb} %Python and Jupyter Code
+\include{cc} %visualising classifiers
 
 
 

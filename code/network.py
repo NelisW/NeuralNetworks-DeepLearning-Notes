@@ -19,9 +19,29 @@ import random
 # Third-party libraries
 import numpy as np
 
+
+#### Miscellaneous functions
+def sigmoid(z):
+    """The sigmoid function."""
+    return 1.0/(1.0+np.exp(-z))
+
+def sigmoid_prime(z):
+    """Derivative of the sigmoid function."""
+    return sigmoid(z)*(1-sigmoid(z))
+
+def tansig(x):
+    """The tansig function."""
+    return 2 / (1 + np.exp(-2*x)) - 1
+
+def tansig_prime(x):
+    """Derivative of the tansig function."""
+    return (1 - (tansig(x))**2 )
+
+
+
 class Network(object):
 
-    def __init__(self, sizes):
+    def __init__(self, sizes,nlfn=sigmoid,nlfnpr=sigmoid_prime,silent=False):
         """The list ``sizes`` contains the number of neurons in the
         respective layers of the network.  For example, if the list
         was [2, 3, 1] then it would be a three-layer network, with the
@@ -37,6 +57,7 @@ class Network(object):
         self.biases = [np.random.randn(y, 1) for y in sizes[1:]]
         self.weights = [np.random.randn(y, x)
                         for x, y in zip(sizes[:-1], sizes[1:])]
+        self.silent = silent
 
     def feedforward(self, a):
         """Return the output of the network if ``a`` is input."""
@@ -69,11 +90,12 @@ class Network(object):
                 for k in range(0, n, mini_batch_size)]
             for mini_batch in mini_batches:
                 self.update_mini_batch(mini_batch, eta)
-            if test_data:
-                print("Epoch {0}: {1} / {2}".format(
-                    j, self.evaluate(test_data), n_test))
-            else:
-                print("Epoch {0} complete".format(j))
+            if not self.silent:
+                if test_data:
+                    print("Epoch {0}: {1} / {2}".format(
+                        j, self.evaluate(test_data), n_test))
+                else:
+                    print("Epoch {0} complete".format(j))
 
     def update_mini_batch(self, mini_batch, eta):
         """Update the network's weights and biases by applying
@@ -139,13 +161,3 @@ class Network(object):
         """Return the vector of partial derivatives \partial C_x /
         \partial a for the output activations."""
         return (output_activations-y)
-
-#### Miscellaneous functions
-def sigmoid(z):
-    """The sigmoid function."""
-    return 1.0/(1.0+np.exp(-z))
-
-def sigmoid_prime(z):
-    """Derivative of the sigmoid function."""
-    return sigmoid(z)*(1-sigmoid(z))
-
