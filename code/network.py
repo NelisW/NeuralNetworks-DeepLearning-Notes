@@ -38,7 +38,6 @@ def tansig_prime(x):
     return (1 - (tansig(x))**2 )
 
 
-
 class Network(object):
 
     def __init__(self, sizes,nlfn=sigmoid,nlfnpr=sigmoid_prime,silent=False,seed=None):

@@ -9,7 +9,7 @@ Prepared by CJ Willers.
 \section{Overview}
 \label{sec:OverviewAppc}
 
-This document reports on analysis and experimental work to better understand neural nets, by visualizing the building blocks separately.  It is shown that a single neuron provides the same capability as a simple linear classifier; that is, to separate a data set into two classes, based on a linear discrimination surface (a line in the two-dimensional plane).  The mathematical shape of  the non-linear output of a solitary neuron is of little practical significance.
+This document reports on analysis and experimental work to better understand neural nets, by visualizing the building blocks separately.  It is shown that a single neuron provides the same capability as a simple linear classifier; that is, to separate a data set into two classes, based on a linear discrimination surface (i.e., a straight line in the two-dimensional plane).  The mathematical shape of  the non-linear output of a solitary neuron is of little practical significance.
 
 The almost magical power of neurons only really come to fruition when the neurons are connected in a network, when: 
 \begin{enumerate}
@@ -18,11 +18,11 @@ The almost magical power of neurons only really come to fruition when the neuron
 \item the weights of all neurons in the network can be adjusted to optimise performance.
 \end{enumerate}
 
-When layers of non-linear neurons are used, the simple linear discrimination capability of a single neuron can be applied to define complex discrimination curves.  These complex curves are constructed of smaller sections of the individual neuron discrimination lines.
+When layers of non-linear neurons are combined, the simple linear discrimination capability of a single neuron can be applied to define complex discrimination curves.  These complex curves are constructed of smaller sections of the individual neuron discrimination lines.
 
 \section{A Single Neuron}
 
-The artificial neuron is the core computing element, simulating a biological neuron.  The artificial neuron receives a number of signals (small voltages) of arbitrary (analogue) value from other artificial neurons.  The artificial neuron then weights (multiplies by a set of values) the input signals, adds them together.  The sum is then distorted by a non-linear process, to yield the output signal. The output signal is then fed into neurons in the network.   The artificial neuron is modelled in mathematical form as follows:
+The artificial neuron is the core computing element, simulating a biological neuron.  The artificial neuron receives a number of signals (small voltages) of arbitrary (analogue) value from other artificial neurons.  The artificial neuron then weights (multiplies by a set of values) the input signals, adds them together.  The sum is then distorted by a non-linear process, to yield the output signal. The output signal is then fed into neurons in the network.   The artificial neuron is modelled in mathematical form as shown in Figure~\ref{fig:neuralnetconcept}.
 
 \begin{figure}[tb]
 \centering
@@ -36,9 +36,12 @@ Neural net: $z=\varphi(w_1x_1+w_2x_2+b)$
 
 Straight line:  $0=(mx+(-1)y+c)$
 
-Note the remarkable resemblance between the two equations.  Suppose, for a short while, that the non-linear function can be 'forced' to be linear (in other words, the $\varphi()$ function   disappears).  Also consider the neuron when $z=0$.  Then the equation for the straight line and the (assumed simplified neuron) have the same form.  Under these two conditions, one can state: $w_1=m$, $w_2=-1$, $x_1=x$, $x_2=y$, $b=c$.  It is evident that the two weights and bias of a two-input neuron defines a straight line.  Returning to fix the two simplifying assumptions, we note that the straight line now describes the locus (line) where the non-linear function $\varphi()$ is zero.  
+Note the remarkable resemblance between the two equations.  Suppose, for a short while, that the non-linear function can be 'forced' to be linear (in other words, the $\varphi()$ function   disappears).  Also consider the neuron when $z=0$.  Then the equation for the straight line and the (assumed simplified) neuron have the same form.  Under these two conditions, one can state: $w_1=m$, $w_2=-1$, $x_1=x$, $x_2=y$, $b=c$.  It is evident that the two weights and bias of a two-input neuron defines a straight line.  Returning to fix the two simplifying assumptions, we note that the straight line now describes the locus (line) where the non-linear function $\varphi()$ is zero.  
 
-Suppose that the non-linear function is the tansig function\cite{stackexchangeEllefsen2015,WikiPediaHyperbolicfunction2019,NickBecker2017}, 
+Several nonlinear functions are used in neural nets, including the sigmoid (logistics), tansig, or soft max
+functions\cite{stackexchangeEllefsen2015,WikiPediaHyperbolicfunction2019,NickBecker2017,DustinStansbury2014,HamzaMahmood2018}. 
+
+The tansig function is defined as (see Figure~\ref{fig:tansig}):
 \begin{equation}
 \varphi(x)
 =\left(\frac{2}{1+e^{-bx}}\right)-1
@@ -53,9 +56,36 @@ The derivative of the tansig function is
 \end{equation}
 
 
-Imagine a sheet of paper formed into a two-dimensional tansig shape (see figures on the left).  Visualize walking along the $z=0$ contour of the tansig surface.  As we walk along this line, to the left of us, the tansig surface falls away to $-1$, while on the right hand side, the tansig surface rises to $+1$.  Note, however, that the tansig $z=0$ line is the equation of the straight line derived from the neuron equation, $0=z=\varphi(w_1x_1+w_2x_2+b)$ , since $\varphi(x)=0$.  The neuron's weights and bias therefore determines the exact location and direction of the tansig surface in the two-dimensional Cartesian space.  
+The sigmoid or logistics function is defined as (see Figure~\ref{fig:sigmoid}):
+\begin{equation}
+\sigma(x)
+=\frac{1}{1+e^{-x}}.
+\end{equation}  
+The derivative of the sigmoid function is 
+\begin{equation}
+ \sigma^\prime(x)
+ =\sigma(x)(1-\sigma(x))
+\end{equation}
 
-Note that while $\varphi(w_1x_1+w_2x_2+b)$  and  $\varphi(2w_1x_1+2w_2x_2+2b)$ both result in the same straight line in the two-dimensional plane, they yield two very different surfaces.  The slope of the surface, away from the  $\varphi(x)=0$ line, is strongly affected by the neuron's weights and bias.  
+
+\begin{figure}[p]
+\centering
+\includegraphics[width=\textwidth]{pic/tansig01}
+\includegraphics[width=\textwidth]{pic/tansig02}
+\caption{The tansig function \label{fig:tansig}}
+\end{figure}
+
+\begin{figure}[p]
+\centering
+\includegraphics[width=\textwidth]{pic/sigmoid01}
+\includegraphics[width=\textwidth]{pic/sigmoid02}
+\caption{The sigmoid function \label{fig:sigmoid}}
+\end{figure}
+
+For this discussion consider the tansig function, but the same also applies to the sigmoid. 
+Imagine a sheet of paper formed into a two-dimensional shape (see Figures~\ref{fig:tansig} and \ref{fig:sigmoid}).  Visualize walking along the $z=0$ contour of the tansig surface (or $z=0.5$ contour of the sigmoid surface).  As we walk along this line, to the left of us, the surface falls away to smaller values, while on the right hand side, the surface rises to larger values.  Note, however, that the tansig $z=0$ line is the equation of the straight line derived from the neuron equation, $0=z=\varphi(w_1x_1+w_2x_2+b)$ , since $\varphi(x)=0$.  The neuron's weights and bias therefore determines the exact location and orientation or direction of the tansig surface in the two-dimensional Cartesian space.  
+
+Note that while $\varphi(w_1x_1+w_2x_2+b)$  and  $\varphi(2w_1x_1+2w_2x_2+2b)$ both result in the same straight line in the two-dimensional plane, they yield two very different tansig surfaces.  The slope of the surface, away from the  $\varphi(x)=0$ line, is strongly affected by the neuron's weights and the bias introduces a shift perpendicular to, and 'up/down' relative to the $z=0$ line, the $z=0$ line because of shifting the tansig  argument.  
 
 \section{Linear Classifiers and Neurons}
 
@@ -69,15 +99,19 @@ Figure~\ref{fig:chC-trainingset} shows data from two classes plotted in terms of
 
 The task at hand is to determine a method to discriminate between the two classes O and X on the basis of the feature sets $x_1$ and $x_2$.  While it is easy to do this by visual observation, the objective is to determine an accurate and robust mathematical means to perform this task.  
 
-As a first attempt, draw a straight line as shown in Figure~\ref{fig:chC-trainingset}.  This line is a simple linear (straight line) classifier, where the line $x_2=0.7x_1-1$  represents the classification boundary.  All objects with features 'above' the line belongs to class O, while the object with features 'below' the line belongs to class X.  Observing the figure carefully, one notices that not all the class O-objects fall 'above' the line.  There are also some class X objects above the line.   In other words, the two classes denoted by X and O cannot be discriminated by this simple discriminator.  
+As a first attempt, draw a straight line as shown in Figure~\ref{fig:chC-trainingset}.  This line is a simple linear (straight line) classifier, where the line $x_2=0.7x_1-1$  represents the classification boundary.  All objects with features 
+'above' the line belongs to class X, while the object with features 
+'below' the line belongs to class O.  Observing the figure carefully, one notices that not all the class X-objects fall 'above' the line.  There are also some class O objects above the line.   In other words, the two classes denoted by X and O cannot be discriminated by this simple discriminator.  
 
-%As a second attempt, combine the linear classifier shown above with the tansig surface shown on the previous page.  This is done by orienting the tansig surface along the straight line defined by the linear classifier.  This seemingly simple operation has significant implications.  It now becomes clear that a two-dimensional \textit{(two-input) neuron is a linear discrimination element}, with a non-linear output function.    It is very important to observe that this two-input neuron defines a single, straight line between two classes, and that this has nothing to do with the non-linear output function - the discrimination ability of the single neuron is determined solely by its weights and bias.  Sadly, still, this single neuron has the same limitation as linear discriminator. 
+Consider next a 2-D tansig sheet superimposed around the linear classifier line.  This is done by orienting the tansig $z=0$ along the straight line defined by the linear classifier (bottom graphs in Figure~\ref{fig:tansig}).  This seemingly simple operation has significant implications.  We now have a two-dimensional \textit{(two-input) neuron as a linear discrimination element}, but with a non-linear amplitude output.    It is very important to observe that this two-input neuron defines a single, straight line between two classes, and that the classification 'line' has nothing to do with the non-linear scaling in the output - the discrimination ability of the single neuron is determined primarily by its weights and bias.  Sadly, still, this single neuron still has the same limitations as linear discriminator. 
 
 Suppose we can add more straight lines (neurons), and somehow define in which regions they should operate --- then we can define a complex discrimination line as a set of shorter segments.  Enter neural networks.
 
 \section{Neural networks}
 
-Adding more discrimination lines is easy: just add more input neurons.  If we need N segments to define the discrimination line in the two-dimensional plane, use N neurons.   Note that, in effect, we are using N linear classifiers (straight lines), but we have to limit the operating range of each classifier to a small segment of its total length.    In effect, this means that all the straight lines are optimised to achieve the best discrimination, but each in his own (local) area.  This is where the hidden layer(s) come to the rescue:  each first-layer neuron's output is scaled by the weight where this neuron feeds into the second layer, thereby 'activating' only selected sections of each of the linear classifiers.  Note, however, that the optimisation is not done separately for each line - all elements in the net are trained as a whole, with full consideration of the interaction and dependencies between elements.  
+Adding more discrimination lines is easy: just add more input neurons.  If we need N segments to define the discrimination line in the two-dimensional plane, use N neurons.   Note that, in effect, we are using N linear classifiers (straight lines), but we have to limit the operating range of each classifier to a small segment of its total length.    In effect, this means that all the straight lines are optimised to achieve the best discrimination, but each in his own (local) area.  This is where the hidden layer(s) come to the rescue:  each first-layer neuron's output is scaled by the weight where this neuron feeds into the second layer, thereby 'activating' only selected sections of each of the linear classifiers.  
+The sections of the classifier that are not used, are pushed into upper or lower saturation by the nonlinear tansig function. The saturation, combined by the weight feeding into the next layer, relegate these sections to having no effect. 
+Note, however, that the optimisation is not done separately for each line - all elements in the net are trained as a whole, with full consideration of the interaction and dependencies between elements.  
 
 
 \begin{figure}[tb]
@@ -87,41 +121,70 @@ Adding more discrimination lines is easy: just add more input neurons.  If we ne
 \end{figure}
 
 
-To illustrate these concepts, a small neural net was trained to discriminate between the O and X classes in Figure~\ref{fig:chC-trainingset}.  Four hidden layer neurons and two output neurons were used (Figure~\ref{fig:neuralnetconcept02}).  There are only two inputs $(x_1,x_2)$ , feeding into the hidden layer neurons.  When the net is trained, the weights and bias values are adjusted to find an optimum discrimination.  Class X object provide an output signal of $+1$, while a Class O object provides a $-1$ output signal.  
+To illustrate these concepts, a small neural net was trained to discriminate between the O and X classes in Figure~\ref{fig:chC-trainingset}.  Four hidden layer neurons and two output neurons were used (Figure~\ref{fig:neuralnetconcept02}).  There are only two inputs $(x_1,x_2)$ , feeding into the hidden layer neurons.  When the net is trained, the weights and bias values are adjusted to find an optimum discrimination.  Class X object provide an output signal of $-1$, while a Class O object provides a $+1$ output signal.  
 
-In our journey through neural network land,  we start of by considering each neuron on its own, then the neural net is assembled by adding the hidden layer neurons one by one, until we reach the final network.  The three-dimensional graphs shown on the following pages represent the output of the neuron (or network), for all possible input values  $(x_1,x_2)$  with $0\leq x_1 \leq 10$  and  $0\leq x_2 \leq 10$.  The graphs were obtained by defining a two-dimensional grid with grid interval of 0.25.  For each of the 100$\times$100  $(x_1,x_2)$ points, the neuron/network responses were calculated and plotted in the three-dimensional graph format.   We can see how the neuron (or network) will respond to all possible input signal combinations.   By careful study of these input-output graphs, the inner workings of the neural net becomes clear.
+In our journey through neural network land,  we start of by considering each neuron on its own, then the neural net is assembled by adding the hidden layer neurons one by one, until we reach the final network.  The three-dimensional graphs shown in Figure~\ref{fig:chC-hiddeneurons04} represent the output of the hidden neurons, for all possible input values  $(x_1,x_2)$  with $0\leq x_1 \leq 10$  and  $0\leq x_2 \leq 10$.    For each of the $(x_1,x_2)$ points, the neuron responses were calculated and plotted in the three-dimensional graph format.   We can see how the neuron will respond to all possible input signal combinations.   By careful study of these input-output graphs, the inner workings of the neural net become clear.
+ 
+\begin{figure}[tbhp]
+\centering
+\includegraphics[height=1.1\textwidth,angle=90]{pic/chC-hiddeneurons04}
+\caption{Small neural net neuron responses\label{fig:chC-hiddeneurons04}}
+\end{figure}
 
 First, we will study the tansig surface shape of each neuron hidden neuron, and show how these hidden neurons each contribute a portion to the overall discrimination line.  Note that not all neurons seem to have the same dramatic effect, but keep in mind that the next layer can scale up this output when adding it to the other neuron signals.  In fact, the key to the neural network calculation is the fact that the outputs from these hidden layer neurons must be added in exactly the correct proportions to achieve the final discrimination objective.  
+ 
+The graphs in Figure~\ref{fig:chC-hiddeneurons04} show the individual responses of the hidden neurons.   The top row shows that each of the neurons only provide a simple straight line discrimination.   The lines are widely different in slope and offset.  The outputs of these hidden neurons are also contained between $-1$ and $+1$, by the tansig function.   
+The graph on the bottom right in Figure~\ref{fig:chC-classif04} shows the $y=mx+c$ lines for each of the hidden neurons.  Each line in this graph  traces out the $z=0$  for one of the tansig surfaces.  Note how each of the lines attempt to provide a measure of discrimination between the O and X classes.  None of these lines are able to provide the required separation between O and X classes.   
+
+The second and third rows in Figure~\ref{fig:chC-hiddeneurons04} show the sum of the neuron signals, starting with the bias, and then adding an additional neuron until all neuron signals are included.  The signals shown here are already scaled by the output neuron weights, i.e., it is the output neuron activation, but the non-linear output compression is not yet applied. 
+Note how the output neuron weights (sign and magnitude) manipulate the signals from each of the previous layer neurons to build a surface that will eventually form the discrimination surface.  In particular, note how the class X area is growing in a positive direction, while the class O area is growing towards the negative.  Keep in mind that the class X output must be $+1$ while the class O output must be $-1$.  As the neuron signals are added, the emerging shape approaches the required discrimination class regions 
+
 
 In experimenting with the net, it was quite interesting to observe how much the net behaviour changes, for just one small adjustment in the training set.  Even when using the same input data, different runs resulted in dramatically different shapes, just because of random differences in starting weights and biases.  The results shown here, therefore only demonstrate one possible solution, there are many other (equally valid) solutions.  These other solutions are obtained by repeated training, each time with different seeds to the random number generator. 
+
+
+
+\FloatBarrier
  
- 
-\begin{figure}[tbhp]
+\begin{figure}[p]
 \centering
-\includegraphics[height=1.1\textwidth,angle=90]{pic/chC-hiddeneurons}
-\caption{Small neural net neuron responses\label{fig:chC-hiddeneurons}}
-\end{figure}
- 
-\begin{figure}[tbhp]
-\centering
-\includegraphics[width=\textwidth]{pic/chC-classif0}
-\caption{Small neural net classifier\label{fig:chC-classif0}}
+\includegraphics[width=\textwidth]{pic/chC-classifa04}
+\includegraphics[width=\textwidth]{pic/chC-classifb04}
+\caption{Small neural net classifier, four hidden neurons, seed value 10\label{fig:chC-classif04}}
 \end{figure}
 
-The graphs in Figure~\ref{fig:chC-hiddeneurons} show the individual responses of the hidden neurons.   The top row shows that each of the neurons only provide a simple straight line discrimination.   The lines are widely different in slope and offset.  The outputs of these hidden neurons are also contained between $-1$ and $+1$, by the tansig function.   
-The graph on the bottom right in Figure~\ref{fig:chC-classif0} shows the $y=mx+c$ lines for each of the hidden neurons.  Each line in this graph  traces out the $z=0$  for one of the tansig surfaces.  Note how each of the lines attempt to provide a measure of discrimination between the O and X classes.  None of these lines are able to provide the required separation between O and X classes.   
-
-The second and third rows in Figure~\ref{fig:chC-hiddeneurons} show the sum of the neuron signals, starting with the bias, and then adding an additional neuron until all neuron signals are included.  The signals shown here are already scaled by the output neuron weights, in the correct proportions, but the non-linear output compression is not yet applied. 
-Note how the output neuron weights (sign and magnitude) manipulate the signals from each of the previous layer neurons to build a surface that will eventually form the discrimination surface.  In particular, note how the class X area is growing in a positive direction, while the class O area is growing towards $-10$.  Keep in mind that the class X output must be $+1$ while the class O output must be $-1$.  As the neuron signals are added, the emerging shape approaches the required discrimination class regions 
  
+\begin{figure}[p]
+\centering
+\includegraphics[width=\textwidth]{pic/chC-classifa08}
+\includegraphics[width=\textwidth]{pic/chC-classifb08}
+\caption{Small neural net classifier, eight hidden neurons, seed value 10\label{fig:chC-classif08}}
+\end{figure}
  
-The output signal from the output neurons (but before non-linear compression) are shown in Figure~\ref{fig:chC-classif0}.   It is quite informative to study the graph and to identify the individual linear discrimination lines, and to observe how these lines are cleverly segmented by adding the neurons' signals together.   It is also evident that the hidden neuron signals  were scaled differently by the input weights on the output neuron.  
+  
+\begin{figure}[p]
+\centering
+\includegraphics[width=\textwidth]{pic/chC-classifa05}
+\includegraphics[width=\textwidth]{pic/chC-classifb05}
+\caption{Small neural net classifier, four hidden neurons, seed value 1\label{fig:chC-classif05}}
+\end{figure}
 
-The key observation is that the hidden neuron outputs are limited by the tansig signal, and hence, their output values can be scaled \textit{differently} by the weights in the output layer.  If the hidden layer outputs were not limited, the output signals would be monotonically increasing/decreasing away from the $\varphi(0)=0$  line, and there would be little value in adding these increasing values together. 
+The output signal from the output neurons (before and after non-linear compression) are shown in Figure~\ref{fig:chC-classif04}.   It is quite informative to study the graph and to identify the individual linear discrimination lines, and to observe how these lines are cleverly segmented by adding the neurons' signals together.   It is also evident that the hidden neuron signals  were scaled differently by the input weights on the output neuron.  
 
-This output response is the result of a happy dance of 16 weights, and 6 bias values, for the full range of input feature values.  Note that this output neuron activation signal (before the tansig compression) can vary wider than $-20$ to $+20$, depending on the input  $(x_1,x_2)$.    The distinctly visible plateaus are remnants from the tansig shapes of the input neurons.  
+The key observation is that the hidden neuron outputs are limited by the tansig signal, and hence, their output values can be scaled \textit{differently} by the weights in the output layer.  If the hidden layer outputs were not limited, the output signals would be  increasing/decreasing away from the $\varphi(0)=0$  line, and there would be little value in adding these increasing values together. 
 
-Since we are only interested in classifying between class O and class X, we define a threshold value of $0$, and compare the net output against this threshold to classify an object. 
+This output response is the result of a happy dance of 16 weights, and 6 bias values, for the full range of input feature values.  Note that this output neuron activation signal (before the tansig compression) can vary wider than $-20$ to $+20$, depending on the input  $(x_1,x_2)$.    The distinctly visible plateaus in Figure~\ref{fig:chC-classif04} are remnants from the tansig shapes of the hidden neurons.  
+
+Figure~\ref{fig:chC-classif08} shows a classifier using eight hidden neurons.  Despite using more hidden neurons, the classifier performs poorer than the four-neuron-classifier.  The figure shows that only three of the eight neurons actually contributes to the classifier; the other neurons' classifier lines are not even in the input values' domain.  Clearly more is not better than less.
+
+Figure~\ref{fig:chC-classif05} shows a classifier also using four hidden neurons, but with a different initial weights and bias set, because the random number generator seed value is different. The results are significantly different from Figure~\ref{fig:chC-classif04}, but is not unlike the solution for the eight-hidden-neuron case in Figure~\ref{fig:chC-classif08}.  This case shows that experimentation with all the different model parameters is required to find the optimal solution.  The solution is not obtained by simple analytical process or by a 'first-time-lucky' experiment.
+
+
+\section{Interpreting the Output}
+
+We are  interested in classifying between class O and class X.  The classifier has two 
+
+, we therefore define a threshold value of $0$, and compare the net output against this threshold to classify an object. 
 \begin{enumerate}
 \item where the net output is greater than zero is class X domain, and 
 \item where the net output is less than zero is class O domain.  
@@ -162,31 +225,3 @@ This study only covers two-dimensional space, where the discrimination boundary 
 The weights of the first layer neurons define the linear discriminators, while the weights in subsequent layers manipulates the linear discriminators so that only the required segments are effective.  On a meta level, one can say that the next layer weights perform linear discrimination on the outputs of the previous layer neurons.  This effect of abstract levels of next layers manipulating previous layers becomes hard to visualize.
 
 It is generally accepted that the human brain has neuron connectivity of the order \num{10e4} (see \cite{WikiPediaNeuron2019}), this means that the brain can assemble discrimination hyper-surfaces in \num{10e4}  dimensional space.  Furthermore, the brain's complex feedback paths and ability to have thousands of 'hidden layers' hints that the brain can form discrimination surfaces of almost unlimited complexity.  Our work with small networks are but feeble attempts in comparison with the complexity of natural neural networks.  
-
-\begin{lstlisting}
-
-\usepackage{caption}
-
-\begin{figure}[tb]
-\centering
-\begin{subfigure}[t]{.45\textwidth}
-\includegraphics[width=\columnwidth,clip=true,trim=33px 24px 10px 22px]{eps/intensities-mwir}
-\caption{Log scaled MWIR image.}\label{fig:intensities-mwir}
-\end{subfigure}
-\begin{subfigure}[t]{0.45\textwidth}
-\includegraphics[width=\columnwidth,clip=true,trim=33px 24px 10px 22px]{eps/intensities-swir}
-\caption{Log scaled SWIR image.} \label{fig:intensities-swir}
-\end{subfigure}
-\begin{subfigure}[t]{0.45\textwidth}
-\includegraphics[width=\columnwidth,clip=true,trim=33px 24px 10px 22px]{eps/intensities-segmentation}
-\caption{CFAR segmentation of MWIR image.} \label{fig:intensities-segmentation}
-\end{subfigure}
-\begin{subfigure}[t]{0.45\textwidth}
-\includegraphics[width=\columnwidth,clip=true,trim=33px 24px 10px 22px]{eps/intensities-ratio}
-\caption{Normalised  MWIR-to-SWIR ratio of MWIR CFAR segmented pixels.} \label{fig:intensities-ratio}
-\end{subfigure}
-\caption{Pixel intensities across MWIR and SWIR bands, for a target and MTV countermeasure, example from Test Point 45b1.\label{fig:intensities}}
-\end{figure}
-
-
-\end{lstlisting}
