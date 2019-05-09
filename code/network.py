@@ -41,7 +41,7 @@ def tansig_prime(x):
 
 class Network(object):
 
-    def __init__(self, sizes,nlfn=sigmoid,nlfnpr=sigmoid_prime,silent=False):
+    def __init__(self, sizes,nlfn=sigmoid,nlfnpr=sigmoid_prime,silent=False,seed=None):
         """The list ``sizes`` contains the number of neurons in the
         respective layers of the network.  For example, if the list
         was [2, 3, 1] then it would be a three-layer network, with the
@@ -54,6 +54,8 @@ class Network(object):
         ever used in computing the outputs from later layers."""
         self.num_layers = len(sizes)
         self.sizes = sizes
+        if seed is not None:
+            np.random.seed(seed)
         self.biases = [np.random.randn(y, 1) for y in sizes[1:]]
         self.weights = [np.random.randn(y, x)
                         for x, y in zip(sizes[:-1], sizes[1:])]
@@ -76,12 +78,13 @@ class Network(object):
         epoch, and partial progress printed out.  This is useful for
         tracking progress, but slows things down substantially."""
 
-        training_data = list(training_data)
-        n = len(training_data)
-
-        if test_data:
+        if test_data is not None:
             test_data = list(test_data)
             n_test = len(test_data)
+            # print(n_test)
+
+        training_data = list(training_data)
+        n = len(training_data)
 
         for j in range(epochs):
             random.shuffle(training_data)
@@ -91,11 +94,11 @@ class Network(object):
             for mini_batch in mini_batches:
                 self.update_mini_batch(mini_batch, eta)
             if not self.silent:
-                if test_data:
-                    print("Epoch {0}: {1} / {2}".format(
-                        j, self.evaluate(test_data), n_test))
-                else:
-                    print("Epoch {0} complete".format(j))
+                if j % 200 == 0:
+                    if test_data is not None:
+                        print(f"Epoch {j}: {self.evaluate(test_data)} / {n_test}")
+                    else:
+                        print(f"Epoch {j} complete")
 
     def update_mini_batch(self, mini_batch, eta):
         """Update the network's weights and biases by applying
@@ -155,6 +158,7 @@ class Network(object):
         neuron in the final layer has the highest activation."""
         test_results = [(np.argmax(self.feedforward(x)), y)
                         for (x, y) in test_data]
+        # print(test_results[0],test_results[1])
         return sum(int(x == y) for (x, y) in test_results)
 
     def cost_derivative(self, output_activations, y):

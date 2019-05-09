@@ -65,49 +65,65 @@ Note that while $\varphi(w_1x_1+w_2x_2+b)$  and  $\varphi(2w_1x_1+2w_2x_2+2b)$ b
 \caption{Neural net concept\label{fig:chC-trainingset}}
 \end{figure}
 
-Figure~\ref{fig:chC-trainingset} shows data from two classes plotted in terms of feature $x_1$ and feature $x_2$.  Objects from class O are marked with a circle, and objects from class * are marked with an asterisk.  
+Figure~\ref{fig:chC-trainingset} shows data from two classes plotted in terms of feature $x_1$ and feature $x_2$.  Objects from class O are marked with a circle, and objects from class X are marked with an asterisk.  
 
-The task at hand is to determine a method to discriminate between the two classes O and * on the basis of the feature sets $x_1$ and $x_2$.  While it is easy to do this by visual observation, the objective is to determine an accurate and robust mathematical means to perform this task.  
+The task at hand is to determine a method to discriminate between the two classes O and X on the basis of the feature sets $x_1$ and $x_2$.  While it is easy to do this by visual observation, the objective is to determine an accurate and robust mathematical means to perform this task.  
 
-As a first attempt, draw a straight line as shown in the figure above.  This line is a simple linear (straight line) classifier, where the line $y=\frac{10}{7}(x-1)$  represents the classification boundary.  All objects with features 'above' the line belongs to class O, while the object with features 'below' the line belongs to class *.  Observing the figure carefully, one notices that not all the class O-objects fall 'above' the line.  There are also some class * objects above the line.   In other words, the two classes denoted by * and O cannot be discriminated by this simple discriminator.  
+As a first attempt, draw a straight line as shown in Figure~\ref{fig:chC-trainingset}.  This line is a simple linear (straight line) classifier, where the line $x_2=0.7x_1-1$  represents the classification boundary.  All objects with features 'above' the line belongs to class O, while the object with features 'below' the line belongs to class X.  Observing the figure carefully, one notices that not all the class O-objects fall 'above' the line.  There are also some class X objects above the line.   In other words, the two classes denoted by X and O cannot be discriminated by this simple discriminator.  
 
-As a second attempt, combine the linear classifier shown above with the tansig surface shown on the previous page.  This is done by orienting the tansig surface along the straight line defined by the linear classifier.  This seemingly simple operation has significant implications.  It now becomes clear that a two-dimensional \textit{(two-input) neuron is a linear discrimination element}, with a non-linear output function.    It is very important to observe that this two-input neuron defines a single, straight line between two classes, and that this has nothing to do with the non-linear output function - the discrimination ability of the single neuron is determined solely by its weights and bias.  Sadly, still, this single neuron has the same limitation as linear discriminator. 
+%As a second attempt, combine the linear classifier shown above with the tansig surface shown on the previous page.  This is done by orienting the tansig surface along the straight line defined by the linear classifier.  This seemingly simple operation has significant implications.  It now becomes clear that a two-dimensional \textit{(two-input) neuron is a linear discrimination element}, with a non-linear output function.    It is very important to observe that this two-input neuron defines a single, straight line between two classes, and that this has nothing to do with the non-linear output function - the discrimination ability of the single neuron is determined solely by its weights and bias.  Sadly, still, this single neuron has the same limitation as linear discriminator. 
 
 Suppose we can add more straight lines (neurons), and somehow define in which regions they should operate --- then we can define a complex discrimination line as a set of shorter segments.  Enter neural networks.
 
 \section{Neural networks}
 
-Adding more discrimination lines is easy: just add more input neurons.  If we need 5 segments to define the discrimination line in the two-dimensional plane, use 5 neurons.   Note that, in effect, we are using 5 linear classifiers (straight lines), but we have to limit the operating range of each classifier to a small segment of its total length.    In effect, this means that all the straight lines are optimised to achieve the best discrimination, but each in his own (local) area.  This is where the hidden layer(s) come to the rescue:  each first-layer neuron's output is scaled by the weight where this neuron feeds into the second layer, thereby 'activating' only selected sections of each of the linear classifiers.  Note, however, that the optimisation is not done separately for each line - all elements in the net are trained as a whole, with full consideration of the interaction and dependencies between elements.  
+Adding more discrimination lines is easy: just add more input neurons.  If we need N segments to define the discrimination line in the two-dimensional plane, use N neurons.   Note that, in effect, we are using N linear classifiers (straight lines), but we have to limit the operating range of each classifier to a small segment of its total length.    In effect, this means that all the straight lines are optimised to achieve the best discrimination, but each in his own (local) area.  This is where the hidden layer(s) come to the rescue:  each first-layer neuron's output is scaled by the weight where this neuron feeds into the second layer, thereby 'activating' only selected sections of each of the linear classifiers.  Note, however, that the optimisation is not done separately for each line - all elements in the net are trained as a whole, with full consideration of the interaction and dependencies between elements.  
 
-To illustrate these concepts, a small neural net was trained to discriminate between the O and * classes.  Five hidden layer neurons and one output neuron were used.  There are only two inputs $(x_1,x_2)$ , feeding into the hidden layer neurons.  When the net is trained, the weights and bias values are adjusted to find an optimum discrimination.  Class * object provide an output signal of $+1$, while a Class O object provides a $-1$ output signal.  
 
-In our journey through neural network land,  we start of by considering each neuron on its own, then the neural net is assembled by adding the hidden layer neurons one by one, until we reach the final network.    The three-dimensional graphs shown on the following pages represent the output of the neuron (or network), for all possible input values  $(x_1,x_2)$  with $0\leq x_1 \leq 10$  and  $0\leq x_2 \leq 10$.  The graphs were obtained by defining a two-dimensional grid with grid interval of 0.25.  For each of the 40$\times$40  $(x_1,x_2)$ points, the neuron/network responses were calculated and plotted in the three-dimensional graph format.   We can see how the neuron (or network) will respond to all possible input signal combinations.   By careful study of these input-output graphs, the inner workings of the neural net becomes clear.
+\begin{figure}[tb]
+\centering
+\includegraphics[width=0.8\textwidth]{eps/neuralnetconcept02}
+\caption{Small neural net\label{fig:neuralnetconcept02}}
+\end{figure}
+
+
+To illustrate these concepts, a small neural net was trained to discriminate between the O and X classes in Figure~\ref{fig:chC-trainingset}.  Four hidden layer neurons and two output neurons were used (Figure~\ref{fig:neuralnetconcept02}).  There are only two inputs $(x_1,x_2)$ , feeding into the hidden layer neurons.  When the net is trained, the weights and bias values are adjusted to find an optimum discrimination.  Class X object provide an output signal of $+1$, while a Class O object provides a $-1$ output signal.  
+
+In our journey through neural network land,  we start of by considering each neuron on its own, then the neural net is assembled by adding the hidden layer neurons one by one, until we reach the final network.  The three-dimensional graphs shown on the following pages represent the output of the neuron (or network), for all possible input values  $(x_1,x_2)$  with $0\leq x_1 \leq 10$  and  $0\leq x_2 \leq 10$.  The graphs were obtained by defining a two-dimensional grid with grid interval of 0.25.  For each of the 100$\times$100  $(x_1,x_2)$ points, the neuron/network responses were calculated and plotted in the three-dimensional graph format.   We can see how the neuron (or network) will respond to all possible input signal combinations.   By careful study of these input-output graphs, the inner workings of the neural net becomes clear.
 
 First, we will study the tansig surface shape of each neuron hidden neuron, and show how these hidden neurons each contribute a portion to the overall discrimination line.  Note that not all neurons seem to have the same dramatic effect, but keep in mind that the next layer can scale up this output when adding it to the other neuron signals.  In fact, the key to the neural network calculation is the fact that the outputs from these hidden layer neurons must be added in exactly the correct proportions to achieve the final discrimination objective.  
 
 In experimenting with the net, it was quite interesting to observe how much the net behaviour changes, for just one small adjustment in the training set.  Even when using the same input data, different runs resulted in dramatically different shapes, just because of random differences in starting weights and biases.  The results shown here, therefore only demonstrate one possible solution, there are many other (equally valid) solutions.  These other solutions are obtained by repeated training, each time with different seeds to the random number generator. 
+ 
+ 
+\begin{figure}[tbhp]
+\centering
+\includegraphics[height=1.1\textwidth,angle=90]{pic/chC-hiddeneurons}
+\caption{Small neural net neuron responses\label{fig:chC-hiddeneurons}}
+\end{figure}
+ 
+\begin{figure}[tbhp]
+\centering
+\includegraphics[width=\textwidth]{pic/chC-classif0}
+\caption{Small neural net classifier\label{fig:chC-classif0}}
+\end{figure}
 
- 
-This graphs below show the individual responses of the hidden neurons.   Note that each of the neurons only provide a straight line, nothing more.   The lines are also widely different in slope and offset.  The outputs of these nets are also contained between $-1$ and $+1$, by the tansig function.   
+The graphs in Figure~\ref{fig:chC-hiddeneurons} show the individual responses of the hidden neurons.   The top row shows that each of the neurons only provide a simple straight line discrimination.   The lines are widely different in slope and offset.  The outputs of these hidden neurons are also contained between $-1$ and $+1$, by the tansig function.   
+The graph on the bottom right in Figure~\ref{fig:chC-classif0} shows the $y=mx+c$ lines for each of the hidden neurons.  Each line in this graph  traces out the $z=0$  for one of the tansig surfaces.  Note how each of the lines attempt to provide a measure of discrimination between the O and X classes.  None of these lines are able to provide the required separation between O and X classes.   
 
-The graph on the bottom right left shows the $y=mx+c$ lines for each of the hidden neurons.  Each line in this graph can be traced to the two dimensional shapes, since these lines trace out the $z=0$  for the tansig surfaces.  Note how each of the lines attempt to provide a measure of discrimination between the O and * classes.  None of these lines are able to provide the required separation between O and * classes.   
-
+The second and third rows in Figure~\ref{fig:chC-hiddeneurons} show the sum of the neuron signals, starting with the bias, and then adding an additional neuron until all neuron signals are included.  The signals shown here are already scaled by the output neuron weights, in the correct proportions, but the non-linear output compression is not yet applied. 
+Note how the output neuron weights (sign and magnitude) manipulate the signals from each of the previous layer neurons to build a surface that will eventually form the discrimination surface.  In particular, note how the class X area is growing in a positive direction, while the class O area is growing towards $-10$.  Keep in mind that the class X output must be $+1$ while the class O output must be $-1$.  As the neuron signals are added, the emerging shape approaches the required discrimination class regions 
  
  
-The graphs below show the sum of the neuron signals, starting with the bias, and then adding an additional neuron until all neuron signals are included.  The signals shown here are already scaled by the output neuron weights, in the correct proportions, but the non-linear output compression is not yet applied. 
-
-Note how the output neuron weights (sign and magnitude) manipulate the signals from each of the previous layer neurons to build a surface that will eventually form the discrimination surface.  In particular, note how the class * area is growing in a positive direction, while the class O area is growing towards $-10$.  Keep in mind that the class * output must be $+1$ while the class O output must be $-1$.  As the neuron signals are added, the emerging shape approaches the required discrimination class regions 
- 
- 
-The output signal from the output neuron (but before non-linear compression) net is shown below.   It is quite informative to study the graph and to identify the individual linear discrimination lines, and to observe how these lines are cleverly segmented by adding the neurons' signals together.   It is also evident that the hidden neuron signals  were scaled differently by the input weights on the output neuron.  
+The output signal from the output neurons (but before non-linear compression) are shown in Figure~\ref{fig:chC-classif0}.   It is quite informative to study the graph and to identify the individual linear discrimination lines, and to observe how these lines are cleverly segmented by adding the neurons' signals together.   It is also evident that the hidden neuron signals  were scaled differently by the input weights on the output neuron.  
 
 The key observation is that the hidden neuron outputs are limited by the tansig signal, and hence, their output values can be scaled \textit{differently} by the weights in the output layer.  If the hidden layer outputs were not limited, the output signals would be monotonically increasing/decreasing away from the $\varphi(0)=0$  line, and there would be little value in adding these increasing values together. 
 
-This output response is the result of a happy dance of 15 weights, and 6 bias values, for the full range of input feature values.  Note that this net's output signal can vary from $-20$ to $+20$, depending on the input  $(x_1,x_2)$.    The distinctly visible plateaus are remnants from the tansig shapes of the input neurons.  
+This output response is the result of a happy dance of 16 weights, and 6 bias values, for the full range of input feature values.  Note that this output neuron activation signal (before the tansig compression) can vary wider than $-20$ to $+20$, depending on the input  $(x_1,x_2)$.    The distinctly visible plateaus are remnants from the tansig shapes of the input neurons.  
 
-Since we are only interested in classifying between class O and class *, we define a threshold value of $0$, and compare the net output against this threshold to classify an object. 
+Since we are only interested in classifying between class O and class X, we define a threshold value of $0$, and compare the net output against this threshold to classify an object. 
 \begin{enumerate}
-\item where the net output is greater than zero is class * domain, and 
+\item where the net output is greater than zero is class X domain, and 
 \item where the net output is less than zero is class O domain.  
 \end{enumerate} 
 the final shaping of the discrimination curve is shown on the left.  The two top graphs show the final output of the neural net before and after non-linear compression.  
@@ -116,17 +132,18 @@ The second graph shows the output of the neural net after the non-linear limitin
 
 The third curve shows a plan or top view of the two-dimensional Cartesian space.   The original input values are shown, together with the neural net response, shown in a contour plot.  A contour plot shows constant value lines (exactly like contour lines on a map shown altitude).  The $z=0$  line is somewhere in the turquoise colour band (near the middle of the band).  
 
-Everything to the left (blue) side of $z=0$  is class O,  while the space to the right (red) side of $z=0$  is class *.  Observe how effectively the net employs the 5 linear discriminators to build the complex discrimination shape.  
+Everything to the left (blue) side of $z=0$  is class O,  while the space to the right (red) side of $z=0$  is class X.  Observe how effectively the net employs the 5 linear discriminators to build the complex discrimination shape.  
 
 We can only visualize curves like these up to the third dimension, but it some means of visualization for higher dimensions are available, it could be a useful tool to confirm the net design.
 
+\FloatBarrier
 \section{Alternative Perspective}
 
 This chapter provides compelling evidence to consider an artificial  neural net as a cascaded collection of linear discrimination building lines, planes or hyperplanes.  The graphs clearly show a number of lines and various plateaus and valleys that meet our intuitive notion of 'discrimination'.
 
 Note, however, that neither the neural net, nor the back-propagation algorithm has any conscious knowledge of any such discrimination lines of surfaces.  In the same sense that a falling rock has no knowledge of Newton's laws, the net performs its function without being bound by our own poorly construed mental pictures of how things work.
 
-An alternative view on the operation of the neural net, which is just as valid as the above view, it to consider the neural net as a very large (but conceptually simple) mathematical equation.  This equation is formed by a large number of sub-equations (neurons).  The end effect is a black box (the equation) that has a number of inputs and a number of outputs.  Inside this black box, are the equation itself, plus a large number of parameters (weights and biases) that must be adjusted to the problem at hand.  In terms of our two dimensional problem, this is the same as fitting a $y=mx+c$ curve to a number of data points: the slope $m$ and offset $c$ are parameters that must be adjusted to minimize the curve-fit error.  
+An alternative view on the operation of the neural net, which is just as valid as the  view described here, it to consider the neural net as a very large (but conceptually simple) mathematical equation.  This equation is formed by a large number of sub-equations (neurons).  The end effect is a black box (the equation) that has a number of inputs and a number of outputs.  Inside this black box, are the equation itself, plus a large number of parameters (weights and biases) that must be adjusted to the problem at hand.  In terms of our two dimensional problem, this is the same as fitting a $y=mx+c$ curve to a number of data points: the slope $m$ and offset $c$ are parameters that must be adjusted to minimize the curve-fit error.  
 
 In our little experiment above, the training of the neural net meant finding the best set of  linear discriminators.  However, in terms of the black box model, training the net means finding the set of parameters (weights and biases) that minimizes the output error for the given training set.  The output error is defined as the mean error from the ideal output, for all the neurons, taken collectively.  This error is normally defined as the mean value of the square of all the errors from all the neurons
 \begin{equation}
@@ -146,374 +163,7 @@ The weights of the first layer neurons define the linear discriminators, while t
 
 It is generally accepted that the human brain has neuron connectivity of the order \num{10e4} (see \cite{WikiPediaNeuron2019}), this means that the brain can assemble discrimination hyper-surfaces in \num{10e4}  dimensional space.  Furthermore, the brain's complex feedback paths and ability to have thousands of 'hidden layers' hints that the brain can form discrimination surfaces of almost unlimited complexity.  Our work with small networks are but feeble attempts in comparison with the complexity of natural neural networks.  
 
-
-Matlab code used to create the graphs in this paper
 \begin{lstlisting}
-
-% simnn.m
-
-% some graphics stuff
-set(0,'Units','pixels');
-scnsize=get(0,'Screensize');
-
-
-pt=[2   5
-    3   4
-    10   7
-    1   7
-    3.4 6.0
-    7   7
-    0  10
-    6   5.5
-    9   9.5
-    5   7
-    4   8
-    2   3
-    5   4.5  % last of first set   
-    1   .7
-    0.5 3
-    5   3.2
-    0.5 4
-    3.4 3.2
-    2.3 1.2
-    7   5.5
-    6   4
-    9   6
-    4   1
-    2   0.5 
-    0 5 
-    9   3    
-    ];
-    
-p=pt';
-t=[ones(1, 13) -1*ones(1, 13)];
-
-trainnnet=0;
-if (trainnnet==1)
-% train this net
-    figure(1)
-    net=newff([0 10 ; 0 10  ],[5 1], {'tansig','tansig'}, 'trainlm');
-    net.trainParam.show = 5;
-    net.trainParam.epochs = 100;
-    net.trainParam.goal = 1e-5;
-    net=train(net,p,t);
-else
-    load visual
-end 
-
-
-
-% here we evaluate the net's performance against the training set
-a=sim(net,p);
-
-tt=[1:size(a,2)];
-z=0*ones(size(tt));
-
-figure(2)
-
-plot(tt,t,tt,z,tt,a)
-title('testing net output vs target')
-
-disp('training set results')
-legal=(a>0);
-nonlegal=(a<=0);
-
-corleg=sum(legal(1:13))/13
-errleg=1-corleg
-cornon=sum(nonlegal(14:26))/13
-errnon=1-cornon
-
-
-x=[0:.25:10];
-y=[0:.25:10];
-
-xx=x'*ones(size(y));
-yy=ones(size(x'))*y;
-%mesh(xx)
-%mesh(yy)
-
-% layer 1, neuron 1
-disp('net.IW{1,1}(1,2) to get the weight between neuron 1 and input 2:')
-disp( 'net.b{1}(4) to get the bias in layer 1, neuron4:')
-
-w111=net.IW{1,1}(1,1)
-w112=net.IW{1,1}(1,2)
-b11=net.b{1}(1);
-z=xx*w111+yy*w112+b11;
-zz11=(2*ones(size(z))./(1+exp(-2*z)))-1; 
-
-w121=net.IW{1,1}(2,1)
-w122=net.IW{1,1}(2,2)
-b12=net.b{1}(2);
-z=xx*w121+yy*w122+b12;
-zz12=(2*ones(size(z))./(1+exp(-2*z)))-1; 
-
-w131=net.IW{1,1}(3,1)
-w132=net.IW{1,1}(3,2)
-b13=net.b{1}(3);
-z=xx*w131+yy*w132+b13;
-zz13=(2*ones(size(z))./(1+exp(-2*z)))-1; 
-
-w141=net.IW{1,1}(4,1)
-w142=net.IW{1,1}(4,2)
-b14=net.b{1}(4);
-z=xx*w141+yy*w142+b14;
-zz14=(2*ones(size(z))./(1+exp(-2*z)))-1; 
-
-w151=net.IW{1,1}(5,1)
-w152=net.IW{1,1}(5,2)
-b15=net.b{1}(5);
-z=xx*w151+yy*w152+b15;
-zz15=(2*ones(size(z))./(1+exp(-2*z)))-1; 
-
-figure(3)
-pos=[0, -100, 600, 740];
-set(3,'Position', pos);
-set(3,'PaperPositionMode','auto');
-
-subplot(3,2,1)
-mesh(x,y,zz11)
-xlabel('x1')
-ylabel('x2')
-zlabel('output')
-axis([0 10 0 10 -1 1])
-title('hidden neuron1 output')
-
-subplot(3,2,2)
-mesh(x,y,zz12)
-xlabel('x1')
-ylabel('x2')
-zlabel('output')
-axis([00 10 0 10 -1 1])
-title('hidden neuron2 output')
-
-subplot(3,2,3)
-mesh(x,y,zz13)
-xlabel('x1')
-ylabel('x2')
-zlabel('output')
-axis([0 10 0 10 -1 1])
-title('hidden neuron3 output')
-
-subplot(3,2,4)
-mesh(x,y,zz14)
-xlabel('x1')
-ylabel('x2')
-zlabel('output')
-axis([0 10 0 10 -1 1])
-title('hidden neuron4 output')
-
-subplot(3,2,5)
-mesh(x,y,zz15)
-xlabel('x1')
-ylabel('x2')
-zlabel('output')
-axis([0 10 0 10 -1 1])
-title('hidden neuron5 output')
-
-subplot(3,2,6)
-plot(p(2,1:13) , p(1,1:13),'*',p(2,14:26) , p(1,14:26),'o')
-axis([0 10 0 10 ]);
-hold on
-ax=[-20:1:20];
-ay=-(w112*ax+b11)/w111;
-plot(ax,ay);
-ay=-(w122*ax+b12)/w121;
-plot(ax,ay);
-ay=-(w132*ax+b13)/w131;
-plot(ax,ay);
-ay=-(w142*ax+b14)/w141;
-plot(ax,ay);
-ay=-(w152*ax+b15)/w151;
-plot(ax,ay);
-xlabel('x1');
-ylabel('x2');
-title('linear classification lines');
-textarray=['n1';'n2';'n3';'n4';'n5'];
-textx=[9, 8.5,2,5,9];
-texty=[6.5,9.5,5.5,8,3.5];
-text(textx,texty,textarray);
-hold off
-
-print -depsc2 -tiff fiveinputs.eps
-
-%now add the three together in the output neuron
-disp('net.LW{2,1}(1,2) to get the weight between L2N1 and L1N2:')
-
-w221=net.LW{2,1}(1,1)
-w222=net.LW{2,1}(1,2)
-w223=net.LW{2,1}(1,3)
-w224=net.LW{2,1}(1,4)
-w225=net.LW{2,1}(1,5)
-b21=net.b{2}(1);
-
-%%% output per neuron
-figure(4)
-pos=[0, -100, 600, 740];
-set(4,'Position', pos);
-set(4,'PaperPositionMode','auto');
-
-z=b21*ones(size(w221*zz11));
-subplot(3,2,1)
-mesh(x,y,z)
-xlabel('x1')
-ylabel('x2')
-zlabel('output')
-title('bias only, observed at ouput');
-axis([0 10 0 10 min(min(z)) -max(max(z))])
-
-z=w221*zz11 + b21;
-subplot(3,2,2)
-mesh(x,y,z)
-xlabel('x1')
-ylabel('x2')
-zlabel('output')
-title('Neuron1 + bias, observed at ouput');
-axis([0 10 0 10 min(min(z)) max(max(z))])
-
-z=z +  w222*zz12 ;
-subplot(3,2,3)
-mesh(x,y,z)
-xlabel('x1')
-ylabel('x2')
-zlabel('output')
-title('Neuron1 + Neuron2 + bias');
-axis([0 10 0 10 min(min(z)) max(max(z))])
-
-z=z +  w223*zz13 ;
-subplot(3,2,4)
-mesh(x,y,z)
-xlabel('x1')
-ylabel('x2')
-zlabel('output')
-title('Neuron1 + Neuron2 + Neuron3 + bias');
-axis([0 10 0 10 min(min(z)) max(max(z))])
-
-z=z +  w224*zz14 ;
-subplot(3,2,5)
-mesh(x,y,z)
-xlabel('x1')
-ylabel('x2')
-zlabel('output')
-title('Neuron1 + Neuron2 + Neuron3 + Neuron4 + bias');
-axis([0 10 0 10 min(min(z)) max(max(z))])
-
-z=z +  w225*zz15 ;
-subplot(3,2,6)
-mesh(x,y,z)
-xlabel('x1')
-ylabel('x2')
-zlabel('output')
-title('All five neurons + bias');
-axis([0 10 0 10 min(min(z)) max(max(z))])
-
-print -depsc2 -tiff fivegrow.eps
-
-z=w221*zz11 + w222*zz12 + w223*zz13 + w224*zz14 + w225*zz15 + b21;
-zz21c=2*ones(size(z))./(1+exp(-2*z)) -1;
-zz21u=z;
-
-figure(5)
-pos=[0, -100, 350, 740];
-set(5,'Position', pos);
-set(5,'PaperPositionMode','auto');
-
-subplot(3,1,1)
-mesh(x,y,zz21u)
-xlabel('x1')
-ylabel('x2')
-zlabel('output')
-axis([0 10 0 10 min(min(zz21u)) max(max(zz21u))])
-title('Output neuron signal before tansig compression');
-
-subplot(3,1,2)
-mesh(x,y,zz21c)
-xlabel('x1')
-ylabel('x2')
-zlabel('output')
-axis([0 10 0 10 min(min(zz21c)) max(max(zz21c))])
-title('Output neuron signal after tansig compression');
-
-subplot(3,1,3)
-contour(x,y,zz21c,10)
-hold on
-plot(p(2,1:13) , p(1,1:13),'*',p(2,14:26) , p(1,14:26),'o')
-axis([0 10 0 10 ]);
-xlabel('x1')
-ylabel('x2')
-title('net output superimposed on class detail')
-print -depsc2 -tiff outputplots.eps
-
-figure(6)
-plot(p(2,1:13) , p(1,1:13),'*',p(2,14:26) , p(1,14:26),'o')
-axis([0 10 0 10 ]);
-hold on
-ax=[1 8]; ay=[0 10];
-plot(ax,ay);
-xlabel('x1');
-ylabel('x2');
-title('linear classifier');
-hold off
-print -depsc2 -tiff linclass.eps
-
-figure(7)
-pos=[0, -100, 350, 740];
-set(7,'Position', pos);
-set(7,'PaperPositionMode','auto');
-
-xts=[-5:0.1:5];
-yts=(2*ones(size(xts))./(1+exp(-2*xts)))-1; 
-
-subplot(4,1,1)
-plot(xts,yts);
-xlabel('x')
-ylabel('output')
-axis([-3 3 -1 1 ])
-title('tansig curve')
-
-w121=net.IW{1,1}(2,1)
-w122=net.IW{1,1}(2,2)
-b12=net.b{1}(2);
-z=-(xx*w141+yy*w142+b12);
-zts1=(2*ones(size(z))./(1+exp(-2*z/4)))-1; 
-zts2=(2*ones(size(z))./(1+exp(-2*z)))-1; 
-zts3=(2*ones(size(z))./(1+exp(-2*8*z)))-1; 
-
-subplot(4,1,2)
-mesh(x,y,zts1)
-xlabel('x1')
-ylabel('x2')
-zlabel('output')
-axis([00 10 0 10 -1 1])
-title('tansig sheet 1')
-
-subplot(4,1,3)
-mesh(x,y,zts2)
-xlabel('x1')
-ylabel('x2')
-zlabel('output')
-axis([00 10 0 10 -1 1])
-title('tansig sheet 2')
-
-subplot(4,1,4)
-mesh(x,y,zts3)
-xlabel('x1')
-ylabel('x2')
-zlabel('output')
-axis([00 10 0 10 -1 1])
-title('tansig sheet 3')
-print -depsc2 -tiff -loose tansig.eps
-
-figure(8)
-
-mesh(x,y,zz21u)
-xlabel('x1')
-ylabel('x2')
-zlabel('output')
-axis([0 10 0 10 min(min(zz21u)) max(max(zz21u))])
-title('Output neuron signal before tansig compression');
-print -depsc2 -tiff outputmeshu.eps
-
 
 \usepackage{caption}
 
@@ -537,7 +187,6 @@ print -depsc2 -tiff outputmeshu.eps
 \end{subfigure}
 \caption{Pixel intensities across MWIR and SWIR bands, for a target and MTV countermeasure, example from Test Point 45b1.\label{fig:intensities}}
 \end{figure}
-
 
 
 \end{lstlisting}

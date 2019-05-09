@@ -59,9 +59,16 @@ def load_data_wrapper():
     turn out to be the most convenient for use in our neural network
     code."""
     tr_d, va_d, te_d = load_data()
+    # print(tr_d[0].shape)
+    # print(tr_d[1].shape)
     training_inputs = [np.reshape(x, (784, 1)) for x in tr_d[0]]
     training_results = [vectorized_result(y) for y in tr_d[1]]
     training_data = zip(training_inputs, training_results)
+    print(training_inputs[0].shape)
+    print(training_results[0].shape)
+    # for xx in training_data:
+    #     print(xx)
+    # print(*training_data)
     validation_inputs = [np.reshape(x, (784, 1)) for x in va_d[0]]
     validation_data = zip(validation_inputs, va_d[1])
     test_inputs = [np.reshape(x, (784, 1)) for x in te_d[0]]
@@ -75,4 +82,5 @@ def vectorized_result(j):
     network."""
     e = np.zeros((10, 1))
     e[j] = 1.0
+    # print(e)
     return e
