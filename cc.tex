@@ -39,51 +39,9 @@ Straight line:  $0=(mx+(-1)y+c)$
 Note the remarkable resemblance between the two equations.  Suppose, for a short while, that the non-linear function can be 'forced' to be linear (in other words, the $\varphi()$ function   disappears).  Also consider the neuron when $z=0$.  Then the equation for the straight line and the (assumed simplified) neuron have the same form.  Under these two conditions, one can state: $w_1=m$, $w_2=-1$, $x_1=x$, $x_2=y$, $b=c$.  It is evident that the two weights and bias of a two-input neuron defines a straight line.  Returning to fix the two simplifying assumptions, we note that the straight line now describes the locus (line) where the non-linear function $\varphi()$ is zero.  
 
 Several nonlinear functions are used in neural nets, including the sigmoid (logistics), tansig, or soft max
-functions\cite{stackexchangeEllefsen2015,WikiPediaHyperbolicfunction2019,NickBecker2017,DustinStansbury2014,HamzaMahmood2018}. 
-
-The tansig function is defined as (see Figure~\ref{fig:tansig}):
-\begin{equation}
-\varphi(x)
-=\left(\frac{2}{1+e^{-bx}}\right)-1
-=\left(\frac{1-e^{-bx}}{1+e^{-bx}}\right)
-\end{equation}  
-where, normally, $b=2$ for the $\tanh(x)$ function.
-The derivative of the tansig function is 
-\begin{equation}
- \varphi^\prime(x)
- = \frac{b}{2} \left(1+\varphi(x))(1-\varphi(x)\right)
- = \frac{b}{2}\left(1-\varphi^2(x)\right)
-\end{equation}
-
-
-The sigmoid or logistics function is defined as (see Figure~\ref{fig:sigmoid}):
-\begin{equation}
-\sigma(x)
-=\frac{1}{1+e^{-x}}.
-\end{equation}  
-The derivative of the sigmoid function is 
-\begin{equation}
- \sigma^\prime(x)
- =\sigma(x)(1-\sigma(x))
-\end{equation}
-
-
-\begin{figure}[p]
-\centering
-\includegraphics[width=\textwidth]{pic/tansig01}
-\includegraphics[width=\textwidth]{pic/tansig02}
-\caption{The tansig function \label{fig:tansig}}
-\end{figure}
-
-\begin{figure}[p]
-\centering
-\includegraphics[width=\textwidth]{pic/sigmoid01}
-\includegraphics[width=\textwidth]{pic/sigmoid02}
-\caption{The sigmoid function \label{fig:sigmoid}}
-\end{figure}
-
+functions (see Appendix~\ref{sec:ActivationFunctions}). 
 For this discussion consider the tansig function, but the same also applies to the sigmoid. 
-Imagine a sheet of paper formed into a two-dimensional shape (see Figures~\ref{fig:tansig} and \ref{fig:sigmoid}).  Visualize walking along the $z=0$ contour of the tansig surface (or $z=0.5$ contour of the sigmoid surface).  As we walk along this line, to the left of us, the surface falls away to smaller values, while on the right hand side, the surface rises to larger values.  Note, however, that the tansig $z=0$ line is the equation of the straight line derived from the neuron equation, $0=z=\varphi(w_1x_1+w_2x_2+b)$ , since $\varphi(x)=0$.  The neuron's weights and bias therefore determines the exact location and orientation or direction of the tansig surface in the two-dimensional Cartesian space.  
+Imagine a sheet of paper formed into a two-dimensional shape (see Figures~\ref{fig:tansig}).  Visualize walking along the $z=0$ contour of the tansig surface.  As we walk along this line, to the left of us, the surface falls away to smaller values, while on the right hand side, the surface rises to larger values.  Note, however, that the tansig $z=0$ line is the equation of the straight line derived from the neuron equation, $0=z=\varphi(w_1x_1+w_2x_2+b)$ , since $\varphi(x)=0$.  The neuron's weights and bias therefore determines the exact location and orientation or direction of the tansig surface in the two-dimensional Cartesian space.  
 
 Note that while $\varphi(w_1x_1+w_2x_2+b)$  and  $\varphi(2w_1x_1+2w_2x_2+2b)$ both result in the same straight line in the two-dimensional plane, they yield two very different tansig surfaces.  The slope of the surface, away from the  $\varphi(x)=0$ line, is strongly affected by the neuron's weights and the bias introduces a shift perpendicular to, and 'up/down' relative to the $z=0$ line, the $z=0$ line because of shifting the tansig  argument.  
 
