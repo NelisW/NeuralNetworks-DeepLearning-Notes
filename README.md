@@ -8,6 +8,6 @@ Part I of this book is not authorised by Michael Nielsen, the authoritative vers
 
 The book is formatted using Tufte-LaTeX, a document format based on the work of Edward Tufte.
 
-This is a work in progress, it will be updated from time to time. For this reason the PDF is not committed, you can build it yourself.
+This is a work in progress, it will be updated from time to time. For this reason the PDF is not committed, you can build it yourself using MikTeX or TexLive.
 
 
