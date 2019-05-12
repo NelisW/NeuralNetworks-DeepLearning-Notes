@@ -304,15 +304,23 @@ To understand the similarity to the perceptron model, suppose $z \equiv w \cdot 
 
 What about the algebraic form of $\sigma$? How can we understand that? In fact, the exact form of $\sigma$ isn't so important - what really matters is the shape of the function when plotted. Here's the shape:
 
-{\centering
-\includegraphics[width=0.5\textwidth,]{pic/sigmoidfunction01}
-\par}
+
+\begin{marginfigure}[-110mm]
+\includegraphics[width=1.1\textwidth]{sigmoid}
+\caption{The logistics sigmoid function}
+\label{fig:ch01-logistitcssigmoid}
+\end{marginfigure}
+
 
 This shape is a smoothed out version of a step function:
 
-{\centering
-\includegraphics[width=0.5\textwidth,]{pic/stepfunction01}
-\par}
+
+\begin{marginfigure}[-35mm]
+\includegraphics[width=1.1\textwidth]{stepfn}
+\caption{The step function}
+\label{fig:ch01-stepfn}
+\end{marginfigure}
+
 
 
 If $\sigma$ had in fact been a step function, then the sigmoid neuron would be a perceptron, since the output would be 1 or 0 depending on whether $w \cdot x+b$ was positive or negative\footnote{Actually, when  $w \cdot x+b=0$ the perceptron outputs 0, while the step function outputs 1. So, strictly speaking, we'd need to modify the step function at that one point. But you get the idea.}.
@@ -338,18 +346,42 @@ Show that the behaviour of the network doesn't change.
 
 \section{The architecture of neural networks}
 
-In the next section I'll introduce a neural network that can do a pretty good job classifying handwritten digits. In preparation for that, it helps to explain some terminology that lets us name different parts of a network. Suppose we have the network: 
+\begin{marginfigure}[-35mm]
+\begin{neuralnetwork}[height=5.5, layertitleheight=0, nodespacing=1cm, layerspacing=1.5cm]
+	\newcommand{\nodetextclear}[2]{}
+	\newcommand{\nodetextxnb}[2]{\ifnum0=#2 \else $x_#2$ \fi}
+	\newcommand{\logiclabel}[1]{\,{$\scriptstyle#1$}\,}
+	\newcommand{\nodetextY}[2]{$y$}
+	\newcommand{\linklabelsU}[4]{\logiclabel{+1}}
+	\newcommand{\linklabelsA}[4]{\ifnum0=#2 \logiclabel{+3} \else \logiclabel{-2} \fi}
+	\setdefaultnodetext{\nodetextclear}
+	% Input layer
+	\inputlayer[count=3, bias=false, title=Input\\layer, text=\nodetextxnb]
+	% links to first hidden layer from input layer
+	\hiddenlayer[count=4, title=Hidden\\layer,  bias=false]\linklayers
+	\outputlayer[count=1,  title=Output\\layer, text=\nodetextY]\linklayers
+\end{neuralnetwork}
+\end{marginfigure}
 
-{\centering
-\includegraphics[width=0.6\textwidth,]{pic/three-layer-nn01}
-\par}
-
-
+In the next section I'll introduce a neural network that can do a pretty good job classifying handwritten digits. In preparation for that, it helps to explain some terminology that lets us name different parts of a network. Consider a three-layer network.  
 As mentioned earlier, the leftmost layer in this network is called the \textit{input} layer, and the neurons within the layer are called input neurons. The rightmost or output layer contains the \textit{output} neurons, or, as in this case, a single output neuron. The middle layer is called a \textit{hidden} layer, since the neurons in this layer are neither inputs nor outputs. The term ``hidden'' perhaps sounds a little mysterious - the first time I heard the term I thought it must have some deep philosophical or mathematical significance - but it really means nothing more than ``not an input or an output''. The network above has just a single hidden layer, but some networks have multiple hidden layers. For example, the following four-layer network has two hidden layers: 
 
-{\centering
-\includegraphics[width=0.8\textwidth,]{pic/four-layer-nn01}
-\par}
+
+\begin{marginfigure}[-35mm]
+\begin{neuralnetwork}[height=7.5, layertitleheight=0, nodespacing=1cm, layerspacing=1.5cm]
+	\newcommand{\nodetextclear}[2]{}
+	\newcommand{\nodetextxnb}[2]{\ifnum0=#2 \else $x_#2$ \fi}
+	\newcommand{\logiclabel}[1]{\,{$\scriptstyle#1$}\,}
+	\newcommand{\nodetextY}[2]{$y$}
+	\newcommand{\linklabelsU}[4]{\logiclabel{+1}}
+	\newcommand{\linklabelsA}[4]{\ifnum0=#2 \logiclabel{+3} \else \logiclabel{-2} \fi}
+	\setdefaultnodetext{\nodetextclear}
+	\inputlayer[count=3, bias=false,  title=Input\\layer, text=\nodetextxnb]
+	\hiddenlayer[count=6, bias=false, title=Hidden\\layer, ]\linklayers
+	\hiddenlayer[count=4, bias=false, title=Hidden\\layer, ]\linklayers
+	\outputlayer[count=1, text=\nodetextY, title=Output\\layer, ]\linklayers
+\end{neuralnetwork}
+\end{marginfigure}
 
 
 
@@ -367,34 +399,35 @@ Recurrent neural nets have been less influential than feedforward networks, in p
 
 \section{A simple network to classify handwritten digits}
 
-Having defined neural networks, let's return to handwriting recognition. We can split the problem of recognizing handwritten digits into two sub-problems. First, we'd like a way of breaking an image containing many digits into a sequence of separate images, each containing a single digit. For example, we'd like to break the image
+Having defined neural networks, let's return to handwriting recognition. We can split the problem of recognizing handwritten digits into two sub-problems. First, we'd like a way of breaking an image containing many digits into a sequence of separate images, each containing a single digit. For example, we'd like to break the image into six separate images,
+
+\begin{marginfigure}
+\includegraphics{504192}
+\end{marginfigure}
+
+\begin{marginfigure}
+\includegraphics{digits_separate}
+\end{marginfigure}
+
+We humans solve this \textit{segmentation problem} with ease, but it's challenging for a computer program to correctly break up the image. Once the image has been segmented, the program then needs to classify each individual digit. So, for instance, we'd like our program to recognize that the first digit above, is a 5.
+
+\begin{marginfigure}
+\includegraphics[width=0.17\textwidth]{mnist_first_digit}
+\end{marginfigure}
 
 
-{\centering
-\includegraphics[width=0.5\textwidth,]{pic/504192}
-\par}
 
-into six separate images,
-
-{\centering
-\includegraphics[width=0.8\textwidth,]{pic/digits_separate}
-\par}
-
-We humans solve this \textit{segmentation problem} with ease, but it's challenging for a computer program to correctly break up the image. Once the image has been segmented, the program then needs to classify each individual digit. So, for instance, we'd like our program to recognize that the first digit above,
-
-
-{\centering
-\includegraphics[width=.2\textwidth,]{pic/mnist_first_digit}
-\par}
-
-is a 5.
 
 We'll focus on writing a program to solve the second problem, that is, classifying individual digits. We do this because it turns out that the segmentation problem is not so difficult to solve, once you have a good way of classifying individual digits. There are many approaches to solving the segmentation problem. One approach is to trial many different ways of segmenting the image, using the individual digit classifier to score each trial segmentation. A trial segmentation gets a high score if the individual digit classifier is confident of its classification in all segments, and a low score if the classifier is having a lot of trouble in one or more segments. The idea is that if the classifier is having trouble somewhere, then it's probably having trouble because the segmentation has been chosen incorrectly. This idea and other variations can be used to solve the segmentation problem quite well. So instead of worrying about segmentation we'll concentrate on developing a neural network which can solve the more interesting and difficult problem, namely, recognizing individual handwritten digits.
-To recognize individual digits we will use a three-layer neural network:
+To recognize individual digits we will use a three-layer neural network shown in Figure~\ref{fig:chapter01-02}.
 
-{\centering
-\includegraphics[width=\textwidth,]{pic/tikz12}
-\par}
+\begin{figure}[tbhp]
+\centering
+\includegraphics[width=\textwidth]{chapter01-02}
+\caption{Character recognition network}
+\label{fig:chapter01-02}
+\end{figure}
+
 
 The input layer of the network contains neurons encoding the values of the input pixels. As discussed in the next section, our training data for the network will consist of many 28 by 28 pixel images of scanned handwritten digits, and so the input layer contains 784=28$\times$28 neurons. For simplicity I've omitted most of the 784 input neurons in the diagram above. The input pixels are greyscale, with a value of 0.0 representing white, a value of 1.0 representing black, and in between values representing gradually darkening shades of grey.
 
@@ -404,19 +437,25 @@ The output layer of the network contains 10 neurons. If the first neuron fires, 
 
 You might wonder why we use 10 output neurons. After all, the goal of the network is to tell us which digit (0,1,2,$\ldots$,9) corresponds to the input image. A seemingly natural way of doing that is to use just 4 output neurons, treating each neuron as taking on a binary value, depending on whether the neuron's output is closer to 0 or to 1. Four neurons are enough to encode the answer, since 2\textsuperscript{4}=16 is more than the 10 possible values for the input digit. Why should our network use 10 neurons instead? Isn't that inefficient? The ultimate justification is empirical: we can try out both network designs, and it turns out that, for this particular problem, the network with 10 output neurons learns to recognize digits better than the network with 4 output neurons. But that leaves us wondering why using 10 output neurons works better. Is there some heuristic that would tell us in advance that we should use the 10-output encoding instead of the 4-output encoding?
 
-To understand why we do this, it helps to think about what the neural network is doing from first principles. Consider first the case where we use 10 output neurons. Let's concentrate on the first output neuron, the one that's trying to decide whether or not the digit is a 0. It does this by weighing up evidence from the hidden layer of neurons. What are those hidden neurons doing? Well, just suppose for the sake of argument that the first neuron in the hidden layer detects whether or not an image like the following is present:
+To understand why we do this, it helps to think about what the neural network is doing from first principles. Consider first the case where we use 10 output neurons. Let's concentrate on the first output neuron, the one that's trying to decide whether or not the digit is a 0. It does this by weighing up evidence from the hidden layer of neurons. What are those hidden neurons doing? Well, just suppose for the sake of argument that the first neuron in the hidden layer detects whether or not an image like the top picture is present.
 
-{\centering
-\includegraphics[width=0.2\textwidth,]{pic/mnist_top_left_feature}
-\par}
+\begin{marginfigure}
+\includegraphics[width=0.3\textwidth]{mnist_top_left_feature}
+\end{marginfigure}
 
-It can do this by heavily weighting input pixels which overlap with the image, and only lightly weighting the other inputs. In a similar way, let's suppose for the sake of argument that the second, third, and fourth neurons in the hidden layer detect whether or not the following images are present:
 
-{\centering
-\includegraphics[width=0.2\textwidth,]{pic/mnist_other_features}
-\par}
+It can do this by heavily weighting input pixels which overlap with the image, and only lightly weighting the other inputs. In a similar way, let's suppose for the sake of argument that the second, third, and fourth neurons in the hidden layer detect whether or not the next set of images are present.
 
-As you may have guessed, these four images together make up the 0 image that we saw in the line of digits shown earlier:
+
+\begin{marginfigure}
+\includegraphics[width=0.7\textwidth]{mnist_other_features}
+\end{marginfigure}
+
+As you may have guessed, these four images together make up the 0 image that we saw in the line of digits shown earlier.
+
+\begin{marginfigure}
+\includegraphics[width=0.2\textwidth]{mnist_complete_zero}
+\end{marginfigure}
 
 So if all four of these hidden neurons are firing then we can conclude that the digit is a 0. Of course, that's not the only sort of evidence we can use to conclude that the image was a 0 - we could legitimately get a 0 in many other ways (say, through translations of the above images, or slight distortions). But it seems safe to say that at least in this case we'd conclude that the input was a 0.
 
@@ -430,9 +469,12 @@ Now, with all that said, this is all just a heuristic. Nothing says that the thr
 There is a way of determining the bitwise representation of a digit by adding an extra layer to the three-layer network above. The extra layer converts the output from the previous layer into a binary representation, as illustrated in the figure below. Find a set of weights and biases for the new output layer. Assume that the first 3 layers of neurons are such that the correct output in the third layer (i.e., the old output layer) has activation at least 0.99, and incorrect outputs have activation less than 0.01. 
 \end{enumerate}
 
-{\centering
-\includegraphics[width=\textwidth,]{pic/tikz13}
-\par}
+\begin{figure}[tbhp]
+\centering
+\includegraphics[width=\textwidth]{chapter01-03}
+\caption{Four-layer character recognition network}
+\label{fig:chapter01-03}
+\end{figure}
 
 
 \section{Learning with gradient descent}
