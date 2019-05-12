@@ -1,0 +1,120 @@
+% -*- TeX -*- -*- UK -*- -*- Soft -*-"
+
+\documentclass[a4,nobib]{tufte-book} 
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{graphicx}
+
+
+% New setup
+%%\setstocksize{297mm}{210mm}
+%\settrimmedsize{297mm}{210mm}{*}
+%\setlength{\trimtop}{0pt}
+%\setlength{\trimedge}{\stockwidth}
+%\addtolength{\trimedge}{-\paperwidth}
+%\settypeblocksize{24cm}{150mm}{*}
+%\setulmargins{25mm}{*}{*}
+%\setlrmargins{30mm}{*}{*}
+%\setmarginnotes{17pt}{51pt}{\onelineskip}
+%\setheadfoot{\onelineskip}{2\onelineskip}
+%\setheaderspaces{*}{2\onelineskip}{*}
+%\checkandfixthelayout
+
+\usepackage{url}
+\usepackage{listings}
+\usepackage{color}
+\usepackage{courier}
+\usepackage{graphics}
+\usepackage{caption}
+\usepackage{textcomp}
+\usepackage{acronym}
+%\usepackage{upquote}
+
+\usepackage{textcomp} % additional fonts, required for upquote in listings
+\usepackage{afterpage}
+\usepackage{placeins} % FloatBarrier
+\usepackage[detect-weight]{siunitx} % nice! SI units and print numbers
+
+\usepackage{ifthen}
+\usepackage{bm} % bold math
+
+%\usepackage{lastpage}
+\usepackage{palatino} 
+
+\usepackage{tcolorbox} % for box-style TBC
+
+\input{commands.tex}
+
+\newcommand{\formatpart}[1]{%
+\begin{fullwidth}
+    \centering%
+    \partname~\thepart%
+    \newline%
+    \pgfornament[width=4cm]{84}\hfil%
+    \newline%
+    #1%
+\end{fullwidth}
+    }
+
+\titleformat% Formatting the part header
+  {\part} % command
+  [block] % shape
+  {\bfseries\sc\Huge} % format
+  {} % label
+  {0pt} % sep
+  { \formatpart
+}%
+
+%the following is required for carriage return symbol
+%ftp://ftp.botik.ru/rented/znamensk/CTAN/fonts/mathabx/texinputs/mathabx.dcl
+%https://secure.kitserve.org.uk/content/mathabx-font-symbol-redefinition-clash-latex
+\DeclareFontFamily{U}{mathb}{\hyphenchar\font45}
+\DeclareFontShape{U}{mathb}{m}{n}{
+      <5> <6> <7> <8> <9> <10> gen * mathb
+      <10.95> mathb10 <12> <14.4> <17.28> <20.74> <24.88> mathb12
+      }{}
+\DeclareSymbolFont{mathb}{U}{mathb}{m}{n}
+\DeclareMathSymbol{\dlsh}{3}{mathb}{"EA}
+
+\newcommand*{\titleTH}{\begingroup%
+\raggedleft
+\vspace*{\baselineskip}
+{\Large Michael Nielsen}\\[0.167\textheight]
+{\Huge Neural Networks and Deep Learning}\\[\baselineskip]
+\par
+\vfill
+October 2018
+\vfill
+
+http://neuralnetworksanddeeplearning.com/index.html
+%{\Large The Publisher \plogo}\par
+\vspace*{3\baselineskip}
+\endgroup}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% files making up this document
+
+\includeonly{c0,c1,c2,c3,c4,c5,c6,c7,c8,ca,cb,cc,cd}
+
+%\includeonly{c8,cc,cd}
+
+\begin{document}
+\titleTH
+\include{c0} % front matter
+\include{c1} %[[Done]] Neural Nets Recognizing Handwritten Digits 
+\include{c2} %[[Done]] How the Backpropagation Algorithm Works 
+\include{c3} %Improving the Way Neural Networks Learn 
+\include{c4} %[[Done]] A Visual Proof That Neural Nets Can Compute Any Function 
+\include{c5} %Why are deep neural networks hard to train?
+\include{c6} %deep learning
+\include{c7} %[[Done]] algorithm for intelligence?   
+\include{c8} %[[Done]] bibliography   
+\appendix
+\include{ca} %Environment Setup
+\include{cb} %Python and Jupyter Code
+\include{cc} %visualising classifiers
+\include{cd} %activation/nonlin functions
+
+
+
+\end{document}

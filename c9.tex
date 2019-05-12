@@ -27,7 +27,7 @@ The artificial neuron is the core computing element, simulating a biological neu
 \begin{figure}[tb]
 \centering
 \includegraphics[width=\textwidth]{eps/neuralnetconcept}
-\caption{Neural net concept\label{fig:neuralnetconcept}}
+\caption{Neural net concept}\label{fig:neuralnetconcept}
 \end{figure}
 
 Consider a very simple neuron with only two inputs $(x_1,x_2)$.  Then $\bm{x}=(x_1,x_2)$  and  $\bm{w}=(w_1,w_2)$, and the artificial neuron operation is $y = \varphi(\bm{x}\cdot\bm{w}+w_b)$, where $\varphi$  is any non-linear function and  $w_b$ is the neuron's bias weight.  Compare the mathematical expression of a two-input neural net with a simple straight line in a two-dimensional Cartesian space:
@@ -50,7 +50,8 @@ Note that while $\varphi(w_1x_1+w_2x_2+b)$  and  $\varphi(2w_1x_1+2w_2x_2+2b)$ b
 \begin{figure}[tb]
 \centering
 \includegraphics[width=.6\textwidth]{pic/chC-trainingset}
-\caption{Neural net concept\label{fig:chC-trainingset}}
+\caption{Neural net concept}
+\label{fig:chC-trainingset}
 \end{figure}
 
 Figure~\ref{fig:chC-trainingset} shows data from two classes plotted in terms of feature $x_1$ and feature $x_2$.  Objects from class O are marked with a circle, and objects from class X are marked with an asterisk.  
@@ -75,7 +76,7 @@ Note, however, that the optimisation is not done separately for each line - all 
 \begin{figure}[tb]
 \centering
 \includegraphics[width=0.8\textwidth]{eps/neuralnetconcept02}
-\caption{Small neural net\label{fig:neuralnetconcept02}}
+\caption{Small neural net}\label{fig:neuralnetconcept02}
 \end{figure}
 
 
@@ -86,7 +87,8 @@ In our journey through neural network land,  we start of by considering each neu
 \begin{figure}[tbhp]
 \centering
 \includegraphics[height=1.1\textwidth,angle=90]{pic/chC-hiddeneurons04}
-\caption{Small neural net neuron responses\label{fig:chC-hiddeneurons04}}
+\caption{Small neural net neuron responses}
+\label{fig:chC-hiddeneurons04}
 \end{figure}
 
 First, we will study the tansig surface shape of each neuron hidden neuron, and show how these hidden neurons each contribute a portion to the overall discrimination line.  Note that not all neurons seem to have the same dramatic effect, but keep in mind that the next layer can scale up this output when adding it to the other neuron signals.  In fact, the key to the neural network calculation is the fact that the outputs from these hidden layer neurons must be added in exactly the correct proportions to achieve the final discrimination objective.  
@@ -108,7 +110,8 @@ In experimenting with the net, it was quite interesting to observe how much the 
 \centering
 \includegraphics[width=\textwidth]{pic/chC-classifa04}
 \includegraphics[width=\textwidth]{pic/chC-classifb04}
-\caption{Small neural net classifier, four hidden neurons, seed value 10\label{fig:chC-classif04}}
+\caption{Small neural net classifier, four hidden neurons, seed value 10}
+\label{fig:chC-classif04}
 \end{figure}
 
  
@@ -116,7 +119,8 @@ In experimenting with the net, it was quite interesting to observe how much the 
 \centering
 \includegraphics[width=\textwidth]{pic/chC-classifa08}
 \includegraphics[width=\textwidth]{pic/chC-classifb08}
-\caption{Small neural net classifier, eight hidden neurons, seed value 10\label{fig:chC-classif08}}
+\caption{Small neural net classifier, eight hidden neurons, seed value 10}
+\label{fig:chC-classif08}
 \end{figure}
  
   
@@ -124,7 +128,8 @@ In experimenting with the net, it was quite interesting to observe how much the 
 \centering
 \includegraphics[width=\textwidth]{pic/chC-classifa05}
 \includegraphics[width=\textwidth]{pic/chC-classifb05}
-\caption{Small neural net classifier, four hidden neurons, seed value 1\label{fig:chC-classif05}}
+\caption{Small neural net classifier, four hidden neurons, seed value 1}
+\label{fig:chC-classif05}
 \end{figure}
 
 The output signal from the output neurons (before and after non-linear compression) are shown in Figure~\ref{fig:chC-classif04}.   It is quite informative to study the graph and to identify the individual linear discrimination lines, and to observe how these lines are cleverly segmented by adding the neurons' signals together.   It is also evident that the hidden neuron signals  were scaled differently by the input weights on the output neuron.  
