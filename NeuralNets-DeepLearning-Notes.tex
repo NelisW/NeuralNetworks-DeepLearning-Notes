@@ -50,7 +50,7 @@
     \centering%
     \partname~\thepart%
     \newline%
-    \pgfornament[width=4cm]{84}\hfil%
+    \ %\pgfornament[width=4cm]{84}\hfil%
     \newline%
     #1%
 \end{fullwidth}
@@ -94,13 +94,14 @@ http://neuralnetworksanddeeplearning.com/index.html
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % files making up this document
 
-\includeonly{c0,c1,c2,c3,c4,c5,c6,c7,c8,ca,cb,cc,cd}
+\includeonly{c0,c1,c2,c3,c4,c5,c6,c7,c8,c9,ca,cb,cbib}
 
 %\includeonly{c8,cc,cd}
 
 \begin{document}
 \titleTH
 \include{c0} % front matter
+\part{Neural Networks and Deep Learning: Michael Nielsen}
 \include{c1} %[[Done]] Neural Nets Recognizing Handwritten Digits 
 \include{c2} %[[Done]] How the Backpropagation Algorithm Works 
 \include{c3} %Improving the Way Neural Networks Learn 
@@ -108,13 +109,14 @@ http://neuralnetworksanddeeplearning.com/index.html
 \include{c5} %Why are deep neural networks hard to train?
 \include{c6} %deep learning
 \include{c7} %[[Done]] algorithm for intelligence?   
-\include{c8} %[[Done]] bibliography   
-\appendix
+\part{Study Notes: Nelis Willers}
+\include{c8} %activation/nonlin functions
+\include{c9} %visualising classifiers
+\part{Supplementary Notes}
 \include{ca} %Environment Setup
 \include{cb} %Python and Jupyter Code
-\include{cc} %visualising classifiers
-\include{cd} %activation/nonlin functions
 
+\include{cbib} %[[Done]] bibliography   
 
 
 \end{document}
