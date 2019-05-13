@@ -13,8 +13,9 @@ from matplotlib.ticker import LinearLocator
 from mpl_toolkits.mplot3d import axes3d 
 import matplotlib.pyplot as plt
 import numpy
+plt.rcParams['mathtext.fontset'] = 'cm'
 
-fig = plt.figure()
+fig = plt.figure(figsize=(10,10),dpi=300)
 ax = fig.gca(projection='3d')
 X = numpy.arange(-1, 1, 0.1)
 Y = numpy.arange(-1, 1, 0.1)
@@ -23,8 +24,8 @@ Z = X**2 + Y**2
 
 colortuple = ('w', 'b')
 colors = numpy.empty(X.shape, dtype=str)
-for x in xrange(len(X)):
-    for y in xrange(len(Y)):
+for x in range(len(X)):
+    for y in range(len(Y)):
         colors[x, y] = colortuple[(x + y) % 2]
 
 surf = ax.plot_surface(X, Y, Z, rstride=1, cstride=1, facecolors=colors,
@@ -37,7 +38,9 @@ ax.w_xaxis.set_major_locator(LinearLocator(3))
 ax.w_yaxis.set_major_locator(LinearLocator(3))
 ax.w_zaxis.set_major_locator(LinearLocator(3))
 ax.text(1.79, 0, 1.62, "$C$", fontsize=20)
-ax.text(0.05, -1.8, 0, "$v_1$", fontsize=20)
-ax.text(1.5, -0.25, 0, "$v_2$", fontsize=20)
+ax.text(0.05, -1.8, 0, "$x_1$", fontsize=20)
+ax.text(1.5, -0.25, 0, "$x_2$", fontsize=20)
 
 plt.show()
+plt.tight_layout() 
+fig.savefig('valley.pdf')

@@ -69,12 +69,12 @@ Obviously, the perceptron isn't a complete model of human decision-making! But w
 
 \begin{marginfigure}
 \begin{neuralnetwork}[height=3.5]
-	\newcommand{\nodetextclear}[2]{}
-	\newcommand{\nodetextx}[2]{$x_#2$}
-	\newcommand{\nodetexty}[2]{$y_#2$}
-	\inputlayer[count=4, bias=false, title=Input\\layer, text=\nodetextx]
-	\hiddenlayer[count=5, bias=false, title=Hidden\\layer, text=\nodetextclear] \linklayers
-	\outputlayer[count=3, title=Output\\layer, text=\nodetexty] \linklayers
+\newcommand{\nodetextclear}[2]{}
+\newcommand{\nodetextx}[2]{$x_#2$}
+\newcommand{\nodetexty}[2]{$y_#2$}
+\inputlayer[count=4, bias=false, title=Input\\layer, text=\nodetextx]
+\hiddenlayer[count=5, bias=false, title=Hidden\\layer, text=\nodetextclear] \linklayers
+\outputlayer[count=3, title=Output\\layer, text=\nodetexty] \linklayers
 \end{neuralnetwork}
 \end{marginfigure}
 
@@ -118,10 +118,10 @@ I've described perceptrons as a method for weighing evidence to make decisions. 
 
 Then we see that input 00 produces output 1, since ($-$2)$\times$0+($-$2)$\times$0$+$3=3 is positive. Here, I've introduced the $\times$ symbol to make the multiplications explicit. Similar calculations show that the inputs 01 and 10 produce output 1. But the input 11 produces output 0, since ($-$2)$\times$1+($-$2)$\times$1+3=$-$1 is negative. And so our perceptron implements a \lstinline{NAND} gate!
 
-The \lstinline{NAND} example shows that we can use perceptrons to compute simple logical functions. In fact, we can use networks of perceptrons to compute \textit{any} logical function at all. The reason is that the \lstinline{NAND} gate is universal for computation, that is, we can build any computation up out of \lstinline{NAND} gates. For example, we can use \lstinline{NAND} gates to build a circuit which adds two bits, $x_1$ and $x_2$. This requires computing the bitwise sum, $x_1\bigoplus x_2$, as well as a carry bit which is set to 1 when both $x_1$ and $x_2$ are 1, i.e., the carry bit is just the bitwise product $x_1 x_2$
+The \lstinline{NAND} example shows that we can use perceptrons to compute simple logical functions. In fact, we can use networks of perceptrons to compute \textit{any} logical function at all. The reason is that the \lstinline{NAND} gate is universal for computation, that is, we can build any computation up out of \lstinline{NAND} gates. For example, we can use \lstinline{NAND} gates to build a circuit which adds two bits, $x_1$ and $x_2$. This requires computing the bitwise sum, $x_1\bigoplus x_2$, as well as a carry bit which is set to 1 when both $x_1$ and $x_2$ are 1, i.e., the carry bit is just the bitwise product $x_1 x_2$.
 
 \begin{marginfigure}
-\includegraphics{tikz3}
+\includegraphics{chapter01-05}
 \end{marginfigure}
 
 To get an equivalent network of perceptrons we replace all the \lstinline{NAND} gates by perceptrons with two inputs, each with weight $-$2, and an overall bias of 3. Here's the resulting network. Note that I've moved the perceptron corresponding to the bottom right \lstinline{NAND} gate a little, just to make it easier to draw the arrows on the diagram.
@@ -481,9 +481,9 @@ There is a way of determining the bitwise representation of a digit by adding an
 
 Now that we have a design for our neural network, how can it learn to recognize digits? The first thing we'll need is a data set to learn from - a so-called training data set. We'll use the MNIST data set \cite{LeCun2019}, which contains tens of thousands of scanned images of handwritten digits, together with their correct classifications. MNIST's name comes from the fact that it is a modified subset of two data sets collected by NIST, the United States' National Institute of Standards and Technology. Here's a few images from MNIST:
 
-{\centering
-\includegraphics[width=0.8\textwidth,]{pic/digits_separate}
-\par}
+\begin{marginfigure}
+\includegraphics{digits_separate}
+\end{marginfigure}
 
 As you can see, these digits are, in fact, the same as those shown at the beginning of this chapter as a challenge to recognize. Of course, when testing our network we'll ask it to recognize images which aren't in the training set!
 
@@ -504,11 +504,12 @@ Even given that we want to use a smooth cost function, you may still wonder why 
 
 Recapping, our goal in training a neural network is to find weights and biases which minimize the quadratic cost function $C(w,b)$. This is a well-posed problem, but it's got a lot of distracting structure as currently posed - the interpretation of $w$ and $b$ as weights and biases, the $\sigma$ function lurking in the background, the choice of network architecture, MNIST, and so on. It turns out that we can understand a tremendous amount by ignoring most of that structure, and just concentrating on the minimization aspect. So for now we're going to forget all about the specific form of the cost function, the connection to neural networks, and so on. Instead, we're going to imagine that we've simply been given a function of many variables and we want to minimize that function. We're going to develop a technique called \textit{gradient descent} which can be used to solve such minimization problems. Then we'll come back to the specific function we want to minimize for neural networks.
 
-Okay, let's suppose we're trying to minimize some function, $C(v)$. This could be any real-valued function of many variables, $v=v_1,v_2,\ldots$. Note that I've replaced the $w$ and $b$ notation by $v$ to emphasize that this could be any function - we're not specifically thinking in the neural networks context any more. To minimize $C(v)$ it helps to imagine $C$ as a function of just two variables, which we'll call $v_1$ and $v_2$:
+Okay, let's suppose we're trying to minimize some function, $C(v)$. This could be any real-valued function of many variables, $v=v_1,v_2,\ldots$. Note that I've replaced the $w$ and $b$ notation by $v$ to emphasize that this could be any function - we're not specifically thinking in the neural networks context any more. To minimize $C(v)$ it helps to imagine $C$ as a function of just two variables, which we'll call $v_1$ and $v_2$.
 
-{\centering
-\includegraphics[width=0.8\textwidth,]{pic/valley}
-\par}
+
+\begin{marginfigure}
+\includegraphics{valley}
+\end{marginfigure}
 
 What we'd like is to find where $C$ achieves its global minimum. Now, of course, for the function plotted above, we can eyeball the graph and find the minimum. In that sense, I've perhaps shown slightly too simple a function! A general function, $C$, may be a complicated function of many variables, and it won't usually be possible to just eyeball the graph to find the minimum.
 
@@ -549,9 +550,9 @@ Then we'll use this update rule again, to make another move. If we keep doing th
 
 Summing up, the way the gradient descent algorithm works is to repeatedly compute the gradient $\nabla C$, and then to move in the \textit{opposite} direction, ``falling down'' the slope of the valley. We can visualize it like this:
 
-{\centering
-\includegraphics[width=0.8\textwidth,]{pic/valley_with_ball}
-\par}
+\begin{marginfigure}
+\includegraphics{valley_with_ball}
+\end{marginfigure}
 
 Notice that with this rule gradient descent doesn't reproduce real physical motion. In real life a ball has momentum, and that momentum may allow it to roll across the slope, or even (momentarily) roll uphill. It's only after the effects of friction set in that the ball is guaranteed to roll down into the valley. By contrast, our rule for choosing $\Delta v$ just says ``go down, right now''. That's still a pretty good rule for finding the minimum!
 
@@ -662,6 +663,7 @@ Apart from the MNIST data we also need a Python library called Numpy, for doing 
 
 Let me explain the core features of the neural networks code, before giving a full listing, below. The centerpiece is a Network class, which we use to represent a neural network. Here's the code we use to initialize a Network object:
 
+\begin{fullwidth}
 \begin{lstlisting}[language=Python]
 class Network(object):
 
@@ -672,6 +674,7 @@ class Network(object):
         self.weights = [np.random.randn(y, x) 
                         for x, y in zip(sizes[:-1], sizes[1:])]
 \end{lstlisting}
+\end{fullwidth}
                         
 In this code, the list \lstinline{sizes} contains the number of neurons in the respective layers. So, for example, if we want to create a \lstinline{Network} object with 2 neurons in the first layer, 3 neurons in the second layer, and 1 neuron in the final layer, we'd do this with the code: 
 \begin{lstlisting}[language=Python]
@@ -700,6 +703,7 @@ Note that when the input $z$ is a vector or Numpy array, Numpy automatically app
 
 We then add a \lstinline{feedforward} method to the \lstinline{Network} class, which, given an input $a$ for the network, returns the corresponding output\footnote{It is assumed that the input \lstinline{a} is an \lstinline{(n, 1)} Numpy ndarray, not a \lstinline{(n,)} vector. Here, \lstinline{n} is the number of inputs to the network. If you try to use an \lstinline{(n,)} vector as input you'll get strange results. Although using an \lstinline{(n,)} vector appears the more natural choice, using an \lstinline{(n, 1)} ndarray makes it particularly easy to modify the code to feedforward multiple inputs at once, and that is sometimes convenient. }
 All the method does is applies Equation~\ref{eq:ch01-22} for each layer: 
+\begin{fullwidth}
 \begin{lstlisting}[language=Python]
     def feedforward(self, a):
         """Return the output of the network if ``a'' is input."""
@@ -707,8 +711,10 @@ All the method does is applies Equation~\ref{eq:ch01-22} for each layer:
             a = sigmoid(np.dot(w, a)+b)
         return a
 \end{lstlisting}
+\end{fullwidth}
 Of course, the main thing we want our \lstinline{Network} objects to do is to learn. To that end we'll give them an \lstinline{SGD} method which implements stochastic gradient descent. Here's the code. It's a little mysterious in a few places, but I'll break it down below, after the listing.
 
+\begin{fullwidth}
 \begin{lstlisting}[language=Python]
 def SGD(self, training_data, epochs, mini_batch_size, eta,
             test_data=None):
@@ -735,11 +741,13 @@ def SGD(self, training_data, epochs, mini_batch_size, eta,
             else:
                 print('Epoch {0} complete'.format(j))
 \end{lstlisting}
-                
+\end{fullwidth}
+               
 The \lstinline{training_data} is a list of tuples \lstinline{(x, y)} representing the training inputs and corresponding desired outputs. The variables epochs and \lstinline{mini_batch_size} are what you'd expect - the number of epochs to train for, and the size of the mini-batches to use when sampling. \lstinline{eta} is the learning rate, $\eta$. If the optional argument \lstinline{test_data} is supplied, then the program will evaluate the network after each epoch of training, and print out partial progress. This is useful for tracking progress, but slows things down substantially.
 
 The code works as follows. In each epoch, it starts by randomly shuffling the training data, and then partitions it into mini-batches of the appropriate size. This is an easy way of sampling randomly from the training data. Then for each \lstinline{mini_batch} we apply a single step of gradient descent. This is done by the code \lstinline{self.update_mini_batch(mini_batch, eta)}, which updates the network weights and biases according to a single iteration of gradient descent, using just the training data in \lstinline{mini_batch}. Here's the code for the \lstinline{update_mini_batch} method: 
 
+\begin{fullwidth}
 \begin{lstlisting}[language=Python]
     def update_mini_batch(self, mini_batch, eta):
         """Update the network's weights and biases by applying
@@ -757,11 +765,12 @@ The code works as follows. In each epoch, it starts by randomly shuffling the tr
         self.biases = [b-(eta/len(mini_batch))*nb 
                        for b, nb in zip(self.biases, nabla_b)]
 \end{lstlisting}
+\end{fullwidth}
                        
 Most of the work is done by the line 
 
 \begin{lstlisting}[language=Python]
-            delta_nabla_b, delta_nabla_w = self.backprop(x, y)
+    delta_nabla_b, delta_nabla_w = self.backprop(x, y)
 \end{lstlisting}
 
 This invokes something called the \textit{backpropagation} algorithm, which is a fast way of computing the gradient of the cost function. So \lstinline{update_mini_batch} works simply by computing these gradients for every training example in the \lstinline{mini_batch}, and then updating \lstinline{self.weights} and \lstinline{self.biases} appropriately.
@@ -771,11 +780,11 @@ I'm not going to show the code for \lstinline{self.backprop} right now. We'll st
 Let's look at the full program, including the documentation strings, which I omitted above. Apart from \lstinline{self.backprop} the program is self-explanatory - all the heavy lifting is done in \lstinline{self.SGD} and \lstinline{self.update_mini_batch}, which we've already discussed. The \lstinline{self.backprop} method makes use of a few extra functions to help in computing the gradient, namely \lstinline{sigmoid_prime}, which computes the derivative of the $\sigma$ function, and \lstinline{self.cost_derivative}, which I won't describe here. You can get the gist of these (and perhaps the details) just by looking at the code and documentation strings. We'll look at them in detail in the next chapter. Note that while the program appears lengthy, much of the code is documentation strings intended to make the code easy to understand. In fact, the program contains just 74 lines of non-whitespace, non-comment code. All the code may be found on GitHub.
 
 
+\begin{fullwidth}
 \begin{lstlisting}[caption={network.py (Python 3.7.1)},label={lst:network.py}, language=Python]
 """
 network.py
 ~~~~~~~~~~
-IT WORKS
 
 A module to implement the stochastic gradient descent learning
 algorithm for a feedforward neural network.  Gradients are calculated
@@ -921,6 +930,7 @@ def sigmoid_prime(z):
     """Derivative of the sigmoid function."""
     return sigmoid(z)*(1-sigmoid(z))
 \end{lstlisting}
+\end{fullwidth}
 
 How well does the program recognize handwritten digits? Well,  Execute the code in Listing~\ref{lst:ch01.py}, which does the following:
 
@@ -931,8 +941,8 @@ Import the network script shown above and set up a Network with 30 hidden neuron
 
 Finally, we'll use stochastic gradient descent to learn from the MNIST \lstinline{training_data} over 30 epochs, with a mini-batch size of 10, and a learning rate of $\eta$=3.0, 
 
+\begin{fullwidth}
 \begin{lstlisting}[caption={ch01.py (Python 3.7.1)},label={lst:ch01.py}, language=Python]
-
 # load the MNIST data
 import mnist_loader
 training_data, validation_data, test_data = mnist_loader.load_data_wrapper()
@@ -946,6 +956,7 @@ net = network.Network([784, 30, 10])
 net.SGD(training_data, epochs=30, mini_batch_size=10, eta=3.0, test_data=test_data)
 
 \end{lstlisting}
+\end{fullwidth}
 
 Note that it will take some time to execute - for a typical machine (as of 2015) it will likely take a few minutes to run. I suggest you set things running, continue to read, and periodically check the output from the code. If you're in a rush you can speed things up by (1) decreasing the number of epochs, (2) by decreasing the number of hidden neurons, or (3) by using only part of the training data. Note that production code would be much, much faster: these Python scripts are intended to help you understand how neural nets work, not to be high-performance code! And, of course, once we've trained a network it can be run very quickly indeed, on almost any computing platform. For example, once we've learned a good set of weights and biases for a network, it can easily be ported to run in Javascript in a web browser, or as a native app on a mobile device. In any case, here is a partial transcript of the output of one training run of the neural network. The transcript shows the number of test images correctly recognized by the neural network after each epoch of training. As you can see, after just a single epoch this has reached 9,129 out of 10,000, and the number continues to grow,
 \begin{lstlisting}
@@ -1011,6 +1022,7 @@ The lesson to take away from this is that debugging a neural network is not triv
  
 Earlier, I skipped over the details of how the MNIST data is loaded. It's pretty straightforward. For completeness, here's the code. The data structures used to store the MNIST data are described in the documentation strings - it's straightforward stuff, tuples and lists of Numpy ndarray objects (think of them as vectors if you're not familiar with ndarrays):
 
+\begin{fullwidth}
 \begin{lstlisting}
 # %load mnist_loader.py
 """
@@ -1091,17 +1103,16 @@ def vectorized_result(j):
     e[j] = 1.0
     return e
 \end{lstlisting}
-
- ============================================================
+\end{fullwidth}
 
 I said above that our program gets pretty good results. What does that mean? Good compared to what? It's informative to have some simple (non-neural-network) baseline tests to compare against, to understand what it means to perform well. The simplest baseline of all, of course, is to randomly guess the digit. That'll be right about ten percent of the time. We're doing much better than that!
 
-What about a less trivial baseline? Let's try an extremely simple idea: we'll look at how \textit{dark} an image is. For instance, an image of a 2 will typically be quite a bit darker than an image of a 1, just because more pixels are blackened out, as the following examples illustrate:
+What about a less trivial baseline? Let's try an extremely simple idea: we'll look at how \textit{dark} an image is. For instance, an image of a 2 will typically be quite a bit darker than an image of a 1, just because more pixels are blackened out, as the following examples illustrate.
 
-{\centering
-\includegraphics[width=0.3\textwidth,]{pic/digits21}
-\par}
 
+\begin{marginfigure}
+\includegraphics[width=0.4\textwidth]{digits21}
+\end{marginfigure}
 
 This suggests using the training data to compute average darknesses for each digit, 0,1,2,$\ldots$,9. When presented with a new image, we compute how dark the image is, and then guess that it's whichever digit has the closest average darkness. This is a simple procedure, and is easy to code up, so I won't explicitly write out the code - if you're interested it's in the GitHub repository \cite{Nielsengithub2019} But it's a big improvement over random guessing, getting 2,225 of the 10,000 test images correct, i.e., 22.25 percent accuracy.
 
@@ -1112,15 +1123,11 @@ If we run scikit-learn's SVM classifier using the default settings, then it gets
 That's not the end of the story, however. The 9,435 of 10,000 result is for scikit-learn's default settings for SVMs. SVMs have a number of tunable parameters, and it's possible to search for parameters which improve this out-of-the-box performance. I won't explicitly do this search, but instead refer you to this blog post \cite{Muellermnist2019} by Andreas Mueller if you'd like to know more. Mueller shows that with some work optimizing the SVM's parameters it's possible to get the performance up above 98.5 percent accuracy. In other words, a well-tuned SVM only makes an error on about one digit in 70. That's pretty good! Can neural networks do better?
 
 
-Muellermnist2019
 In fact, they can. At present, well-designed neural networks outperform every other technique for solving MNIST, including SVMs. The current (2013) record is classifying 9,979 of 10,000 images correctly. This was done by Li Wan \cite{wanli2019}, Matthew Zeiler \cite{matthewzeiler2019}, Sixin Zhang, Yann LeCun \cite{yannlecun2019}, and Rob Fergus \cite{RobFergus2019}. We'll see most of the techniques they used later in the book. At that level the performance is close to human-equivalent, and is arguably better, since quite a few of the MNIST images are difficult even for humans to recognize with confidence, for example:
 
-
-{\centering
-\includegraphics[width=0.8\textwidth,]{pic/digits-unreadable}
-\par}
-
-
+\begin{marginfigure}
+\includegraphics[width=1.1\textwidth]{digits-unreadable}
+\end{marginfigure}
 
 I trust you'll agree that those are tough to classify! With images like these in the MNIST data set it's remarkable that neural networks can accurately classify all but 21 of the 10,000 test images. Usually, when programming we believe that solving a complicated problem like recognizing the MNIST digits requires a sophisticated algorithm. But even the neural networks in the Wan \textit{et. al.,} paper just mentioned involve quite simple algorithms, variations on the algorithm we've seen in this chapter. All the complexity is learned, automatically, from the training data. In some sense, the moral of both our results and those in more sophisticated papers, is that for some problems: 
 
@@ -1132,29 +1139,38 @@ While our neural network gives impressive performance, that performance is somew
 
 To put these questions more starkly, suppose that a few decades hence neural networks lead to artificial intelligence (AI). Will we understand how such intelligent networks work? Perhaps the networks will be opaque to us, with weights and biases we don't understand, because they've been learned automatically. In the early days of AI research people hoped that the effort to build an AI would also help us understand the principles behind intelligence and, maybe, the functioning of the human brain. But perhaps the outcome will be that we end up understanding neither the brain nor how artificial intelligence works!
 
+\begin{marginfigure}[-226mm]
+\includegraphics[width=\textwidth]{Kangaroo.JPG}
+\end{marginfigure}
+\begin{marginfigure}[-118mm]
+\includegraphics[width=\textwidth]{Einstein_crop.jpg}
+\end{marginfigure}
+\begin{marginfigure}[-40mm]
+\includegraphics[width=\textwidth]{hubble.JPG}
+\end{marginfigure}
+
 To address these questions, let's think back to the interpretation of artificial neurons that I gave at the start of the chapter, as a means of weighing evidence. Suppose we want to determine whether an image shows a human face or not\footnote{Credits: 1. Ester Inbar \cite{wikipediakangeroo2019}. 2. Unknown \cite{wikipediaeinsteinaged32019}. 3. NASA, ESA, G. Illingworth, D. Magee, and P. Oesch (University of California, Santa Cruz), R. Bouwens (Leiden University), and the HUDF09 Team \cite{wikipediahubblexdeepfield2019}}:
 
 
-{\centering
-\includegraphics[height=0.3\textwidth,]{pic/Kangaroo.JPG}
-\includegraphics[height=0.3\textwidth,]{pic/Einstein_crop.jpg}
-\includegraphics[height=0.3\textwidth,]{pic/hubble.jpg}
-\par}
+
 
 We could attack this problem the same way we attacked handwriting recognition - by using the pixels in the image as input to a neural network, with the output from the network a single neuron indicating either ``Yes, it's a face'' or ``No, it's not a face''.
 Let's suppose we do this, but that we're not using a learning algorithm. Instead, we're going to try to design a network by hand, choosing appropriate weights and biases. How might we go about it? Forgetting neural networks entirely for the moment, a heuristic we could use is to decompose the problem into sub-problems: does the image have an eye in the top left? Does it have an eye in the top right? Does it have a nose in the middle? Does it have a mouth in the bottom middle? Is there hair on top? And so on.
 If the answers to several of these questions are ``yes'', or even just ``probably yes'', then we'd conclude that the image is likely to be a face. Conversely, if the answers to most of the questions are ``no'', then the image probably isn't a face.
 Of course, this is just a rough heuristic, and it suffers from many deficiencies. Maybe the person is bald, so they have no hair. Maybe we can only see part of the face, or the face is at an angle, so some of the facial features are obscured. Still, the heuristic suggests that if we can solve the sub-problems using neural networks, then perhaps we can build a neural network for face-detection, by combining the networks for the sub-problems. Here's a possible architecture, with rectangles denoting the sub-networks. Note that this isn't intended as a realistic approach to solving the face-detection problem; rather, it's to help us build intuition about how networks function. Here's the architecture:
 
-{\centering
-\includegraphics[width=\textwidth,]{pic/tikz14.png}
-\par}
+\begin{figure}[h]
+\includegraphics[width=\textwidth]{chapter01-04}
+\end{figure}
+
+\FloatBarrier
 
 It's also plausible that the sub-networks can be decomposed. Suppose we're considering the question: ``Is there an eye in the top left?'' This can be decomposed into questions such as: ``Is there an eyebrow?''; ``Are there eyelashes?''; ``Is there an iris?''; and so on. Of course, these questions should really include positional information, as well - ``Is the eyebrow in the top left, and above the iris?'', that kind of thing - but let's keep it simple. The network to answer the question ``Is there an eye in the top left?'' can now be decomposed:
 
-{\centering
-\includegraphics[width=\textwidth,]{pic/tikz15.png}
-\par}
+
+\begin{figure}[h]
+\includegraphics[width=\textwidth]{chapter01-06}
+\end{figure}
 
 Those questions too can be broken down, further and further through multiple layers. Ultimately, we'll be working with sub-networks that answer questions so simple they can easily be answered at the level of single pixels. Those questions might, for example, be about the presence or absence of very simple shapes at particular points in the image. Such questions can be answered by single neurons connected to the raw pixels in the image.
 
