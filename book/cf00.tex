@@ -45,7 +45,7 @@ If you’re interested in commercial use, please contact both the authors.
 
 \listoffigures
 
-\listoftables
+%\listoftables
 
 \input{abbrev.tex}
 
@@ -57,17 +57,46 @@ If you’re interested in commercial use, please contact both the authors.
 \chapter*{Introduction}
 
 The purpose with this book is to document some of my learning about \ac{ML}.
+This document does not attempt to add any new knowledge to the field, there are several other resources with strong mathematics available for this purpose \cite{geron2017handson,Webb2002statpatn,Michie94,theodoridis2003,Duda2001,Bishop1995,Bishop2006,Goodfellow2016}. There is also a huge body of knowledge on the internet, most of it of introductory or review nature, but very useful to gain a general (non-mathematical) understanding.
+The focus here is on exploring the concepts and explaining these concepts to gain an intuitive but practical understanding.
 
-\section*{Overview}
+The book has three distinctly separate parts: it contains Michael Nielsen's book as Part I, my own notes in Part II, and some more information from diverse sources in Part III.  The material in Part I is presented with minimal change so as to retain Michael's excellent review content.  The material in Part II is part original and part a rehash of other people's work. The material in Part III is mostly a rehash of other people's work.
 
+\section*{Terminology}
+
+\begin{marginfigure}
+\includegraphics{chapterf00-01}
+\end{marginfigure}
+
+The newcomer can easily be confused by the terminology used in the field.  There is some differences in the details of different definitions, but the broad consensus can be depicted as fields of expertise within fields of expertise, often drawn as a Venn diagram as shown here.
+
+\ac{AI} can be broadly defined as the simulation of human intelligence by machines, including computers. These \ac{AI} processes include learning, reasoning and self-correction. Work in this area started as early as the 1940s. \ac{ML}\cite{WikiPediaMachineLearning2019,DanielFaggella2019}, is normally defined as the application of \ac{AI} to learn from data without explicitly programming the learned behaviour. \ac{ML} therefore focuses on the development of programs that can access data and learn new behaviour from the data, by themselves.  Early ML work started in the 1980s. Arguably the neural networks subset does not belong to the figure, but this technology plays such a key role that perhaps it should earn to be explicitly shown.  Neural nets is a computing technique loosely modelled on the human brain, that can  recognise patterns.  These neural nets are a dominant part of the bigger machine learning field. Neural nets attracted much attention in the 1980's and 1990s, although it was used extensively, the application of this technology was limited by computing power.  In particular, the pattern information had to be carefully prepared for the neural net, which sometimes required very special skills. Practical application of neural nets were limited to three-layer neural nets, which could be trained by the then-available algorithms and computers.  \ac{DLea}\cite{WikiPediaDeepLearning2019}, which required more than three layer neural nets, with deeply hidden layers (hence the term deep learning) was defined and understood already in the 1980s.  The algorithms and computers could not solve the deep learning problems at the time.   Around 2006 new algorithms were was proposed that opened up the deep learning neural nets to practical use.
+Deep learning is therefore a special application of neural nets, which is a part of machine learning, which in turn is part of artificial intelligence.
+
+\newthought{Machine learning} is defined as\cite{DanielFaggella2019} ``Machine Learning is the science of getting computers to learn and act like humans do, and improve their learning over time in autonomous fashion, by feeding them data and information in the form of observations and real-world interactions.''
 
 
 \section*{Historic Perspective}
 
 Favio V\'{a}zquez gives a brief introduction to Deep Learning \cite{Vazquez2018}\footnote{This blog post \cite{Vazquez2018} is well worth the read.}, with the following very  nice historic time line:\\
 
-{\centering \includegraphics[width=\textwidth,]{pic/deeplearningtimeline.png} \par}
+%\begin{fullwidth}
+\begin{figure*}[h]
+\includegraphics[width=\textwidth]{deeplearningtimeline}
+\end{figure*}
+%\end{fullwidth}
 
+
+\FloatBarrier
 \section*{Attribution}
 
-The stylistic neuron on the Part header pages were adapted from \cite{Erler2004}.
+\begin{enumerate}
+\item 
+The entirety of Part I is taken from Michael Nielsen's online book\cite{Nielsen2015}. Some minor changes were made to the text.
+
+\item
+The stylistic neuron on the Part header pages were adapted from \cite{Erler2004}. 
+
+\item
+Some of the neural diagrams  are created with the \lstinline{neural} TikZ module for \LaTeX{}\cite{cowan2019} by Mark Cowan.
+\end{enumerate}
