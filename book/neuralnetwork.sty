@@ -24,6 +24,13 @@
 \newcommand{\nn@inc}[1] {\stepcounter{nn@#1@counter}}
 \newcommand{\nn@del}[1] {\stepcounter{nn@#1@counter}}
 
+% the aux files complain if these are not defined
+\nn@var{layerindex}
+\nn@var{lastlayerstart} \nn@var{thislayerstart}
+\nn@var{lastlayercount} \nn@var{thislayercount}
+\nn@var{lastlayerindex} \nn@var{thislayerindex}
+
+
 \define@key{network}{nodespacing} {\pgfmathsetlengthmacro\nn@nodespacing{#1}}
 \define@key{network}{layerspacing} {\pgfmathsetlengthmacro\nn@layerspacing{#1}}
 \define@key{network}{height} {\def\nn@height{#1}}
