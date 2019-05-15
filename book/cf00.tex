@@ -78,16 +78,47 @@ Deep learning is therefore a special application of neural nets, which is a part
 
 \section*{Historic Perspective}
 
-Favio V\'{a}zquez gives a brief introduction to Deep Learning \cite{Vazquez2018}\footnote{This blog post \cite{Vazquez2018} is well worth the read.}, with the following very  nice historic time line:\\
+In his excellent blog post \cite{Vazquez2018} Favio V\'{a}zquez gives a brief introduction to the history of \ac{DL} with a very nice historic time line (Figure~\ref{fig:deeplearningtimeline}).
 
-%\begin{fullwidth}
-\begin{figure*}[h]
+\begin{figure*}[tph]
 \includegraphics[width=\textwidth]{deeplearningtimeline}
+\caption{Favio V\'{a}zquez's \ac{DL} time line}
+\label{fig:deeplearningtimeline}
 \end{figure*}
-%\end{fullwidth}
 
 
-\FloatBarrier
+
+%\FloatBarrier
+
+\section*{The Plan}
+
+My present motivated plan to learn more about \ac{ML} is as shown below. This is the third plan since I started, which demonstrates the volatility of the \ac{ML} world. What seems like a good idea today is in insanely poor choice six months later.
+
+\begin{enumerate}
+\item \marginnote{A study \cite{Ericsson93therole} found that full mastery requires long and consistent practice, but another study \cite{Macnamara2014} found that practice alone is not a guarantee for success.} Select the technology/product with utmost care.  Provided you have the ability, it takes ten years or ten thousand hours to fully master a topic. How many ten-year cycles can you afford in your lifetime?
+
+\item \marginnote{Even staying with large companies is risky. Google is notorious for dropping services. Do you remember the MFC technology from Microsoft? It is interesting that Qt, HTML, Python and JavaScript are still around after all these years.} You want to invest in a technology with a long shelf life (probably not possible in \ac{ML}). Stay with mainstream and large projects with a wide following. Stay away from small or risky projects, time spent there is time wasted. 
+    
+\item I want to stay on the Windows platform this is where all my tools are (I do not have a Linux boot PC at present).  This requirement severely limits my options (see below). Linux is miles ahead here, most of the serious work is done on Linux.
+    
+\item Stay local, not in the cloud.   If you have large models with large data sets, using the cloud services is far better, but I have no funding to pay for cloud services at this time.
+
+\item Stay with open source projects with large following and a good Internet support base. The bigger the user base, the better you protect your investment in terms of support and long term survivability. Services such as StackOverflow provide more useful support than does commercial companies, simply because of the large support base. People often denigrate the value of YouTube, but there are also some seriously useful tutorials and support information there. 
+
+\item Steps:
+\begin{enumerate}
+\item Start with Michael Nielsen's excellent introductory online book \cite{Nielsen2015}. His book is included as Part~I of this document.  The purpose with the book is to provide understanding at a conceptual level, not as a rigourous academic treatise; which is what I need to start of with.
+\item Start with Scikit Learn, simply because it is easily installable, does not require a \ac{GPU} software installation, has a large example base and is reasonably well documented.
+\item Invest in learning TensorFlow \cite{TensorFlow2Alpha2019}.  I previously considered PyTorch \cite{paszkePyTorch2017,PyTorch2019} and fastai \cite{fastai2019}, but found it difficult to do a GPU install on Windows.  One of the objections against TensorFlow~1 was its awkward \lstinline{sessions}  construction, but this falls away with TensorFlow~2.  Installation of GPU TensorFlow~2 is still not simple for Windows, but I will start with the \ac{CPU} version.
+\item Work through G\'{e}ron's book \cite{geron2017handson} \textit{Hands-on machine learning with Scikit-Learn and TensorFlow}.  The first part of the book uses Scikit Learn to establish a good understanding and then moves on to using the TensorFlow tools.
+    The book receives good reviews and is presently under revision for a second edition, covering TensorFlow~2.
+\item I want to document my learning process in Part~II of this book, and add insights from other authors into Part~III of this book. This will come as time availability allows.
+\item For in-depth backup and if I ever need this, I will consult the academic books \cite{geron2017handson,Webb2002statpatn,Michie94,theodoridis2003,Duda2001,Bishop1995,Bishop2006,Goodfellow2016}, but for now, my interest is still at an elementary level.
+\end{enumerate}
+\item All of the above will be done at a leisurely pace outside of working hours and jointly with my life partner and fellow traveller Riana.
+\end{enumerate}
+
+
 \section*{Attribution}
 
 \begin{enumerate}
