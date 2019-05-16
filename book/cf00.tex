@@ -56,11 +56,21 @@ If you’re interested in commercial use, please contact both the authors.
 
 \chapter*{Introduction}
 
-The purpose with this book is to document some of my learning about \ac{ML}.
-This document does not attempt to add any new knowledge to the field, there are several other resources with strong mathematics available for this purpose \cite{geron2017handson,Webb2002statpatn,Michie94,theodoridis2003,Duda2001,Bishop1995,Bishop2006,Goodfellow2016}. There is also a huge body of knowledge on the internet, most of it of introductory or review nature, but very useful to gain a general (non-mathematical) understanding.
-The focus here is on exploring the concepts and explaining these concepts to gain an intuitive but practical understanding.
+
+\newthought{There are several different approaches} to learning about and mastering \ac{ML}.  
+
+The top-down approach provides pre-packaged solutions, for which you just prepare your data and use the canned algorithms. fastai \cite{fastai2019} is an excellent example of the top-down approach and recommended to get solutions quickly and relatively painlessly. There are also many examples and tutorials available on the Internet that can be modified to suit your problem's needs.  If the inner workings of these tools are not important to you, go this route. 
+
+The academic approach provides a rigourous and deep theoretical base from which to develop solutions.  This is where the real progress is made, while also being solution driven, the academic explore new ideas and push the boundaries. To prepare yourself for this approach do a university course or work through some of the several good books with strong mathematics  \cite{geron2017handson,Webb2002statpatn,Michie94,theodoridis2003,Duda2001,Bishop1995,Bishop2006,Goodfellow2016}. 
+Going this route requires hard work and testing before solutions are found. Furthermore you will have at least a good understanding of how things work. Best of all, you can solve new and previously unsolved problems.
+
+The purpose with this book is to document is not to do either of the above, for those purposes there are better resources available elsewhere.  My approach here is from an informal, almost hobbyist, perspective as I explore and learn about \ac{ML}. The focus here is on exploring the concepts and explaining these concepts to gain an intuitive but practical understanding\marginnote{Nielsen's online book \cite{Nielsen2015} (repeated here as Part I) is excellent to open understanding for the underlying concepts.}.  If you want the terse academic treatment, this book is not for you. This document also does not attempt to add any new knowledge to the field, nor to provide packaged solutions.
+
+There is a huge body of knowledge on the internet (blogs, YouTube and academic papers). Apart from the academic papers, most of these sources are of introductory or review nature. YouTube is littered with garbage,  but there is some good material also, offering \ac{MOOC} or university course material. Some large companies also promote their products with good YouTube video and blog material. Filter and read selectively.
 
 The book has three distinctly separate parts: it contains Michael Nielsen's book as Part I, my own notes in Part II, and some more information from diverse sources in Part III.  The material in Part I is presented with minimal change so as to retain Michael's excellent review content.  The material in Part II is part original and part a rehash of other people's work. The material in Part III is mostly a rehash of other people's work.
+
+Any publication is bound to be outdated on the date of publication, especially in the very fast moving field of \ac{ML}. Companies are updating products regularly with breaking changes and new theory and algorithms are becoming available daily. We try to keep to the stable fundamentals here, but even so there could be better ways than described here.
 
 \section*{Terminology}
 
@@ -107,10 +117,10 @@ My present motivated plan to learn more about \ac{ML} is as shown below. This is
 
 \item Steps:
 \begin{enumerate}
-\item Start with Michael Nielsen's excellent introductory online book \cite{Nielsen2015}. His book is included as Part~I of this document.  The purpose with the book is to provide understanding at a conceptual level, not as a rigourous academic treatise; which is what I need to start of with.
+\item Start with Michael Nielsen's excellent introductory online book \cite{Nielsen2015}. His book is included as Part~I of this document.  The purpose with the book is to provide understanding at a conceptual level, not as a rigourous academic treatise; which is what I need to start of with. \marginnote{In the online version of the book, Nielsen provides interactive JavaScript tools which do not transfer well to a PDF document.  As an alternative, I coded some of the interactive functionality in Python notebooks, which are available on the GitHub page \cite{willersNNDLgithub2019}. I also sometimes add static screen shots from Nielsen's online tools.}
 \item Start with Scikit Learn, simply because it is easily installable, does not require a \ac{GPU} software installation, has a large example base and is reasonably well documented.
 \item Invest in learning TensorFlow \cite{TensorFlow2Alpha2019}.  I previously considered PyTorch \cite{paszkePyTorch2017,PyTorch2019} and fastai \cite{fastai2019}, but found it difficult to do a GPU install on Windows.  One of the objections against TensorFlow~1 was its awkward \lstinline{sessions}  construction, but this falls away with TensorFlow~2.  Google also integrated Keras \cite{cholletkeras2015,cholletkerasio2015} into TensorFlow~2 as a native higher-level framework.
-    Installation of GPU TensorFlow~2 is still not simple for Windows, but I will start with the \ac{CPU} version.
+    Installation of GPU TensorFlow~2 is still not simple for Windows, but I will start with the \ac{CPU} version. GPU functionality is readily available on Linux or on Google's online CoLaboratory \cite{GoogleCoLaboratory2019}.
 \item Work through G\'{e}ron's book \cite{geron2017handson} \textit{Hands-on machine learning with Scikit-Learn and TensorFlow}.  The first part of the book uses Scikit Learn to establish a good understanding and then moves on to using the TensorFlow tools.
     The book receives good reviews and is presently under revision for a second edition, covering TensorFlow~2.
 \item I want to document my learning process in Part~II of this book, and add insights from other authors into Part~III of this book. This will come as time availability allows.

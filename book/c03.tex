@@ -3,7 +3,7 @@
 \chapter{Improving the Way Neural Networks Learn}
 \label{sec:ImprovingTheWayNeuralNetworksLearn}
 
-\newthought{The material in this chapter} is taken from\\
+The material in this chapter is taken from\\
 \lstinline{http://neuralnetworksanddeeplearning.com/chap3.html}
 
 \newthought{The backpropagation algorithm can be improved.}
@@ -26,8 +26,7 @@ Ideally, we hope and expect that our neural networks will learn fast from their 
 \end{marginfigure}
 
 
-We'll train this neuron to do something ridiculously easy: take the input 1 to the output 0. Of course, this is such a trivial task that we could easily figure out an appropriate weight and bias by hand, without using a learning algorithm. However, it turns out to be illuminating to use gradient descent to attempt to learn a weight and bias. So let's take a look at how the neuron learns.
-
+We'll train this neuron to do something ridiculously easy: take the input 1 to the output 0. Of course, this is such a trivial task that we could easily figure out an appropriate weight and bias by hand, without using a learning algorithm. However, it turns out to be illuminating to use gradient descent to attempt to learn a weight and bias. So let's take a look at how the neuron learns\marginnote{Nielsen provides JavaScript in his online pages. I implemented some of this functionality in Python in the \lstinline{chapter3-graphics.ipynb} notebook \cite{willersNNDLgithub2019}}.
 
 To make things definite, I'll pick the initial weight to be 0.6 and the initial bias to be 0.9. These are generic choices used as a place to begin learning, I wasn't picking them to be special in any way. The initial output from the neuron is 0.82, so quite a bit of learning will be needed before our neuron gets near the desired output, 0.0. Click on ``Run'' in the bottom right corner below to see how the neuron learns an output much closer to 0.0. Note that this isn't a pre-recorded animation, your browser is actually computing the gradient, then using the gradient to update the weight and bias, and displaying the result. 
 \begin{marginfigure}[-40mm]
@@ -51,23 +50,38 @@ in this case. Click on ``Run'' again:
 Although this example uses the same learning rate ($\eta=0.15$), we can see that learning starts out much more slowly. Indeed, for the first 150 or so learning epochs, the weights and biases don't change much at all. Then the learning kicks in and, much as in our first example, the neuron's output rapidly moves closer to 0.0.
 
 This behaviour is strange when contrasted to human learning. As I said at the beginning of this section, we often learn fastest when we're badly wrong about something. But we've just seen that our artificial neuron has a lot of difficulty learning when it's badly wrong - far more difficulty than when it's just a little wrong. What's more, it turns out that this behaviour occurs not just in this toy model, but in more general networks. Why is learning so slow? And can we find a way of avoiding this slowdown?
-\begin{lstlisting}
 
-To understand the origin of the problem, consider that our neuron learns by changing the weight and bias at a rate determined by the partial derivatives of the cost function, ?C/?w
-and ?C/?b. So saying ``learning is slow'' is really the same as saying that those partial derivatives are small. The challenge is to understand why they are small. To understand that, let's compute the partial derivatives. Recall that we're using the quadratic cost function, which, from Equation (6), is given by 
-C=(y?a)22,(54)
-where a is the neuron's output when the training input x=1 is used, and y=0 is the corresponding desired output. To write this more explicitly in terms of the weight and bias, recall that a=?(z), where z=wx+b. Using the chain rule to differentiate with respect to the weight and bias we get 
-?C?w?C?b==(a?y)??(z)x=a??(z)(a?y)??(z)=a??(z),(55)(56)
-where I have substituted x=1 and y=0. To understand the behaviour of these expressions, let's look more closely at the ??(z) term on the right-hand side. Recall the shape of the ?
-function:
--4-3-2-1012340.00.20.40.60.81.0
-zsigmoid function
-We can see from this graph that when the neuron's output is close to 1
-, the curve gets very flat, and so ??(z) gets very small. Equations (55) and (56) then tell us that ?C/?w and ?C/?b
+To understand the origin of the problem, consider that our neuron learns by changing the weight and bias at a rate determined by the partial derivatives of the cost function, $\partial C / \partial w$
+and $\partial C / \partial b$. So saying ``learning is slow'' is really the same as saying that those partial derivatives are small. The challenge is to understand why they are small. To understand that, let's compute the partial derivatives. Recall that we're using the quadratic cost function, which, from Equation~\ref{eq:c01-06-MSEcostfunction}, is given by 
+
+\begin{equation}
+C=\frac{(y-a)^{2}}{2}
+\label{eq:c03-54}
+\end{equation}
+
+where $a$ is the neuron's output when the training input $x=1$ is used, and $y=0$ is the corresponding desired output. To write this more explicitly in terms of the weight and bias, recall that $a=\sigma(z)$, where $z=wx+b$. Using the chain rule to differentiate with respect to the weight and bias we get 
+\begin{equation}
+\frac{\partial C}{\partial w}=(a-y) \sigma^{\prime}(z) x=a \sigma^{\prime}(z)
+\label{eq:c03-55}
+\end{equation}
+\begin{equation}
+\frac{\partial C}{\partial b}=(a-y) \sigma^{\prime}(z)=a \sigma^{\prime}(z)
+\label{eq:c03-56}
+\end{equation}
+where I have substituted $x=1$ and $y=0$. To understand the behaviour of these expressions, let's look more closely at the $\sigma\prime(z)$ term on the right-hand side. Recall the shape of the $\sigma$
+function.
+\begin{marginfigure}
+\includegraphics[width=\textwidth]{sigmoid}
+\end{marginfigure}
+
+We can see from this graph that when the neuron's output is close to 1, the curve gets very flat, and so $\sigma\prime(z)$ gets very small. Equations~\ref{eq:c03-55} and  \ref{eq:c03-56} then tell us that  $\partial C / \partial w$
+and $\partial C / \partial b$
 get very small. This is the origin of the learning slowdown. What's more, as we shall see a little later, the learning slowdown occurs for essentially the same reason in more general neural networks, not just the toy example we've been playing with.
 
 \section{Introducing the cross-entropy cost function}
 \label{sec:Introducingthecross-entropycostfunction}
+
+\begin{lstlisting}
 
 How can we address the learning slowdown? It turns out that we can solve the problem by replacing the quadratic cost with a different cost function, known as the cross-entropy. To understand the cross-entropy, let's move a little away from our super-simple toy model. We'll suppose instead that we're trying to train a neuron with several input variables, $x_1$,$x_2$,?
 , corresponding weights $w_1$,$w_2$,$\ldots$, and a bias, b
