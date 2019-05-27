@@ -3,17 +3,48 @@
 \chapter{Google Colaboratory}
 \label{sec:Google Colaboratory}
 
-The early content of chapter is based on material from  \cite{LiuCoLab2019}.
+The early content of chapter is based on material from  \cite{LiuCoLab2019,AnneBonner2019}.
+\section{Background}
 
-\section{Getting Started with Colab}
+See the FAQ
+\lstinline{https://research.google.com/colaboratory/faq.html}
+
+It is an online  free research tool storing colab notebooks on Google Drive. Colab notebooks can import from Jupyter notebooks.
+
+The code is executed in a virtual machine dedicated to your account. Virtual machines are recycled when idle for a while, and have a maximum lifetime enforced by the system. 
+
+Colaboratory is intended for interactive use. Long-running background computations, particularly on GPUs, may be stopped. We encourage users who wish to run continuous or long-running computations through Colaboratory’s UI to use a local runtime, see \cite{googleLcalColabs2019}.
+
+Colab is ideal for everything from improving your Python coding skills to working with deep learning libraries, like PyTorch, Keras, TensorFlow, and OpenCV. You can create notebooks in Colab, upload notebooks, store notebooks, share notebooks, mount your Google Drive and use whatever you’ve got stored in there, import most of your favorite directories, upload your personal Jupyter Notebooks, upload notebooks directly from GitHub, upload Kaggle files, download your notebooks, and do just about everything else that you might want to be able to do.
+
+\section{Working with Colaboratory Notebooks}
+\subsection{Getting Started}
+\begin{marginfigure}
+\includegraphics{drivecolab}
+\end{marginfigure}
+Start by making a folder in your Google Drive to store the colab notebooks and then create a new colab notebook. Note that you can also create a new notebook directly from colab itself.
 
 Open \lstinline{https://colab.research.google.com} in a browser and click on \lstinline{NEW PYTHON 3 NOTEBOOK} in the lower right corner.  This should launch a notebook in your browser. 
 
-Once you have a notebook created, it'll be saved in your Google Drive (Colab Notebooks folder). You can access it by visiting your Google Drive page, then either double-click on the file name, or right-click, and then choose ``Open with Colab''. 
+Browse around and you will find lots of useful information on the welcome page.
 
-Rename the notebook and save it. 
+Once you have a notebook created, it'll be saved in your Google Drive (Colab Notebooks folder). You can access it by visiting your Google Drive page, then either double-click on the file name, or right-click, and then choose ``Open with Colab''.  Alternatively you can open it from within colab from the menu by File$>$Open and then click on the Google Drive tab.
 
-\section{Saving on GitHub}
+\begin{marginfigure}
+\includegraphics{drivecolab05}
+\end{marginfigure}
+
+Rename the notebook by clicking on the notebook's name or use the File$>$Rename menu.
+
+\subsection{Connecting to a Notebook}
+After some time of inactivity or after the maximum session time, Google will terminate the session.
+The session can be reconnected (or changed to a local or hosted runtime) by clicking in the drop-down box in the top right of the window. Select appropriately and after some time the session will connect and a green tick mark will appear showing how much RAM and disk space are currently in use. 
+\begin{marginfigure}
+\includegraphics{drivecolab06}
+\end{marginfigure}
+
+
+\subsection{Saving on GitHub}
 
 Create a new repository, and commit at least one file to the master branch, so that the github repo has a master branch (not an empy repo).
 In the colab File menu select save copy to github.
@@ -21,19 +52,85 @@ You will be asked to authorise the access and henceforth it should work without 
 Select the require repository and its master branch and then click on OK.
 In future, the file can be opened from within GitHub by clicking on the button.
 
+Just be careful if saving colab notebooks, it will overwrite files by the same name in GitHub.
 \begin{figure*}[h]
 \includegraphics[width=\textwidth]{colabrepo01}
 \end{figure*}
 
 
-\section{Enabling GPU Support}
+\subsection{Enabling GPU Support}
 
-To turn on GPU for your Deep Learning projects, just go to the drop-down menu and select ``Runtime --- Change runtime type --- Hardware accelerator'' and choose GPU
+To turn on GPU for your Deep Learning projects, just go to the drop-down menu and select Runtime$>$Change runtime type$>$Hardware accelerator and choose GPU
 
-\section{Working with the Notebook}
+\subsection{Working with the Notebook}
 
 The colab notebooks are similar to Jupyter notebooks, use the same commands.
 You can also save files to your colab folder (and presumably then also to github).
+
+\subsection{Mounting Google Drive}
+
+If you want to mount your Google Drive for file access, execute
+
+\begin{lstlisting}
+from google.colab import drive
+drive.mount('/content/gdrive')
+\end{lstlisting}
+
+Google will respond by requesting you to authorise access to your user account and then its Drive services, respond by approving. You will be given an authorisation code which must be copied and pasted in the box provided. Once done, you will be informed of the mount point.
+\begin{marginfigure}
+\includegraphics{drivecolab02}
+\end{marginfigure}
+The drive will also be visible in the Files tab on the left explorer pane.  You can list current folder's contents with the Unix 'ls' command.
+\begin{marginfigure}
+\includegraphics{drivecolab03}
+\includegraphics{drivecolab04}
+\end{marginfigure}
+
+\subsection{Uploading and Downloading Files}
+
+Files can be uploaded by clicking on the UPLOAD button in the explorer pane.
+
+
+Use wget to download and if it is a zipped file, unzip to get the contents.
+
+\begin{lstlisting}
+!wget -cq https://s3.amazonaws.com/content.udacity-data.com/courses/nd188/flower_data.zip
+!unzip -qq flower_data.zip
+\end{lstlisting}
+
+\subsection{Long Running Processes}
+
+Colaboratory is intended for interactive use. Long-running background computations, particularly on GPUs, may be stopped. ... Google encourages users who wish to run continuous or long-running computations through Colaboratory’s UI to use a local runtime or Google's paid services.
+
+
+
+
+\subsection{Terminating a Session}
+
+Virtual machines are recycled when idle for a while, and have a maximum lifetime enforced by the system.
+It's 90 minutes if you close the browser. 12 hours if you keep the browser open. Additionally, if you close your browser when a code cell is running, if that same cell has not finished, when you reopen the browser it will still be running (the current executing cell keeps running even after browser is closed)
+When you close the browser while a cell is still running the results will not end up saved on Google Drive.
+
+
+To see a list of all the open sessions or to terminate a session on the menu click on Runtime$>$Manage sessions.  A new window will open that shows all open sessions.  The same window allows the termination of a session.
+\begin{marginfigure}
+\includegraphics{drivecolab07}
+\end{marginfigure}
+
+
+
+
+\section{Working with Colab Notebooks}
+
+Colab notebooks are very similar to Jupyter notebooks.
+Run Python code in the same manner.
+
+Use the ! prepend to execute system level commands such as \lstinline{!pip} or \lstinline{!apt-get install}:
+\begin{lstlisting}
+!pip install -q keras
+import keras
+\end{lstlisting}
+
 
 \section{Introduction to TensorFlow}
 

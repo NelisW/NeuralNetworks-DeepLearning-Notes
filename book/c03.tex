@@ -81,30 +81,47 @@ get very small. This is the origin of the learning slowdown. What's more, as we 
 \section{Introducing the cross-entropy cost function}
 \label{sec:Introducingthecross-entropycostfunction}
 
+How can we address the learning slowdown? It turns out that we can solve the problem by replacing the quadratic cost with a different cost function, known as the cross-entropy. To understand the cross-entropy, let's move a little away from our super-simple toy model. We'll suppose instead that we're trying to train a neuron with several input variables, $x_{1}, x_{2}, \dots$, corresponding weights $w_1$,$w_2$,$\ldots$, and a bias, $b$.
+
+\begin{marginfigure}
+\includegraphics[width=\textwidth]{chapter03-02}
+\end{marginfigure}
+
+The output from the neuron is, of course, $a=\sigma(z)$, where $z=\sum_{j} w_{j} x_{j}+b$ is the weighted sum of the inputs. We define the cross-entropy cost function for this neuron by 
+\begin{equation}
+C=-\frac{1}{n} \sum_{x}[y \ln a+(1-y) \ln (1-a)]
+\label{eq:c03-57}
+\end{equation}
+where $n$ is the total number of items of training data, the sum is over all training inputs, $x$, and $y$ is the corresponding desired output.
+
+It's not obvious that Equation~\ref{eq:c03-57} fixes the learning slowdown problem. In fact, frankly, it's not even obvious that it makes sense to call this a cost function! Before addressing the learning slowdown, let's see in what sense the cross-entropy can be interpreted as a cost function.
+
+Two properties in particular make it reasonable to interpret the cross-entropy as a cost function. First, it's non-negative, that is, $C>0$. To see this, notice that: (a) all the individual terms in the sum in Equation~\ref{eq:c03-57} are negative, since both logarithms are of numbers in the range 0 to 1; and (b) there is a minus sign out the front of the sum.
+
+
+
+Second, if the neuron's actual output is close to the desired output for all training inputs, $x$, then the cross-entropy will be close to zero\footnote{To prove this I will need to assume that the desired outputs $y$ are all either 0 or 1. This is usually the case when solving classification problems, for example, or when computing Boolean functions. To understand what happens when we don't make this assumption, see the exercises at the end of this section.}. To see this, suppose for example that $y=0$ and $a\approx 0$ for some input $x$. This is a case when the neuron is doing a good job on that input. We see that the first term in Equation~\ref{eq:c03-57} for the cost vanishes, since $y=0$, while the second term is just 
+$-\ln (1-a) \approx 0$ A similar analysis holds when $y=1$ and $a\approx1$. And so the contribution to the cost will be low provided the actual output is close to the desired output.
+
+Summing up, the cross-entropy is positive, and tends toward zero as the neuron gets better at computing the desired output, $y$, for all training inputs, $x$. These are both properties we'd intuitively expect for a cost function. Indeed, both properties are also satisfied by the quadratic cost. So that's good news for the cross-entropy. But the cross-entropy cost function has the benefit that, unlike the quadratic cost, it avoids the problem of learning slowing down. To see this, let's compute the partial derivative of the cross-entropy cost with respect to the weights. We substitute $a=\sigma(z)$ into Equation~\ref{eq:c03-57}, and apply the chain rule twice, obtaining: 
+
+\begin{eqnarray}
+\frac{\partial C}{\partial w_{j}} 
+&=&-\frac{1}{n} \sum_{x}\left(\frac{y}{\sigma(z)}-\frac{(1-y)}{1-\sigma(z)}\right) \frac{\partial \sigma}{\partial w_{j}} \label{eq:c03-58}\\ 
+&=&-\frac{1}{n} \sum_{x}\left(\frac{y}{\sigma(z)}-\frac{(1-y)}{1-\sigma(z)}\right) \sigma^{\prime}(z) x_{j} \label{eq:c03-59}
+\end{eqnarray}
+
+Putting everything over a common denominator and simplifying this becomes: 
+
+\begin{equation}
+\frac{\partial C}{\partial w_{j}}=\frac{1}{n} \sum_{x} x_{j}(\sigma(z)-y)
+\label{eq:c03-60}
+\end{equation}
+
+
 \begin{lstlisting}
 
-How can we address the learning slowdown? It turns out that we can solve the problem by replacing the quadratic cost with a different cost function, known as the cross-entropy. To understand the cross-entropy, let's move a little away from our super-simple toy model. We'll suppose instead that we're trying to train a neuron with several input variables, $x_1$,$x_2$,?
-, corresponding weights $w_1$,$w_2$,$\ldots$, and a bias, b
-: 
 
-The output from the neuron is, of course, a=?(z), where z=?jwjxj+b is the weighted sum of the inputs. We define the cross-entropy cost function for this neuron by 
-C=?1n?x[ylna+(1?y)ln(1?a)],(57)
-where n is the total number of items of training data, the sum is over all training inputs, x, and y is the corresponding desired output.
-
-It's not obvious that the expression (57) fixes the learning slowdown problem. In fact, frankly, it's not even obvious that it makes sense to call this a cost function! Before addressing the learning slowdown, let's see in what sense the cross-entropy can be interpreted as a cost function.
-
-Two properties in particular make it reasonable to interpret the cross-entropy as a cost function. First, it's non-negative, that is, $C>0$. To see this, notice that: (a) all the individual terms in the sum in (57) are negative, since both logarithms are of numbers in the range 0 to 1; and (b) there is a minus sign out the front of the sum.
-
-
-Second, if the neuron's actual output is close to the desired output for all training inputs, x
-, then the cross-entropy will be close to zero* *To prove this I will need to assume that the desired outputs y are all either 0 or 1. This is usually the case when solving classification problems, for example, or when computing Boolean functions. To understand what happens when we don't make this assumption, see the exercises at the end of this section.. To see this, suppose for example that y=0 and a?0 for some input x. This is a case when the neuron is doing a good job on that input. We see that the first term in the expression (57) for the cost vanishes, since y=0, while the second term is just $\delta^{l}$n(1?a)?0. A similar analysis holds when y=1 and a?1
-. And so the contribution to the cost will be low provided the actual output is close to the desired output.
-
-Summing up, the cross-entropy is positive, and tends toward zero as the neuron gets better at computing the desired output, y
-, for all training inputs, x. These are both properties we'd intuitively expect for a cost function. Indeed, both properties are also satisfied by the quadratic cost. So that's good news for the cross-entropy. But the cross-entropy cost function has the benefit that, unlike the quadratic cost, it avoids the problem of learning slowing down. To see this, let's compute the partial derivative of the cross-entropy cost with respect to the weights. We substitute a=?(z) into (57), and apply the chain rule twice, obtaining: 
-?C?wj==?1n?x(y?(z)?(1?y)1??(z))???wj?1n?x(y?(z)?(1?y)1??(z))??(z)xj.(58)(59)
-Putting everything over a common denominator and simplifying this becomes: 
-?C?wj=1n?x??(z)xj?(z)(1??(z))(?(z)?y).(60)
 Using the definition of the sigmoid function, ?(z)=1/(1+e?z), and a little algebra we can show that ??(z)=?(z)(1??(z)). I'll ask you to verify this in an exercise below, but for now let's accept it as given. We see that the ??(z) and ?(z)(1??(z)) terms cancel in the equation just above, and it simplifies to become: 
 ?C?wj=1n?xxj(?(z)?y).(61)
 This is a beautiful expression. It tells us that the rate at which the weight learns is controlled by ?(z)?y, i.e., by the error in the output. The larger the error, the faster the neuron will learn. This is just what we'd intuitively expect. In particular, it avoids the learning slowdown caused by the ??(z) term in the analogous equation for the quadratic cost, Equation (55). When we use the cross-entropy, the ??(z)
