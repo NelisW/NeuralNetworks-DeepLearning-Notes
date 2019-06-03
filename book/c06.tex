@@ -363,8 +363,7 @@ Now that we've understood how a Network is initialized, let's look at how it is 
             validation_data, test_data, lmbda=0.0):
         """Train the network using mini-batch stochastic gradient descent."""
         training_x, training_y = training_data
-        validation_x, validation_y = validation_data
-        test_x, test_y = test_data
+        validation_x, validation_y = \lstinlivalidation_data}         test_x, test_y = test_data
 
         # compute number of minibatches for training, validation and testing
         num_training_batches = size(training_data)/mini_batch_size
@@ -560,8 +559,7 @@ class Network(object):
             validation_data, test_data, lmbda=0.0):
         """Train the network using mini-batch stochastic gradient descent."""
         training_x, training_y = training_data
-        validation_x, validation_y = validation_data
-        test_x, test_y = test_data
+        validation_x, validation_y = \lstinlivalidation_data}         test_x, test_y = test_data
 
         # compute number of minibatches for training, validation and testing
         num_training_batches = size(training_data)/mini_batch_size

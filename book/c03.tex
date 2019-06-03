@@ -330,114 +330,125 @@ a_{j}^{L}=\frac{e^{z_{j}^{L}}}{\sum_{k} e^{z_{k}^{L}}}
 \end{equation}
 where in the denominator we sum over all the output neurons.
 
-If you're not familiar with the softmax function, Equation~\ref{eq:c03-78}  may look pretty opaque. It's certainly not obvious why we'd want to use this function. And it's also not obvious that this will help us address the learning slowdown problem. To better understand Equation~\ref{eq:c03-78}, suppose we have a network with four output neurons, and four corresponding weighted inputs, which we'll denote $z_{1}^{L}, z_{2}^{L}, z_{3}^{L}$, and $z_{4}^{L}$. Shown below are adjustable sliders showing possible values for the weighted inputs, and a graph of the corresponding output activations. A good place to start exploration is by using the bottom slider to increase $z_{4}^{L}$:
+If you're not familiar with the softmax function, Equation~\ref{eq:c03-78}  may look pretty opaque. It's certainly not obvious why we'd want to use this function. And it's also not obvious that this will help us address the learning slowdown problem. To better understand Equation~\ref{eq:c03-78}, suppose we have a network with four output neurons\footnote{See the online version of the book for the interactive example.}, and four corresponding weighted inputs, which we'll denote $z_{1}^{L}, z_{2}^{L}, z_{3}^{L}$, and $z_{4}^{L}$. Shown below are adjustable sliders showing possible values for the weighted inputs, and a graph of the corresponding output activations. A good place to start exploration is by using the bottom slider to increase $z_{4}^{L}$.
+\begin{marginfigure}
+\includegraphics{ch03-snip05}
+\end{marginfigure}
+As you increase $z_{4}^{L}$, you'll see an increase in the corresponding output activation, $a_{4}^{L}$, and a decrease in the other output activations. Similarly, if you decrease $z_{4}^{L}$ then $a_{4}^{L}$ will decrease, and all the other output activations will increase. In fact, if you look closely, you'll see that in both cases the total change in the other activations exactly compensates for the change in $a_{4}^{L}$. 
+The reason is that the output activations are guaranteed to always sum up to 1, as we can prove using Equation~\ref{eq:c03-78}   and a little algebra:
+
+\begin{equation}
+\sum_{j} a_{j}^{L}=\frac{\sum_{j} e^{z_{j}^{L}}}{\sum_{k} e^{z_{k}^{L}}}=1.
+\label{eq:c03-79} 
+\end{equation}
+As a result, if $a_{4}^{L}$ increases, then the other output activations must decrease by the same total amount, to ensure the sum over all activations remains 1. And, of course, similar statements hold for all the other activations
+\footnote{The interactive example is also implemented in the notebook at
+\lstinline{../code/chapter3-graphics.ipynb}.}. See also Section~\ref{sec:c10-softmax}.
+\begin{marginfigure}[-80mm]
+\includegraphics{ch03-snip06}
+\includegraphics{ch03-snip07}
+\end{marginfigure}
 
 
-\begin{lstlisting}
+Equation~\ref{eq:c03-78} also implies that the output activations are all positive, since the exponential function is positive. Combining this with the observation in the last paragraph, we see that the output from the softmax layer is a set of positive numbers which sum up to 1. In other words, the output from the softmax layer can be thought of as a probability distribution.
 
+The fact that a softmax layer outputs a probability distribution is rather pleasing. In many problems it's convenient to be able to interpret the output activation $a^L_j$
+as the network's estimate of the probability that the correct output is $j$. So, for instance, in the MNIST classification problem, we can interpret $a^L_j$ as the network's estimated probability that the correct digit classification is $j$.
 
-:
-zL1=
-
-
-
-aL1=
-
-zL2
-
-= 
-
-aL2=
-
-zL3
-
-= 
-
-aL3=
-
-zL4
-
-= 
-
-aL4=
-
-
-As you increase zL4
-, you'll see an increase in the corresponding output activation, aL4, and a decrease in the other output activations. Similarly, if you decrease zL4 then aL4 will decrease, and all the other output activations will increase. In fact, if you look closely, you'll see that in both cases the total change in the other activations exactly compensates for the change in aL4. The reason is that the output activations are guaranteed to always sum up to 1, as we can prove using Equation (78) and a little algebra: 
-?j$a^l_j$=?jezLj?kezLk=1.(79)
-As a result, if aL4 increases, then the other output activations must decrease by the same total amount, to ensure the sum over all activations remains 1
-. And, of course, similar statements hold for all the other activations.
-
-Equation (78) also implies that the output activations are all positive, since the exponential function is positive. Combining this with the observation in the last paragraph, we see that the output from the softmax layer is a set of positive numbers which sum up to 1
-. In other words, the output from the softmax layer can be thought of as a probability distribution.
-
-The fact that a softmax layer outputs a probability distribution is rather pleasing. In many problems it's convenient to be able to interpret the output activation $a^l_j$
-as the network's estimate of the probability that the correct output is j. So, for instance, in the MNIST classification problem, we can interpret $a^l_j$ as the network's estimated probability that the correct digit classification is j
-.
 By contrast, if the output layer was a sigmoid layer, then we certainly couldn't assume that the activations formed a probability distribution. I won't explicitly prove it, but it should be plausible that the activations from a sigmoid layer won't in general form a probability distribution. And so with a sigmoid output layer we don't have such a simple interpretation of the output activations.
 
 \textbf{Exercise}
 
-* Construct an example showing explicitly that in a network with a sigmoid output layer, the output activations $a^l_j$
-won't always sum to 1
-* . 
-We're starting to build up some feel for the softmax function and the way softmax layers behave. Just to review where we're at: the exponentials in Equation (78) ensure that all the output activations are positive. And the sum in the denominator of Equation (78) ensures that the softmax outputs sum to 1
-. So that particular form no longer appears so mysterious: rather, it is a natural way to ensure that the output activations form a probability distribution. You can think of softmax as a way of rescaling the $z_{j}^{L}$
-, and then squishing them together to form a probability distribution.
+\begin{itemize}
+\item Construct an example showing explicitly that in a network with a sigmoid output layer, the output activations $a^L_j$ won't always sum to 1.
+\end{itemize}
+
+We're starting to build up some feel for the softmax function and the way softmax layers behave. Just to review where we're at: the exponentials in Equation~\ref{eq:c03-78} ensure that all the output activations are positive. And the sum in the denominator of Equation~\ref{eq:c03-78} ensures that the softmax outputs sum to 1. So that particular form no longer appears so mysterious: rather, it is a natural way to ensure that the output activations form a probability distribution. You can think of softmax as a way of rescaling the $z_{j}^{L}$, and then squishing them together to form a probability distribution.
 
 \textbf{Exercises}
+\begin{itemize}
+\item
+\textbf{Monotonicity of softmax} Show that $\partial a_{j}^{L} / \partial z_{k}^{L}$ is positive if $j=k$ and negative if $j\neq k$. As a consequence, increasing $z_{j}^{L}$ is guaranteed to increase the corresponding output activation, $a^L_j$, and will decrease all the other output activations. We already saw this empirically with the sliders, but this is a rigorous proof.
 
-* \textbf{Monotonicity of softmax} Show that ?$a^l_j$/?zLk
-is positive if j=k and negative if j?k. As a consequence, increasing $z_{j}^{L}$ is guaranteed to increase the corresponding output activation, $a^l_j$
-*  , and will decrease all the other output activations. We already saw this empirically with the sliders, but this is a rigorous proof.
-*  \textbf{Non-locality of softmax} A nice thing about sigmoid layers is that the output $a^l_j$ is a function of the corresponding weighted input, $a^l_j$=?(zLj). Explain why this is not the case for a softmax layer: any particular output activation $a^l_j$
-* depends on all the weighted inputs. 
+\item
+\textbf{Non-locality of softmax} A nice thing about sigmoid layers is that the output $a^L_j$ is a function of the corresponding weighted input, $a_{j}^{L}=\sigma\left(z_{j}^{L}\right)$. Explain why this is not the case for a softmax layer: any particular output activation $a^L_j$
+depends on \textit{all} the weighted inputs. 
+\end{itemize}
 
 \textbf{Problem}
 
-* \textbf{Inverting the softmax} layer Suppose we have a neural network with a softmax output layer, and the activations $a^l_j$
-are known. Show that the corresponding weighted inputs have the form $z_{j}^{L}$=ln$a^l_j$+C, for some constant C that is independent of j
-* . 
+\begin{itemize}
+\item 
+\textbf{Inverting the softmax} layer Suppose we have a neural network with a softmax output layer, and the activations $a^L_j$
+are known. Show that the corresponding weighted inputs have the form \\$z_{j}^{L}=\ln a_{j}^{L}+C$, for some constant C that is independent of $j$.
+\end{itemize}
 
 
-\textbf{The learning slowdown problem}: We've now built up considerable familiarity with softmax layers of neurons. But we haven't yet seen how a softmax layer lets us address the learning slowdown problem. To understand that, let's define the log-likelihood cost function. We'll use x
-to denote a training input to the network, and y to denote the corresponding desired output. Then the log-likelihood cost associated to this training input is 
-C??lnaLy.(80)
-So, for instance, if we're training with MNIST images, and input an image of a 7, then the log-likelihood cost is $\delta^{l}$naL7. To see that this makes intuitive sense, consider the case when the network is doing a good job, that is, it is confident the input is a 7. In that case it will estimate a value for the corresponding probability aL7 which is close to 1, and so the cost $\delta^{l}$naL7 will be small. By contrast, when the network isn't doing such a good job, the probability aL7 will be smaller, and the cost $\delta^{l}$naL7
+\textbf{The learning slowdown problem}: We've now built up considerable familiarity with softmax layers of neurons. But we haven't yet seen how a softmax layer lets us address the learning slowdown problem. To understand that, let's define the \lstinline{log-likelihood} cost function. We'll use $x$ to denote a training input to the network, and $y$ to denote the corresponding desired output. Then the log-likelihood cost associated to this training input is 
+\begin{equation}
+C \equiv-\ln a_{y}^{L}
+\label{eq:c03-80} 
+\end{equation}
+So, for instance, if we're training with MNIST images, and input an image of a 7, then the log-likelihood cost is $-\ln a_{7}^{L}$. To see that this makes intuitive sense, consider the case when the network is doing a good job, that is, it is confident the input is a 7. In that case it will estimate a value for the corresponding probability $a_{7}^{L}$ which is close to 1, and so the cost $-\ln a_{7}^{L}$ will be small. By contrast, when the network isn't doing such a good job, the probability $a_{7}^{L}$ will be smaller, and the cost $-\ln a_{7}^{L}$
 will be larger. So the log-likelihood cost behaves as we'd expect a cost function to behave.
 
-What about the learning slowdown problem? To analyze that, recall that the key to the learning slowdown is the behaviour of the quantities ?C/?$w^l_{jk}$
-and ?C/?$b^l_j$. I won't go through the derivation explicitly - I'll ask you to do in the problems, below - but with a little algebra you can show that* *Note that I'm abusing notation here, using y in a slightly different way to last paragraph. In the last paragraph we used y to denote the desired output from the network - e.g., output a ``7'' if an image of a 7 was input. But in the equations which follow I'm using y to denote the vector of output activations which corresponds to 7, that is, a vector which is all 0s, except for a 1 in the 7th location. 
-?C?$b^l_j$?C?$w^l_{jk}$==$a^l_j$?yjaL?1k($a^l_j$?yj)(81)(82)
+What about the learning slowdown problem? To analyze that, recall that the key to the learning slowdown is the behaviour of the quantities $\partial C / \partial w_{j k}^{L}$ and $\partial C / \partial b_{j}^{L}$. I won't go through the derivation explicitly - I'll ask you to do in the problems, below - but with a little algebra you can show that\footnote{Note that I'm abusing notation here, using $y$ in a slightly different way to last paragraph. In the last paragraph we used $y$ to denote the desired output from the network -- e.g., output a ``7'' if an image of a 7 was input. But in the equations which follow I'm using $y$ to denote the vector of output activations which corresponds to 7, that is, a vector which is all 0s, except for a 1 in the 7th location. }
+\begin{equation}
+\frac{\partial C}{\partial b_{j}^{L}}=a_{j}^{L}-y_{j}
+\label{eq:c03-81} 
+\end{equation}
+\begin{equation}
+\frac{\partial C}{\partial w_{j k}^{L}}=a_{k}^{L-1}\left(a_{j}^{L}-y_{j}\right)
+\label{eq:c03-82} 
+\end{equation}
 
-These equations are the same as the analogous expressions obtained in our earlier analysis of the cross-entropy. Compare, for example, Equation (82) to Equation (67). It's the same equation, albeit in the latter I've averaged over training instances. And, just as in the earlier analysis, these expressions ensure that we will not encounter a learning slowdown. In fact, it's useful to think of a softmax output layer with log-likelihood cost as being quite similar to a sigmoid output layer with cross-entropy cost.
 
-Given this similarity, should you use a sigmoid output layer and cross-entropy, or a softmax output layer and log-likelihood? In fact, in many situations both approaches work well. Through the remainder of this chapter we'll use a sigmoid output layer, with the cross-entropy cost. Later, in Chapter 6, we'll sometimes use a softmax output layer, with log-likelihood cost. The reason for the switch is to make some of our later networks more similar to networks found in certain influential academic papers. As a more general point of principle, softmax plus log-likelihood is worth using whenever you want to interpret the output activations as probabilities. That's not always a concern, but can be useful with classification problems (like MNIST) involving disjoint classes.
+
+
+These equations are the same as the analogous expressions obtained in our earlier analysis of the cross-entropy. Compare, for example, Equation~\ref{eq:c03-82} to Equation~\ref{eq:c03-67}. It's the same equation, albeit in the latter I've averaged over training instances. And, just as in the earlier analysis, these expressions ensure that we will not encounter a learning slowdown. In fact, it's useful to think of a softmax output layer with log-likelihood cost as being quite similar to a sigmoid output layer with cross-entropy cost.
+
+Given this similarity, should you use a sigmoid output layer and cross-entropy, or a softmax output layer and log-likelihood? In fact, in many situations both approaches work well. Through the remainder of this chapter we'll use a sigmoid output layer, with the cross-entropy cost. Later, in Chapter~\ref{sec:DeepLearning}, we'll sometimes use a softmax output layer, with log-likelihood cost. The reason for the switch is to make some of our later networks more similar to networks found in certain influential academic papers. As a more general point of principle, softmax plus log-likelihood is worth using whenever you want to interpret the output activations as probabilities. That's not always a concern, but can be useful with classification problems (like MNIST) involving disjoint classes.
+
+
 
 \textbf{Problems}
+\begin{itemize}
+\item 
+Derive Equations~\ref{eq:c03-81}  and \ref{eq:c03-82}.
 
-* Derive Equations (81) and (82).
-* \textbf{Where does the ``softmax'' name come from?} Suppose we change the softmax function so the output activations are given by 
-$a^l_j$=eczLj?keczLk,(83)
-where c is a positive constant. Note that c=1 corresponds to the standard softmax function. But if we use a different value of c we get a different function, which is nonetheless qualitatively rather similar to the softmax. In particular, show that the output activations form a probability distribution, just as for the usual softmax. Suppose we allow c to become large, i.e., c??. What is the limiting value for the output activations $a^l_j$? After solving this problem it should be clear to you why we think of the c=1
-*  function as a ``softened'' version of the maximum function. This is the origin of the term ``softmax''.
+\item 
+\textbf{Where does the ``softmax'' name come from?} Suppose we change the softmax function so the output activations are given by 
+\begin{equation}
+a_{j}^{L}=\frac{e^{c z_{j}^{L}}}{\sum_{k} e^{c z_{k}^{L}}}
+\label{eq:c03-83} 
+\end{equation}
+where $c$ is a positive constant. Note that $c=1$ corresponds to the standard softmax function. But if we use a different value of $c$ we get a different function, which is nonetheless qualitatively rather similar to the softmax. In particular, show that the output activations form a probability distribution, just as for the usual softmax. Suppose we allow $c$ to become large, i.e., $c \rightarrow \infty$. What is the limiting value for the output activations $a^L_j$? After solving this problem it should be clear to you why we think of the $c=1$ function as a ``softened'' version of the maximum function. This is the origin of the term ``softmax''.
 
-*  \textbf{Backpropagation with softmax and the log-likelihood cost} In the last chapter we derived the backpropagation algorithm for a network containing sigmoid layers. To apply the algorithm to a network with a softmax layer we need to figure out an expression for the error $\delta^{l}_j$??C/?zLj in the final layer. Show that a suitable expression is: $\delta^{l}_j$=$a^l_j$?yj.(84)
-* Using this expression we can apply the backpropagation algorithm to a network using a softmax output layer and the log-likelihood cost.
+
+\item 
+\textbf{Backpropagation with softmax and the log-likelihood cost} In the last chapter we derived the backpropagation algorithm for a network containing sigmoid layers. To apply the algorithm to a network with a softmax layer we need to figure out an expression for the error $\delta_{j}^{L} \equiv \partial C / \partial z_{j}^{L}$ in the final layer. Show that a suitable expression is: 
+\begin{equation}
+\delta_{j}^{L}=a_{j}^{L}-y_{j}
+\label{eq:c03-84} 
+\end{equation}
+Using this expression we can apply the backpropagation algorithm to a network using a softmax output layer and the log-likelihood cost.
+\end{itemize}
+
+
 
 \section{Overfitting and regularization}
 \label{sec:Overfittingandregularization}
 
-The Nobel prizewinning physicist Enrico Fermi was once asked his opinion of a mathematical model some colleagues had proposed as the solution to an important unsolved physics problem. The model gave excellent agreement with experiment, but Fermi was skeptical. He asked how many free parameters could be set in the model. ``Four'' was the answer. Fermi replied* *The quote comes from a charming article by Freeman Dyson, who is one of the people who proposed the flawed model. A four-parameter elephant may be found here. : ``I remember my friend Johnny von Neumann used to say, with four parameters I can fit an elephant, and with five I can make him wiggle his trunk.".
+The Nobel prizewinning physicist Enrico Fermi was once asked his opinion of a mathematical model some colleagues had proposed as the solution to an important unsolved physics problem. The model gave excellent agreement with experiment, but Fermi was skeptical. He asked how many free parameters could be set in the model. ``Four'' was the answer. Fermi replied\footnote{The quote comes from a charming article by Freeman Dyson \cite{Dyson2004}, who is one of the people who proposed the flawed model. A four-parameter elephant may be found here \cite{Cook2011}.}: ``I remember my friend Johnny von Neumann used to say, with four parameters I can fit an elephant, and with five I can make him wiggle his trunk.''.
 
 The point, of course, is that models with a large number of free parameters can describe an amazingly wide range of phenomena. Even if such a model agrees well with the available data, that doesn't make it a good model. It may just mean there's enough freedom in the model that it can describe almost any data set of the given size, without capturing any genuine insights into the underlying phenomenon. When that happens the model will work well for the existing data, but will fail to generalize to new situations. The true test of a model is its ability to make predictions in situations it hasn't been exposed to before.
 
 Fermi and von Neumann were suspicious of models with four parameters. Our 30 hidden neuron network for classifying MNIST digits has nearly 24,000 parameters! That's a lot of parameters. Our 100 hidden neuron network has nearly 80,000 parameters, and state-of-the-art deep neural nets sometimes contain millions or even billions of parameters. Should we trust the results?
 
-Let's sharpen this problem up by constructing a situation where our network does a bad job generalizing to new situations. We'll use our 30 hidden neuron network, with its 23,860 parameters. But we won't train the network using all 50,000 MNIST training images. Instead, we'll use just the first 1,000 training images. Using that restricted set will make the problem with generalization much more evident. We'll train in a similar way to before, using the cross-entropy cost function, with a learning rate of ?=0.5
-and a mini-batch size of 10
-. However, we'll train for 400 epochs, a somewhat larger number than before, because we're not using as many training examples. Let's use network2 to look at the way the cost function changes:
+Let's sharpen this problem up by constructing a situation where our network does a bad job generalizing to new situations. We'll use our 30 hidden neuron network, with its 23,860 parameters. But we won't train the network using all 50,000 MNIST training images. Instead, we'll use just the first 1,000 training images. Using that restricted set will make the problem with generalization much more evident. We'll train in a similar way to before, using the cross-entropy cost function, with a learning rate of $\eta$=0.5 and a mini-batch size of 10. However, we'll train for 400 epochs, a somewhat larger number than before, because we're not using as many training examples. Let's use \lstinline{network2.py} to look at the way the cost function changes:
+
  
+\begin{lstlisting}
 >>> import mnist_loader 
 >>> training_data, validation_data, test_data = \
 ... mnist_loader.load_data_wrapper()
@@ -446,21 +457,31 @@ and a mini-batch size of 10
 >>> net.large_weight_initializer()
 >>> net.SGD(training_data[:1000], 400, 10, 0.5, evaluation_data=test_data,
 ... monitor_evaluation_accuracy=True, monitor_training_cost=True)
-
-Using the results we can plot the way the cost changes as the network learns* *This and the next four graphs were generated by the program overfitting.py. :
-
+\end{lstlisting}
+Using the results we can plot the way the cost changes as the network learns\footnote{This and the next four graphs were generated by the program overfitting.py.}.
+\begin{marginfigure}
+\includegraphics{ch03-snip08}
+\end{marginfigure}
 This looks encouraging, showing a smooth decrease in the cost, just as we expect. Note that I've only shown training epochs 200 through 399. This gives us a nice up-close view of the later stages of learning, which, as we'll see, turns out to be where the interesting action is.
 
 Let's now look at how the classification accuracy on the test data changes over time:
+\begin{marginfigure}
+\includegraphics{ch03-snip09}
+\end{marginfigure}
 
-Again, I've zoomed in quite a bit. In the first 200 epochs (not shown) the accuracy rises to just under 82 percent. The learning then gradually slows down. Finally, at around epoch 280 the classification accuracy pretty much stops improving. Later epochs merely see small stochastic fluctuations near the value of the accuracy at epoch 280. Contrast this with the earlier graph, where the cost associated to the training data continues to smoothly drop. If we just look at that cost, it appears that our model is still getting ``better''. But the test accuracy results show the improvement is an illusion. Just like the model that Fermi disliked, what our network learns after epoch 280 no longer generalizes to the test data. And so it's not useful learning. We say the network is overfitting or overtraining beyond epoch 280.
+Again, I've zoomed in quite a bit. In the first 200 epochs (not shown) the accuracy rises to just under 82 percent. The learning then gradually slows down. Finally, at around epoch 280 the classification accuracy pretty much stops improving. Later epochs merely see small stochastic fluctuations near the value of the accuracy at epoch 280. Contrast this with the earlier graph, where the cost associated to the training data continues to smoothly drop. If we just look at that cost, it appears that our model is still getting ``better''. But the test accuracy results show the improvement is an illusion. Just like the model that Fermi disliked, what our network learns after epoch 280 no longer generalizes to the test data. And so it's not useful learning. We say the network is \textit{overfitting} or \textit{overtraining} beyond epoch 280.
 
-You might wonder if the problem here is that I'm looking at the cost on the training data, as opposed to the classification accuracy on the test data. In other words, maybe the problem is that we're making an apples and oranges comparison. What would happen if we compared the cost on the training data with the cost on the test data, so we're comparing similar measures? Or perhaps we could compare the classification accuracy on both the training data and the test data? In fact, essentially the same phenomenon shows up no matter how we do the comparison. The details do change, however. For instance, let's look at the cost on the test data:
-
+You might wonder if the problem here is that I'm looking at the \textit{cost} on the training data, as opposed to the \textit{classification accuracy} on the test data. In other words, maybe the problem is that we're making an apples and oranges comparison. What would happen if we compared the cost on the training data with the cost on the test data, so we're comparing similar measures? Or perhaps we could compare the classification accuracy on both the training data and the test data? In fact, essentially the same phenomenon shows up no matter how we do the comparison. The details do change, however. For instance, let's look at the cost on the test data.
+\begin{marginfigure}
+\includegraphics{ch03-snip10}
+\end{marginfigure}
 We can see that the cost on the test data improves until around epoch 15, but after that it actually starts to get worse, even though the cost on the training data is continuing to get better. This is another sign that our model is overfitting. It poses a puzzle, though, which is whether we should regard epoch 15 or epoch 280 as the point at which overfitting is coming to dominate learning? From a practical point of view, what we really care about is improving classification accuracy on the test data, while the cost on the test data is no more than a proxy for classification accuracy. And so it makes most sense to regard epoch 280 as the point beyond which overfitting is dominating learning in our neural network.
 
-Another sign of overfitting may be seen in the classification accuracy on the training data:
 
+Another sign of overfitting may be seen in the classification accuracy on the training data.
+\begin{marginfigure}
+\includegraphics{ch03-snip11}
+\end{marginfigure}
 The accuracy rises all the way up to 100
 percent. That is, our network correctly classifies all 1,000 training images! Meanwhile, our test accuracy tops out at just 82.27
 percent. So our network really is learning about peculiarities of the training set, not just recognizing digits in general. It's almost as though our network is merely memorizing the training set, without understanding digits well enough to generalize to the test set.
@@ -468,15 +489,28 @@ percent. So our network really is learning about peculiarities of the training s
 Overfitting is a major problem in neural networks. This is especially true in modern networks, which often have very large numbers of weights and biases. To train effectively, we need a way of detecting when overfitting is going on, so we don't overtrain. And we'd like to have techniques for reducing the effects of overfitting.
 
 The obvious way to detect overfitting is to use the approach above, keeping track of accuracy on the test data as our network trains. If we see that the accuracy on the test data is no longer improving, then we should stop training. Of course, strictly speaking, this is not necessarily a sign of overfitting. It might be that accuracy on the test data and the training data both stop improving at the same time. Still, adopting this strategy will prevent overfitting.
+
 In fact, we'll use a variation on this strategy. Recall that when we load in the MNIST data we load in three data sets: 
  
+\begin{lstlisting}
 >>> import mnist_loader 
 >>> training_data, validation_data, test_data = \
 ... mnist_loader.load_data_wrapper()
-Up to now we've been using the training_data and test_data, and ignoring the validation_data. The validation_data contains 10,000 images of digits, images which are different from the 50,000 images in the MNIST training set, and the 10,000 images in the MNIST test set. Instead of using the test_data to prevent overfitting, we will use the validation_data. To do this, we'll use much the same strategy as was described above for the test_data. That is, we'll compute the classification accuracy on the validation_data at the end of each epoch. Once the classification accuracy on the validation_data has saturated, we stop training. This strategy is called early stopping. Of course, in practice we won't immediately know when the accuracy has saturated. Instead, we continue training until we're confident that the accuracy has saturated* *It requires some judgment to determine when to stop. In my earlier graphs I identified epoch 280 as the place at which accuracy saturated. It's possible that was too pessimistic. Neural networks sometimes plateau for a while in training, before continuing to improve. I wouldn't be surprised if more learning could have occurred even after epoch 400, although the magnitude of any further improvement would likely be small. So it's possible to adopt more or less aggressive strategies for early stopping..
-Why use the validation_data to prevent overfitting, rather than the test_data? In fact, this is part of a more general strategy, which is to use the validation_data to evaluate different trial choices of hyper-parameters such as the number of epochs to train for, the learning rate, the best network architecture, and so on. We use such evaluations to find and set good values for the hyper-parameters. Indeed, although I haven't mentioned it until now, that is, in part, how I arrived at the hyper-parameter choices made earlier in this book. (More on this later.)
-Of course, that doesn't in any way answer the question of why we're using the validation_data to prevent overfitting, rather than the test_data. Instead, it replaces it with a more general question, which is why we're using the validation_data rather than the test_data to set good hyper-parameters? To understand why, consider that when setting hyper-parameters we're likely to try many different choices for the hyper-parameters. If we set the hyper-parameters based on evaluations of the test_data it's possible we'll end up overfitting our hyper-parameters to the test_data. That is, we may end up finding hyper-parameters which fit particular peculiarities of the test_data, but where the performance of the network won't generalize to other data sets. We guard against that by figuring out the hyper-parameters using the validation_data. Then, once we've got the hyper-parameters we want, we do a final evaluation of accuracy using the test_data. That gives us confidence that our results on the test_data are a true measure of how well our neural network generalizes. To put it another way, you can think of the validation data as a type of training data that helps us learn good hyper-parameters. This approach to finding good hyper-parameters is sometimes known as the hold out method, since the validation_data is kept apart or ``held out'' from the training_data.
-Now, in practice, even after evaluating performance on the test_data we may change our minds and want to try another approach - perhaps a different network architecture - which will involve finding a new set of hyper-parameters. If we do this, isn't there a danger we'll end up overfitting to the test_data as well? Do we need a potentially infinite regress of data sets, so we can be confident our results will generalize? Addressing this concern fully is a deep and difficult problem. But for our practical purposes, we're not going to worry too much about this question. Instead, we'll plunge ahead, using the basic hold out method, based on the training_data, validation_data, and test_data, as described above.
+\end{lstlisting}
+
+
+Up to now we've been using the \lstinline{training_data} and \lstinline{test_data}, and ignoring the \lstinline{validation_data}. The \lstinline{validation_data} contains 10,000 images of digits, images which are different from the 50,000 images in the MNIST training set, and the 10,000 images in the MNIST test set. Instead of using the \lstinline{test_data} to prevent overfitting, we will use the \lstinline{validation_data}. To do this, we'll use much the same strategy as was described above for the \lstinline{test_data}. That is, we'll compute the classification accuracy on the \lstinline{validation_data} at the end of each epoch. Once the classification accuracy on the \lstinline{validation_data} has saturated, we stop training. This strategy is called \textit{early stopping}. Of course, in practice we won't immediately know when the accuracy has saturated. Instead, we continue training until we're confident that the accuracy has saturated\footnote{It requires some judgment to determine when to stop. In my earlier graphs I identified epoch 280 as the place at which accuracy saturated. It's possible that was too pessimistic. Neural networks sometimes plateau for a while in training, before continuing to improve. I wouldn't be surprised if more learning could have occurred even after epoch 400, although the magnitude of any further improvement would likely be small. So it's possible to adopt more or less aggressive strategies for early stopping.}.
+
+
+Why use the \lstinline{validation_data} to prevent overfitting, rather than the \lstinline{test_data}? In fact, this is part of a more general strategy, which is to use the \lstinline{validation_data} to evaluate different trial choices of hyper-parameters such as the number of epochs to train for, the learning rate, the best network architecture, and so on. We use such evaluations to find and set good values for the hyper-parameters. Indeed, although I haven't mentioned it until now, that is, in part, how I arrived at the hyper-parameter choices made earlier in this book. (More on this later.)
+
+
+Of course, that doesn't in any way answer the question of why we're using the \lstinline{validation_data} to prevent overfitting, rather than the \lstinline{test_data}. Instead, it replaces it with a more general question, which is why we're using the  \lstinline{validation_data} rather than the \lstinline{test_data} to set good hyper-parameters? To understand why, consider that when setting hyper-parameters we're likely to try many different choices for the hyper-parameters. If we set the hyper-parameters based on evaluations of the \lstinline{test_data} it's possible we'll end up overfitting our hyper-parameters to the \lstinline{test_data}. That is, we may end up finding hyper-parameters which fit particular peculiarities of the \lstinline{test_data}, but where the performance of the network won't generalize to other data sets. We guard against that by figuring out the hyper-parameters using the \lstinline{validation_data}. Then, once we've got the hyper-parameters we want, we do a final evaluation of accuracy using the \lstinline{test_data}. That gives us confidence that our results on the \lstinline{test_data} are a true measure of how well our neural network generalizes. To put it another way, you can think of the validation data as a type of training data that helps us learn good hyper-parameters. This approach to finding good hyper-parameters is sometimes known as the hold out method, since the  \lstinline{validation_data} is kept apart or ``held out'' from the \lstinline{training_data}.
+
+
+\begin{lstlisting}
+
+Now, in practice, even after evaluating performance on the \lstinline{test_data} we may change our minds and want to try another approach - perhaps a different network architecture - which will involve finding a new set of hyper-parameters. If we do this, isn't there a danger we'll end up overfitting to the \lstinline{test_data} as well? Do we need a potentially infinite regress of data sets, so we can be confident our results will generalize? Addressing this concern fully is a deep and difficult problem. But for our practical purposes, we're not going to worry too much about this question. Instead, we'll plunge ahead, using the basic hold out method, based on the training_data, validation_data, and \lstinline{test_data}, as described above.
 We've been looking so far at overfitting when we're just using 1,000 training images. What happens when we use the full training set of 50,000 images? We'll keep all the other parameters the same (30 hidden neurons, learning rate 0.5, mini-batch size of 10), but train using all 50,000 images for 30 epochs. Here's a graph showing the results for the classification accuracy on both the training data and the test data. Note that I've used the test data here, rather than the validation data, in order to make the results more directly comparable with the earlier graphs.
 
 As you can see, the accuracy on the test and training data remain much closer together than when we were using 1,000 training examples. In particular, the best classification accuracy of 97.86
@@ -524,7 +558,7 @@ where the sum is over training examples x
 in the mini-batch.
 Let's see how regularization changes the performance of our neural network. We'll use a network with 30
 hidden neurons, a mini-batch size of 10, a learning rate of 0.5, and the cross-entropy cost function. However, this time we'll use a regularization parameter of ?=0.1
-. Note that in the code, we use the variable name lmbda, because lambda is a reserved word in Python, with an unrelated meaning. I've also used the test_data again, not the validation_data. Strictly speaking, we should use the validation_data, for all the reasons we discussed earlier. But I decided to use the test_data because it makes the results more directly comparable with our earlier, unregularized results. You can easily change the code to use the validation_data instead, and you'll find that it gives similar results. 
+. Note that in the code, we use the variable name lambda, because lambda is a reserved word in Python, with an unrelated meaning. I've also used the \lstinline{test_data} again, not the validation_data. Strictly speaking, we should use the validation_data, for all the reasons we discussed earlier. But I decided to use the \lstinline{test_data} because it makes the results more directly comparable with our earlier, unregularized results. You can easily change the code to use the \lstinlivalidation_data} instead, and you'll find that it gives similar results. 
  
 >>> import mnist_loader 
 >>> training_data, validation_data, test_data = \
@@ -538,7 +572,7 @@ hidden neurons, a mini-batch size of 10, a learning rate of 0.5, and the cross-e
 ... monitor_training_cost=True, monitor_training_accuracy=True)
 The cost on the training data decreases over the whole time, much as it did in the earlier, unregularized case* *This and the next two graphs were produced with the program overfitting.py.:
 
-But this time the accuracy on the test_data continues to increase for the entire 400 epochs:
+But this time the accuracy on the \lstinline{test_data} continues to increase for the entire 400 epochs:
 
 Clearly, the use of regularization has suppressed overfitting. What's more, the accuracy is considerably higher, with a peak classification accuracy of 87.1
 percent, compared to the peak of 82.27
@@ -1122,7 +1156,7 @@ Another small but important change to our code is the addition of several option
 ... monitor_evaluation_cost=True,
 ... monitor_training_accuracy=True,
 ... monitor_training_cost=True)
-Here, we're setting the evaluation_data to be the validation_data. But we could also have monitored performance on the test_data or any other data set. We also have four flags telling us to monitor the cost and accuracy on both the evaluation_data and the training_data. Those flags are False by default, but they've been turned on here in order to monitor our Network's performance. Furthermore, network2.py's Network.SGD method returns a four-element tuple representing the results of the monitoring. We can use this as follows:
+Here, we're setting the evaluation_data to be the validation_data. But we could also have monitored performance on the \lstinline{test_data} or any other data set. We also have four flags telling us to monitor the cost and accuracy on both the evaluation_data and the training_data. Those flags are False by default, but they've been turned on here in order to monitor our Network's performance. Furthermore, network2.py's Network.SGD method returns a four-element tuple representing the results of the monitoring. We can use this as follows:
 >>> evaluation_cost, evaluation_accuracy, 
 ... training_cost, training_accuracy = net.SGD(training_data, 30, 10, 0.5,
 ... lmbda = 5.0,

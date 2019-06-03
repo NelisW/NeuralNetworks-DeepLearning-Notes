@@ -1,10 +1,72 @@
 % -*- TeX -*- -*- UK -*- -*- Soft -*-
 
-\chapter{Google Colaboratory}
-\label{sec:Google Colaboratory}
+\chapter{Google Colaboratory and Google Playground}
+\label{sec:GoogleColaboratoryPlayground}
+
+\section{Google Playground}
+\label{sec:playground.tensorflow.org}
+
+Google created \lstinline{playground.tensorflow.org}
+\cite{GooglePlayground2019} as a safe learning environment where you can experiment with neural nets and deep learning without writing code.  This is a convenient way to become acquainted with \ac{ML}.
+
+On opening the website has the following graphical interface display: 
+ 
+\begin{figure*}[h]
+\includegraphics[width=\textwidth]{playground01}
+\end{figure*}
+
+Essentially the site provides a neural net training environment where you can select a number of different elements of the project: you can 
+(1) select different \ac{2-D} data sets on the left, 
+(2) set learning parameters on the left,
+(3) specify how features  should be extracted from the data set,
+(4) change the number of layers and/or neurons in each layer,
+(5) see the output from the net, showing the classification performance.
+Along the top you can select learning rate, the activation function, regularisation, and the type of problem. 
+
+Keep the original inputs with two hidden layers and press the run button. 
+
+\begin{figure*}[h]
+\includegraphics[width=\textwidth]{playground02}
+\end{figure*}
+\FloatBarrier
+
+Observe how the net trains. After a while it classifies perfectly.  Move the mouse over the neurons to observe the single neuron's contribution to the classification in the larger image on the right (this is the effect that the neuron has in the network). Hover over the lines and observe that the thickens of the lines describes the weight of the connection. If you click on the line you can change the weight and immediately see the effect in the output. 
+
+Next change the network design by changing the number of layers and neurons. Evidently the problem can be solved with a single hidden layer with three neurons.
+
+\begin{figure*}[h]
+\includegraphics[width=\textwidth]{playground03}
+\end{figure*}
+
+\FloatBarrier
+
+Select a new data set and give it two hidden layers and a few more neurons. Observe that in the following case, most of the work is done in the first hidden layer by the first and third neurons, see their weight compared to the other neurons' weights.
+
+\begin{figure*}[h]
+\includegraphics[width=\textwidth]{playground04}
+\end{figure*}
+
+\FloatBarrier
+
+Reduce the number of neurons in the first hidden row to two and observe that the classification is equally good.  Next remove the second hidden layer and observe that the classifier still performs well. What we have here is a simple straight line classifier.
+
+Next, select the spiral data set and add two more hidden layers and many more neurons.  Also select the ReLu activation function in the top row.  See how nicely the classifier creates the boundaries to discriminate between the two classes!  Note that the top neuron in the third hidden layer has no weight feeding into the output, it can safely be removed.
+
+\begin{figure*}[h]
+\includegraphics[width=\textwidth]{playground04}
+\end{figure*}
+
+\FloatBarrier
+
+This tool is hardly sufficient to develop ant real world practical solution, but it does provide a very nice play pen to develop an understanding of at least the underlying principles.
+
+
+
+\section{Working with Colaboratory Notebooks}
+\subsection{Overview}
+
 
 The early content of chapter is based on material from  \cite{LiuCoLab2019,AnneBonner2019}.
-\section{Background}
 
 See the FAQ
 \lstinline{https://research.google.com/colaboratory/faq.html}
@@ -13,11 +75,10 @@ It is an online  free research tool storing colab notebooks on Google Drive. Col
 
 The code is executed in a virtual machine dedicated to your account. Virtual machines are recycled when idle for a while, and have a maximum lifetime enforced by the system. 
 
-Colaboratory is intended for interactive use. Long-running background computations, particularly on GPUs, may be stopped. We encourage users who wish to run continuous or long-running computations through Colaboratory’s UI to use a local runtime, see \cite{googleLcalColabs2019}.
+Colaboratory is intended for interactive use. Long-running background computations, particularly on GPUs, may be stopped. We encourage users who wish to run continuous or long-running computations through Colaboratory's UI to use a local runtime, see \cite{googleLcalColabs2019}.
 
-Colab is ideal for everything from improving your Python coding skills to working with deep learning libraries, like PyTorch, Keras, TensorFlow, and OpenCV. You can create notebooks in Colab, upload notebooks, store notebooks, share notebooks, mount your Google Drive and use whatever you’ve got stored in there, import most of your favorite directories, upload your personal Jupyter Notebooks, upload notebooks directly from GitHub, upload Kaggle files, download your notebooks, and do just about everything else that you might want to be able to do.
+Colab is ideal for everything from improving your Python coding skills to working with deep learning libraries, like PyTorch, Keras, TensorFlow, and OpenCV. You can create notebooks in Colab, upload notebooks, store notebooks, share notebooks, mount your Google Drive and use whatever you've got stored in there, import most of your favorite directories, upload your personal Jupyter Notebooks, upload notebooks directly from GitHub, upload Kaggle files, download your notebooks, and do just about everything else that you might want to be able to do.
 
-\section{Working with Colaboratory Notebooks}
 \subsection{Getting Started}
 \begin{marginfigure}
 \includegraphics{drivecolab}
@@ -100,7 +161,7 @@ Use wget to download and if it is a zipped file, unzip to get the contents.
 
 \subsection{Long Running Processes}
 
-Colaboratory is intended for interactive use. Long-running background computations, particularly on GPUs, may be stopped. ... Google encourages users who wish to run continuous or long-running computations through Colaboratory’s UI to use a local runtime or Google's paid services.
+Colaboratory is intended for interactive use. Long-running background computations, particularly on GPUs, may be stopped. ... Google encourages users who wish to run continuous or long-running computations through Colaboratory's UI to use a local runtime or Google's paid services.
 
 
 
