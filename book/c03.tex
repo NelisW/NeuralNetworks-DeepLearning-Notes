@@ -220,11 +220,11 @@ The $\sigma^{\prime}\left(z_{j}^{L}\right)$ term has vanished, and so the cross-
 Similarly to the previous problem, use this expression to show that the partial derivatives with respect to the weights and biases in the output layer are given by 
 \begin{equation}
 \frac{\partial C}{\partial w_{j k}^{L}}=\frac{1}{n} \sum_{x} a_{k}^{L-1}\left(a_{j}^{L}-y_{j}\right)
-\label{eq:c03-68}
+\label{eq:c03-69}
 \end{equation}
 \begin{equation}
 \frac{\partial C}{\partial b_{j}^{L}}=\frac{1}{n} \sum_{x}\left(a_{j}^{L}-y_{j}\right)
-\label{eq:c03-69}
+\label{eq:c03-70}
 \end{equation}
 This shows that if the output neurons are linear neurons then the quadratic cost will not give rise to any problems with a learning slowdown. In this case the quadratic cost is, in fact, an appropriate cost function to use. 
 \end{itemize}
@@ -252,9 +252,7 @@ and we train for 30 epochs. The interface to \lstinline{network2.py} is slightly
 \end{lstlisting}
 
 
-Note, by the way, that the \lstinline{net.large_weight_initializer()} command is used to initialize the weights and biases in the same way as described in Chapter~\ref{sec:UsingNeuralNetsTorRcognizeHandWrittenDigits}. We need to run this command because later in this chapter we'll change the default weight initialization in our networks. The result from running the above sequence of commands is a network with 95.49
-percent accuracy. This is pretty close to the result we obtained in Chapter~\ref{sec:UsingNeuralNetsTorRcognizeHandWrittenDigits}, 95.42
-percent, using the quadratic cost.
+Note, by the way, that the \lstinline{net.large_weight_initializer()} command is used to initialize the weights and biases in the same way as described in Chapter~\ref{sec:UsingNeuralNetsTorRcognizeHandWrittenDigits}. We need to run this command because later in this chapter we'll change the default weight initialization in our networks. The result from running the above sequence of commands is a network with 95.49 percent accuracy. This is pretty close to the result we obtained in  Chapter~\ref{sec:UsingNeuralNetsTorRcognizeHandWrittenDigits}, 95.42 percent, using the quadratic cost.
 
 
 Let's look also at the case where we use 100 hidden neurons, the cross-entropy, and otherwise keep the parameters the same. In this case we obtain an accuracy of 96.82 percent. That's a substantial improvement over the results from Chapter 1, where we obtained a classification accuracy of 96.59 percent, using the quadratic cost. That may look like a small change, but consider that the error rate has dropped from 3.41 percent to 3.18
