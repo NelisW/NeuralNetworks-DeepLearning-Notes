@@ -1,9 +1,69 @@
 % -*- TeX -*- -*- UK -*- -*- Soft -*-
 
-\chapter{Regularization, Overfitting and Underfitting}
-\label{sec:Regularization}
+\chapter{Generalisation, Overfitting and Underfitting}
+\label{sec:GeneralisationOverfittingandUnderfitting}
+
+\section{Overfitting and Underfitting in Machine Learning}
+
+This section is based on a blog by MLK \cite{MLK2019}, some parts are copied verbatim. There are some other nice pages here as well, see \cite{MLK2018}.
+
+Generalisation is the ability of  neural net to not only learn the specific data, but to be able to also handle previously unseen data correctly in a broader statistical sense. 
+
+Given a data set, there must be some True Function that can generalise the input-to-output mapping in the best statistical sense, for both the learning data as well as previously unseen data.  The objective is to train the net to find the True Function, but it can be quite hard to find this True Function.
+There are two measures that can help describe the goodness of fit for the trained neural net.
+
+\newthought{Bias} is the error that is introduced by the model's prediction and the actual data: Bias = Predicted – Actual.  Bias is not to be confused with offset, but rather as a generalised error against the training set: how well does the net fit the training set?
+\begin{itemize}
+\item Low Bias means, the model has created a function that has understood the relationship between input and output data.
+\item  High Bias means, the model has created a function that fails to understand the relationship between input and output data.
+\end{itemize}
+
+\newthought{Variance} of a machine learning model is the amount by which its performance vary with \textit{different and previously unseen} data set.
+\begin{itemize}
+\item  Low variance means, the performance of machine learning model does not vary much with different data set
+\item  High variance means, the performance of the machine learning model varies considerably with different data set.
+\end{itemize}
+A good fit model should be generalized enough to work with any unseen data (low variance) and at the same time should produce low prediction error (low bias).
+
+\newthought{Overfitting} is when  the neural net model creates a function which correctly maps  the input data set to the required output data set, with little or no error.  The model so carefully adjusts to the training set that the follows the minutest of details and lose the bigger picture: it does not generalise well against new data.  An overfitted model has low bias, but high variance.
+
+Overfitting can be detected by poor fit performance on the test data set (new data not in training set).  The model is so narrowly trained on the training set that it is unable to generalise well to the test data set.
+
+Avoiding Overfitting by 
+\begin{itemize}
+\item Increase the data in your training set. Limiting yourself with a very small data set can cause your model to create a direct function rather than a generalized function.
+\item Reduce the complexity of your machine learning model architecture. For example you can reduce the number of neurons/layers in neural network, reduce the value of K in KNN model, reduce number of estimators in Random Forest etc. Do remember that we should design the simplest machine learning model that can solve our problem.
+\item Early stopping during training phase can prevent the model from overfitting with the training data itself in subsequent epochs.
+\item In case of deep neural network you may use techniques of Dropouts where neurons are randomly switched off during training phase.
+\item Applying L1 and L2 regularization techniques limits the models tendency to overfit. It is a broad topic which we may discuss in a separate post.
+\end{itemize}
+
+
+\newthought{Underfitting} is when the neural net model fails to build a model that sufficiently well generalises the True Function:  it is unable to capture the true relationship between the given input vectors and the required output vectors.
+An underfitted model may or may not have low variance but it will have large bias.  
+
+Underfitting can be detected by poor fit performance on the training data set: it fails to capture the essence of the True Function.
+
+Avoiding Underfitting by
+\begin{itemize}
+\item Increase the data. If you limit the data during training phase you are not providing enough details to model to learn the relationship between data.
+
+\item Increase the complexity of your machine learning model as it might help you to capture the underlying complex relation between data. For e.g increasing number of neurons/layers in neural network, increasing the value of K in KNN etc.
+
+\item You might be using too few features and hence providing too much less information to your model, resulting in underfitting. So you may try to increase the number of feature into your model.
+
+\item  There may be too much noise in the data that might be preventing your model to understand the correct nature of data. Try to do a proper preprocessing and noise removal from the data.
+
+\item  You may be terminating the training epochs before model starts fitting the data. You may increase the number of epochs and see if the model shows more better accuracy.
+\end{itemize}
+
+
+
+
+
 
 \section{The Bias-Variance Tradeoff}
+\label{sec:Regularization}
 
 This information is taken from \cite{DanielSaunders2017}.
 
