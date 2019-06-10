@@ -1,0 +1,51 @@
+% -*- TeX -*- -*- UK -*- -*- Soft -*-
+
+
+\part{Evolutionary Algorithms}
+
+\chapter{Evolutionary Algorithms Overview}
+\label{chap:EvolAlgoOverview}
+
+
+\section{Introduction}
+
+``In artificial intelligence, an \ac{EAlg} is a subset of evolutionary computation, a generic population-based metaheuristic optimization algorithm. An EA uses mechanisms inspired by biological evolution, such as reproduction, mutation, recombination, and selection. Candidate solutions to the optimization problem play the role of individuals in a population, and the fitness function determines the quality of the solutions. Evolution of the population then takes place after the repeated application of the above operators.
+
+``Evolutionary algorithms often perform well approximating solutions to all types of problems because they ideally do not make any assumption about the underlying fitness landscape.  In most real applications of EAs, computational complexity is a prohibiting factor. In fact, this computational complexity is due to fitness function evaluation. Fitness approximation is one of the solutions to overcome this difficulty. However, seemingly simple EA can solve often complex problems; therefore, there may be no direct link between algorithm complexity and problem complexity.''\cite{WikipeadiaEvolutionaryAlgo2019}
+
+\section{Overview}
+
+The information in this section is taken from \cite{DevinSoni2018}.
+
+Evolutionary algorithms are a heuristic-based approach to solving problems that cannot be easily solved in polynomial time, such as classically NP-Hard problems, and anything else that would take far too long to exhaustively process. When used on their own, they are typically applied to combinatorial problems; however, genetic algorithms are often used in tandem with other methods, acting as a quick way to find a somewhat optimal starting place for another algorithm to work off of.
+
+The premise of an evolutionary algorithm (to be further known as an EA) is quite simple given that you are familiar with the process of natural selection. An EA contains four overall steps: initialization, selection, genetic operators, and termination. These steps each correspond, roughly, to a particular facet of natural selection, and provide easy ways to modularize implementations of this algorithm category. Simply put, in an EA, fitter members will survive and proliferate, while unfit members will die off and not contribute to the gene pool of further generations, much like in natural selection.
+
+\begin{marginfigure}
+\includegraphics{GA-overview}
+\end{marginfigure}
+
+We generally define the problem as such: we wish to find the best combination of elements that maximizes some fitness function, and we will accept a final solution once we have either ran the algorithm for some maximum number of iterations, or we have reached some fitness threshold. This scenario is clearly not the only way to use an EA, but it does encompass many common applications in the discrete case
+
+\subsection{Initialization}
+In order to begin our algorithm, we must first create an initial population of solutions. The population will contain an arbitrary number of possible solutions to the problem, oftentimes called members. It will often be created randomly (within the constraints of the problem) or, if some prior knowledge of the task is known, roughly centered around what is believed to be ideal. It is important that the population encompasses a wide range of solutions, because it essentially represents a gene pool; ergo, if we wish to explore many different possibilities over the course of the algorithm, we should aim to have many different genes present.
+
+\subsection{Selection}
+Once a population is created, members of the population must now be evaluated according to a fitness function. A fitness function is a function that takes in the characteristics of a member, and outputs a numerical representation of how viable of a solution it is. Creating the fitness function can often be very difficult, and it is important to find a good function that accurately represents the data; it is very problem-specific. Now, we calculate the fitness of all members, and select a portion of the top-scoring members.
+
+\subsection{Multiple objective functions}
+EAs can also be extended to use multiple fitness functions. This complicates the process somewhat, because instead of being able to identify a single optimal point, we instead end up with a set of optimal points when using multiple fitness functions. The set of optimal solutions is called the Pareto frontier, and contains elements that are equally optimal in the sense that no solution dominates any other solution in the frontier. A decider is then used to narrow the set down a single solution, based on the context of the problem or some other metric.
+
+
+\begin{marginfigure}
+\includegraphics{GA-pareto-frontier}
+\end{marginfigure}
+
+
+\subsection{Genetic Operators}
+This step really includes two sub-steps: crossover and mutation. After selecting the top members (typically top 2, but this number can vary), these members are now used to create the next generation in the algorithm. Using the characteristics of the selected parents, new children are created that are a mixture of the parents’ qualities. Doing this can often be difficult depending on the type of data, but typically in combinatorial problems, it is possible to mix combinations and output valid combinations from these inputs. Now, we must introduce new genetic material into the generation. If we do not do this crucial step, we will become stuck in local extrema very quickly, and will not obtain optimal results. This step is mutation, and we do this, quite simply, by changing a small portion of the children such that they no longer perfectly mirror subsets of the parents’ genes. Mutation typically occurs probabilistically, in that the chance of a child receiving a mutation as well as the severity of the mutation are governed by a probability distribution.
+
+\subsection{Termination}
+Eventually, the algorithm must end. There are two cases in which this usually occurs: either the algorithm has reached some maximum runtime, or the algorithm has reached some threshold of performance. At this point a final solution is selected and returned.
+
+

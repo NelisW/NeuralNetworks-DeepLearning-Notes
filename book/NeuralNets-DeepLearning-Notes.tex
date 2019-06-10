@@ -186,10 +186,13 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % files making up this document
 
-\includeonly{cf00,c00,c01,c02,c03,c04,c05,c06,c07,c08,c09,c10,c11,c12,c13,
-c0a,c0b,c0c,c0d,cbib}
+\includeonly{cf00,c00,c01,c02,c03,c04,c05,c06,c07
+,c08,c09,c10,c11,c12,c13
+,c0a,c0b,c0c,c0d,cbib
+,p04c01,p04c01,p04c01}
 
-\includeonly{c0d}
+\includeonly{p04c01}
+%\includeonly{cf00}
 
 % Generates the index
 \usepackage{makeidx}
@@ -199,7 +202,8 @@ c0a,c0b,c0c,c0d,cbib}
 
 
 \include{cf00} % front matter
-\part{Neural Networks and Deep Learning: Michael Nielsen}
+
+%\part{Neural Networks and Deep Learning: Michael Nielsen}
 \include{c00} % Nielsen front matter
 \include{c01} %[[Done]] Neural Nets Recognizing Handwritten Digits 
 \include{c02} %[[Done]] How the Backpropagation Algorithm Works 
@@ -208,19 +212,27 @@ c0a,c0b,c0c,c0d,cbib}
 \include{c05} %Why are deep neural networks hard to train?
 \include{c06} %deep learning
 \include{c07} %[Partly done] algorithm for intelligence?   
-\part{Study Notes: Nelis Willers}
+
+%\part{Study Notes: Nelis Willers}
 \include{c08} % biological systems
 \include{c09} %visualising classifiers
 \include{c10} %Activation Functions
 \include{c11} %data preparation
 \include{c12} %loss functions
 \include{c13} %Regularization
-\part{Supplementary Notes}
+
+%\part{Supplementary Notes}
 \include{c0a} %Environment Setup
 \include{c0b} %Python and Jupyter Code
 \include{c0c} % google colab
 \include{c0d} % underfitting and overfitting
-\include{cbib} %[[Done]] bibliography   
 
+%\part{Evolutionary Algorithms}
+\include{p04c01} % Introduction
+\include{p04c02} % DEAP
+\include{p04c03} % Examples
+
+%\part{Reference}
+\include{cbib} %[[Done]] bibliography   
 
 \end{document}
