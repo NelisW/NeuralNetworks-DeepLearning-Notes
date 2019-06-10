@@ -15,7 +15,9 @@
 
 \section{Overview}
 
-The information in this section is taken from \cite{DevinSoni2018}.
+The information in this section is taken from \cite{DevinSoni2018,skymind2019}.
+
+Genetic and evolutionary algorithms approach mathematical optimization (how do I maximize or minimize a certain value?) in similar ways. What they have in common are ideas drawn from biology: natural selection, reproduction and genetic mutation.
 
 Evolutionary algorithms are a heuristic-based approach to solving problems that cannot be easily solved in polynomial time, such as classically NP-Hard problems, and anything else that would take far too long to exhaustively process. When used on their own, they are typically applied to combinatorial problems; however, genetic algorithms are often used in tandem with other methods, acting as a quick way to find a somewhat optimal starting place for another algorithm to work off of.
 
@@ -33,6 +35,10 @@ In order to begin our algorithm, we must first create an initial population of s
 \subsection{Selection}
 Once a population is created, members of the population must now be evaluated according to a fitness function. A fitness function is a function that takes in the characteristics of a member, and outputs a numerical representation of how viable of a solution it is. Creating the fitness function can often be very difficult, and it is important to find a good function that accurately represents the data; it is very problem-specific. Now, we calculate the fitness of all members, and select a portion of the top-scoring members.
 
+The process of natural selection kills living beings that are unfit for their environments, while those more suited to that environment, by definition, survive and reproduce more prolifically. Thus, those individuals who survived long enough to breed successfully were “selected” by nature, which imposes a rough filter of predators and toxins on the organisms within it, and cuts many threads short. The value these individuals are maximizing is their number of descendents, or copies of their genes circulating in the gene pool.
+
+
+
 \subsection{Multiple objective functions}
 EAs can also be extended to use multiple fitness functions. This complicates the process somewhat, because instead of being able to identify a single optimal point, we instead end up with a set of optimal points when using multiple fitness functions. The set of optimal solutions is called the Pareto frontier, and contains elements that are equally optimal in the sense that no solution dominates any other solution in the frontier. A decider is then used to narrow the set down a single solution, based on the context of the problem or some other metric.
 
@@ -45,7 +51,30 @@ EAs can also be extended to use multiple fitness functions. This complicates the
 \subsection{Genetic Operators}
 This step really includes two sub-steps: crossover and mutation. After selecting the top members (typically top 2, but this number can vary), these members are now used to create the next generation in the algorithm. Using the characteristics of the selected parents, new children are created that are a mixture of the parents’ qualities. Doing this can often be difficult depending on the type of data, but typically in combinatorial problems, it is possible to mix combinations and output valid combinations from these inputs. Now, we must introduce new genetic material into the generation. If we do not do this crucial step, we will become stuck in local extrema very quickly, and will not obtain optimal results. This step is mutation, and we do this, quite simply, by changing a small portion of the children such that they no longer perfectly mirror subsets of the parents’ genes. Mutation typically occurs probabilistically, in that the chance of a child receiving a mutation as well as the severity of the mutation are governed by a probability distribution.
 
+\newthought{Crossover}
+When two animals breed, they mix their genes, and those mixed genes are expressed in the child, a new organism. That child represents a genetic experiment in a sense, a test of the world’s environment that a species conducts ever so slowly, one brood at a time. If the new genetic mix is successful, the child’s genes are propagated to its descendents, and so on to theirs ad infinitum (barring radical changes in the environment). In organisms like humans, reproduction mixes the two halves of a diploid chromosome, one contributed by each parent. Crossover, or recombination, is something different that happens when biological organisms produce gametes (sperm, eggs) whose chromosomes will join in the child. The process of creating gametes is called meiosis, and during meiosis, the chromosomes that are being copied and separated during the cell division swap certain portions of their genes. Bits of genetic information are exchanged for other bits of genetic information stored on a sister chromosome, and an utterly novel sequence of genes is created, which manifests in a more varied species. The builders of genetic algorithms mimic this process to create variation in the parameters of the algorithms tested, swapping digital bits instead of genetic ones.
+
+\newthought{Mutation}
+
+As genes are copied and relayed from one generation to the next, mutations creep in. The genes’ order might be misread, and one piece of genetic information substituted for another. From one perspective, mutations look like mistakes, and many indeed lead to the death or impairment of the organism. From another perspective, mutations allow a species to explore the space of all possible genetic combinations, and in so doing, they show whether or not a totally new combination of genes is better than anything that was born before. Mutations ensure diversity, which itself is a hedge that populations make against disease. Mutations also support the continued exploration of a large combinatorial (and undifferentiable) problem, which is especially important given that environments change,1 and those changes can kill off a stagnant and homogeneous species, or favor a novel mutation in its ranks.
+
+Genetic variation emerges due to damaged DNA, transposition, errors in DNA replication, broken DNA repair processes and recombination; in algorithms, it results from deliberate point mutations in parameters (e.g. random-number generation), as well as crossover.
+
+
 \subsection{Termination}
 Eventually, the algorithm must end. There are two cases in which this usually occurs: either the algorithm has reached some maximum runtime, or the algorithm has reached some threshold of performance. At this point a final solution is selected and returned.
 
+\subsection{Genetic and Evolutionary Algorithms}
+Genetic and evolutionary algorithms apply the above ideas to mathematical functions. You could say that a genetic algorithm is like a species. It spawns many singular and unique variations of itself, and those variations are like moth children doomed to be tested against the rigors of the environment. While the environment in real life tests many things about an organism – strength, intelligence, emotional IQ, fashion sense – with algorithms, we usually have a single measure of performance: how well an individual instance does with a so-called fitness function. Fitness is a measure of how well an algorithm performs against its predictive goal. 
 
+Given some process, a genetic algorithm would begin by randomly generating a group of inputs to the process, with values that are clearly unsuited to the data at hand. Those randomly generated inputs results in outputs which  are then evaluated in terms of the fitness function to calculate their total error. And the input parameters with the least output error are selected, to create new functions for the next test. Those winning algorithms are recombined; e.g., you mix the parameters of the one with the other. And with several of them, you may introduce mutations; i.e. variations on the fittest parameters, increasing or decreasing them with the purpose of testing the mutated variety.
+
+Spawn, cull, reproduce and mutate: That cycle is repeated until the function surpasses a threshold of  acceptable fitness.
+
+You can use almost any process algorithm within the testing apparatus of a genetic algorithm, which is really just a search algorithm. For example, you can swap in neural networks, and seek the best structure or hyperparameters for the neural net; i.e. those that allow it to learn the most quickly.
+
+One of the possible advantages of evolutionary algorithms over neural networks, at least for some problems, is that they do not require gradients; i.e. evolutionary algorithms can explore a parameter space in order to decrease error without depending on backpropagation and differentiation that relates those weights to the error. This is important in environments where reward signals may be sparse and dependencies remote, or when you’re dealing with discrete parameters, similar to genes, rather than continuous curves.
+
+
+
+\TBC{TBC}
