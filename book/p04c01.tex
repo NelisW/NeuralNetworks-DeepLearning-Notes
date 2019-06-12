@@ -9,14 +9,36 @@
 
 \section{Introduction}
 
+
+``Algorithms that try to find the global optimum can be classified into two categories:
+exact, and heuristic. Exact methods guarantee the optimal solution will be found for a given optimization problem, and they are the preferred method if they can solve an optimization problem with an effort that grows polynomially with the problem size. On the other hand, problems that are NP-hard  need exponential effort and even medium-sized problems often become intractable and can not be solved any more using this methods. In order to overcome such limitations heuristic methods can be applied. Heuristics can not guarantee that an optimal solution will be found, but can provide acceptable approximate (also optimal) solutions in a reasonable time. Among the basic heuristic methods we can distinguish between constructive and local search methods. Constructive algorithms generate solutions by adding to an originally empty partial solution components until a solution is complete. On the other hand, local search methods start from an initial solution and iteratively
+try to improve it, with a better solution in a defined neighbourhood of the current solution. The following  figure shows an overview of the different optimization approaches''
+\cite{Lindquist2017}.
+
+
+\begin{figure*}[tph]
+\includegraphics[width=.6\textwidth]{globalsearchmethods}
+\caption{Global optimization approaches}
+\label{fig:globalsearchmethods}
+\end{figure*}
+
+
 ``In artificial intelligence, an \ac{EAlg} is a subset of evolutionary computation, a generic population-based metaheuristic optimization algorithm. An EA uses mechanisms inspired by biological evolution, such as reproduction, mutation, recombination, and selection. Candidate solutions to the optimization problem play the role of individuals in a population, and the fitness function determines the quality of the solutions. Evolution of the population then takes place after the repeated application of the above operators.
 
 ``Evolutionary algorithms often perform well approximating solutions to all types of problems because they ideally do not make any assumption about the underlying fitness landscape.  In most real applications of EAs, computational complexity is a prohibiting factor. In fact, this computational complexity is due to fitness function evaluation. Fitness approximation is one of the solutions to overcome this difficulty. However, seemingly simple EA can solve often complex problems; therefore, there may be no direct link between algorithm complexity and problem complexity.''\cite{WikipeadiaEvolutionaryAlgo2019}
 
 Genetic Algorithm was developed by John Holland in 1975. It was shown that it can be used to solve an optimization problem by his student Goldberg, who used genetic algorithms to control gas pipeline transmission. Since then, genetic algorithms have remained popular, and have inspired various other evolutionary programs \cite{Mathur2019}.
 
-
 Genetic algorithms offer some intriguing advantages and can produce results when the tradition gradient-based approaches fail \cite{Mathur2019}:
+
+A genetic algorithm is like a species. It spawns many singular and unique variations of itself, and those variations are like moth children doomed to be tested against the rigours of the environment. While the environment in real life tests many things about an organism --- strength, intelligence, emotional IQ, fashion sense --- with algorithms, we usually have a single measure of performance: how well an individual instance does with a so-called fitness function. Fitness is a measure of how well an algorithm performs against its predictive goal. 
+
+Given some process, a genetic algorithm would begin by randomly generating a group of inputs to the process, with values that are clearly unsuited to the data at hand. Those randomly generated inputs results in outputs which  are then evaluated in terms of the fitness function to calculate their total error. And the input parameters with the least output error are selected, to create new functions for the next test. Those winning algorithms are recombined; e.g., you mix the parameters of the one with the other. And with several of them, you may introduce mutations; i.e. variations on the fittest parameters, increasing or decreasing them with the purpose of testing the mutated variety.
+
+Spawn, cull, reproduce and mutate: That cycle is repeated until the function surpasses a threshold of  acceptable fitness.
+
+You can use almost any process algorithm within the testing apparatus of a genetic algorithm, which is really just a search algorithm. For example, you can swap in neural networks, and seek the best structure or hyperparameters for the neural net; i.e. those that allow it to learn the most quickly.
+
 
 Advantages:
 \begin{enumerate}
@@ -49,15 +71,16 @@ Despite the previously mentioned advantages, we still do not find genetic algori
 \section{Overview: Biological }
 \TBC{TBC}
 
-\section{Overview: EA Computation}
+
+
+
+\section{Evolutionary Computation}
 
 The information in this section is taken from \cite{DevinSoni2018,skymind2019,Song2016}.
-
 
 Genes are Basic instructions for building an organism. Genes are located in chromosomes as sequential form, where each gene represents a specific trait of the organism.
 
 The search space contains \lstinline{Populations} that are collections of \lstinline{Individuals} (the equivalent of a biological chromosome).  Each individual (chromosome) is composed of genes, with each gene describing some trait or property.
-
 
 
 Genetic and evolutionary algorithms approach mathematical optimization (how do I maximize or minimize a certain value?) in similar ways. What they have in common are ideas drawn from biology: natural selection, reproduction and genetic mutation.
@@ -72,27 +95,176 @@ The premise of an evolutionary algorithm (to be further known as an EA) is quite
 
 We generally define the problem as such: we wish to find the best combination of elements that maximizes some fitness function, and we will accept a final solution once we have either ran the algorithm for some maximum number of iterations, or we have reached some fitness threshold. This scenario is clearly not the only way to use an EA, but it does encompass many common applications in the discrete case
 
-The process generally plays out as follows:
+The common underlying idea behind all evolutionary computation techniques is the same\cite{Eiben2015}:
+\begin{enumerate}
+\begin{marginfigure}
+\includegraphics{eibenGA01}
+\end{marginfigure}
+
+\item given a population of somewhat random individuals,
+
+\item the environmental pressure causes natural selection (survival of the fittest), which causes a rise in the fitness of the population.
+
+\item Given a quality function to be optimized, we can randomly create a set of candidate solutions, i.e., elements of the function's domain, and apply the quality function as an abstract fitness measure---the higher the better.
+
+\item Based on this fitness, some of the better candidates are chosen to seed the next generation by applying recombination and/or mutation to them. Recombination is an operator applied to two or more selected candidates (the so-called parents) and results one or more new candidates (the offspring/children).
+
+\item Mutation is applied to one candidate and results in one new candidate.
+
+\item Executing recombination and mutation leads to a set of new candidates (the offspring) that compete Based on their fitness (and possibly age) --- with the old ones for a place in the next generation.
+
+\item This process can be iterated until a candidate with sufficient quality (a solution) is found or a previously set computational limit is reached.
+\end{enumerate}
+
+In this process there are two primary but opposing forces at work: (1) Variation operators (crossover and mutation) that create diversity and novelty in an increasing population, and (2)  selection of parents and children by fitness, which decreases population and diversity, attempting adaptation/evolution towards an optimised solution.
+
+Note that many components of such an evolutionary process are stochastic. During selection, fitter individuals have a higher chance to be selected than less fit ones, but typically even the weak individuals have a chance to become a parent or to survive. For recombination of individuals the choice of which pieces will be recombined is random. Similarly for mutation, the pieces that will be mutated within a candidate solution, and the new pieces replacing them, are chosen randomly. The randomness brings diversity, whereas the fitness tests try to ensure coherency towards the improved-fit solutions.   In an ill-designed GA the randomness may prevent convergence and even after many generations the solution may still be weak or suboptimal. For this reason it is important to really understand the tools available and make the correct choices when designing the experiment.
+
+
+
+
+
+\section{Genotype, Phenotype and Genetic Representation}
+
+
+Eiben describes the \cite{Eiben2015} roles and relationships between genotype and phenotype as follows:
+\begin{enumerate}
+\item
+The first step in defining an EA is to link the problem context to the computation context, that is, to set up a bridge between the two.
+
+Objects forming possible solutions within the problem context are referred to as pheno-types, while their corresponding objects in the computational context are called genotypes.
+
+\begin{marginfigure}
+\includegraphics{eibenGA02}
+\end{marginfigure}
+\item
+Phenotypes are the candidate solutions (individuals) existing the problem space (the real-world space).
+
+Fitness evaluation takes place in phenotype space
+
+\item
+Genotypes are the experimental solutions (individuals) existing the computational. 
+Searching for desired individuals takes place in genotype space.
+\begin{marginfigure}
+\includegraphics{eibenGA03}
+\end{marginfigure}
+
+In order to find the global optimum, every feasible solution must be represented in genotype space.
+
+\item
+The representation is the mapping between phenotypes and genotypes. This means designing the genotype data structure to effectively describe the phenotype. 
+
+Sometimes producing the phenotype from the genotype is a simple and obvious process.  Other times the
+genotype might be a set of parameters to some algorithm, which works on the problem data to produce the phenotype
+
+\item
+The representation must be invertible because the crossover and mutation take place in genotype space, but the individual's genes must be expressed in phenotype space in order to calculate the fitness of the proposed genotype.
+
+Mapping between the two contexts is defined as follows:
+\begin{enumerate}
+
+\item
+Encoding : phenotype $\rightarrow$ genotype (not necessarily one to one)
+
+\item
+Decoding : genotype$\rightarrow$  phenotype (must be one to one)
+\end{enumerate}
+
+\end{enumerate}
+
+\begin{figure*}[tph]
+\includegraphics[width=.6\textwidth]{eibenGA04}
+\caption{Mapping phenotypes and genotypes}
+\label{fig:eibenGA04}
+\end{figure*}
+
+
+\newthought{Binary string encoding} is the original coding used by Holland, and remains most commonly used encoding in examples, but Eiben and Smith believes that most modern GAs use a more sophisticated coding. 
+Each chromosome encodes a binary (bit) string. Each bit in the string can represent some characteristics of the solution. Every bit string therefore is a solution but not necessarily the best solution. Another possibility is that the whole string can represent a number. The way bit strings can code differs from problem to problem. Binary encoding gives many possible chromosomes with a smaller number of alleles. On the other hand this encoding is not natural for many problems and sometimes
+corrections must be made after genetic operation is completed. Binary coded strings with 1s and 0s are mostly used. The length of the string depends on the accuracy.
+In this, (1) Integers are represented exactly, (2)  Finite number of real numbers can be represented, or (3)  Number of real numbers represented increases with string length\cite{Sivanandam2007}.
+
+\newthought{Number string encoding}
+Chromosomes can be encoded as strings of values in any base: binary, octal, decimal, ASCII ordinal numbers, etc.  The values in this string have the meaning of magnitude but have no sequence or index meaning.
+
+\newthought{permutation encoding} where chromosomes can be encoded as a string of numbers 
+where the number represents and index or location in an ordered sequence.  Most sequences use integers that start at one or zero and increment in contiguous manner up to the end index in the sequence. In most sequences there should be no 'missing numbers' or the same number must not be used twice.
+This implies that the crossover and mutation algorithms must comply with the indexing requirements.
+For example, mutation and crossover may not result in the same index value being used twice, or end up with missing index values.
+Permutation encoding is used in the travelling salesman problem, where the number represents a city and the ordering of the numbers specifies the visiting order.
+
+\newthought{Value string encoding}
+Every chromosome is a string of values: from numbers, real numbers or chars to some complicated objects, where the use of binary encoding would be very difficult.  The values can be anything connected to the problem. This encoding produces best results for some special problems. On the other hand, it is often necessary to develop new genetic crossover or mutation operators specific to the problem. 
+
+\newthought{Tree encoding}
+This encoding is mainly used for evolving program expressions for genetic programming.
+Every chromosome is a tree of some objects such as functions and commands
+of a programming language.
+
+\newthought{Approaches to code selection:} 
+Early GA work used binary representation with complex decoding and encoding procedures. Furthermore, when executing crossover and mutation, the algorithms must understand the structure encoded in the binary string (if such encoding is used). Modern GA work uses the most appropriate data structure (floating point numbers, structures, etc.), but the requirement still remains that the crossover and mutation algorithms must be able to understand and process the genotype.
+
+
+Generalised from \cite{Husbands2007} (this was originally written for evolutionary computing for music):
+The structures making up the population, the artificial genotypes, are usually strings
+of numbers or symbols that represent solutions to the problem at hand. They might be
+a string of real numbers that are the parameters or groups of parameters controlling some aspect of the process
+Complex encodings involving mixtures of numbers, symbols, rules and other
+data structures have also been successfully used. It is also possible to use a fairly simple genotype in
+combination with a complex decoding scheme to translate it into the phenotype.
+Rather indirect routes to the end goal can be taken. For instance, the genotype may
+specify the design of a process, or abstract machine, which is then run to generate the
+end product of interest. The genotypes can be of a fixed length
+or, where appropriate, they can be allowed to grow and shrink. The great flexibility
+available in designing a suitable representation is one of the major advantages over
+more traditional methods afforded by the EA framework. However, not all
+representations for a given problem will be equally good. In some cases the
+representation to use is fairly obvious and straightforward (e.g. a string of numbers
+acting as the parameters of a well defined process or design), in others it may not be
+so clear. The representation defines the genotype space through which the EA
+searches looking for a combination of genes that defines a sufficiently fit phenotype.
+If the representation is badly designed the space may become impossibly convoluted
+and too difficult to search with any efficiency, rendering the EA useless. 
+
+\section{Populations, Individuals, Genes and Alleles}
+
+Starting at the macro level and zooming in to micro level the objects are related as follows:
 
 \begin{enumerate}
-\item Randomly initialize population(t)
+\item Population: The population is a multiset of genotype individuals, i.e., repetitions are possible.
+The population is the basic unit of evolution, the population is evolving, not the individuals.
+Selection operators act on population level, in genotype space.
 
-\item Evaluate fitness of population(t)
+All the words in a book is a population.
 
-\item Repeat
-\begin{enumerate}
-\item Select parents from population(t)
+\item Individual:
+An individual comprises a collection of genes, and can be expressed in genotype space or phenotype space, by its representation rules.
 
-\item Perform crossover on parents creating population(t+1)
+Fitness evaluation takes place in phenotype space, for one individual at a time.
 
-\item  Perform Mutation of population(t+1)
+Variation operators (crossover and mutation) act on individual level in genotype space.
 
-\item Evaluate fitness of population(t+1)
+Crossover requires two (normally two, but can be more) individuals and produces one or more new individuals Crossover may or may not (elitist algorithm) remove the parents from the population. Watch out for bloating, where the population grows too large.
+
+Mutation requires one individual and produces one individual, where the original individual is destroyed.  
+
+One word found in a book is an individual.
+
+\item Gene:
+The gene encodes one (or more) characteristics of an individual. Depending on the nature of the problem a genetype may have more than one instance in the individual, but its meaning is separately significant for each instant. 
+
+The letters in a word can be considered the genes the word.
+
+
+\item Allele:
+An allele is one of the possible variational values that a gene can have --- so its relationship to a gene is just like that of a specific value to a variable in mathematics. 
+There is an allele to describe a specific variation of the gene.
+
+The letters' allele will be one or more of the letters in the set called the alphabet.
 \end{enumerate}
-\item Until best individual is good enough
-\end{enumerate}
 
 
+\section{Steps in Evolutionary Computation}
 \subsection{Initialization}
 In order to begin our algorithm, we must first create an initial population of solutions. The population will contain an arbitrary number of possible solutions to the problem, oftentimes called members. It will often be created randomly (within the constraints of the problem) or, if some prior knowledge of the task is known, roughly centered around what is believed to be ideal. It is important that the population encompasses a wide range of solutions, because it essentially represents a gene pool; ergo, if we wish to explore many different possibilities over the course of the algorithm, we should aim to have many different genes present.
 
@@ -140,16 +312,62 @@ attempts to avoid getting stuck in local minima in the search space.
 Eventually, the algorithm must end. There are two cases in which this usually occurs: either the algorithm has reached some maximum runtime, or the algorithm has reached some threshold of performance. At this point a final solution is selected and returned.
 
 \subsection{Genetic and Evolutionary Algorithms}
-Genetic and evolutionary algorithms apply the above ideas to mathematical functions. You could say that a genetic algorithm is like a species. It spawns many singular and unique variations of itself, and those variations are like moth children doomed to be tested against the rigors of the environment. While the environment in real life tests many things about an organism – strength, intelligence, emotional IQ, fashion sense – with algorithms, we usually have a single measure of performance: how well an individual instance does with a so-called fitness function. Fitness is a measure of how well an algorithm performs against its predictive goal. 
 
-Given some process, a genetic algorithm would begin by randomly generating a group of inputs to the process, with values that are clearly unsuited to the data at hand. Those randomly generated inputs results in outputs which  are then evaluated in terms of the fitness function to calculate their total error. And the input parameters with the least output error are selected, to create new functions for the next test. Those winning algorithms are recombined; e.g., you mix the parameters of the one with the other. And with several of them, you may introduce mutations; i.e. variations on the fittest parameters, increasing or decreasing them with the purpose of testing the mutated variety.
-
-Spawn, cull, reproduce and mutate: That cycle is repeated until the function surpasses a threshold of  acceptable fitness.
-
-You can use almost any process algorithm within the testing apparatus of a genetic algorithm, which is really just a search algorithm. For example, you can swap in neural networks, and seek the best structure or hyperparameters for the neural net; i.e. those that allow it to learn the most quickly.
-
-One of the possible advantages of evolutionary algorithms over neural networks, at least for some problems, is that they do not require gradients; i.e. evolutionary algorithms can explore a parameter space in order to decrease error without depending on backpropagation and differentiation that relates those weights to the error. This is important in environments where reward signals may be sparse and dependencies remote, or when you’re dealing with discrete parameters, similar to genes, rather than continuous curves.
 
 
 
 \TBC{TBC}
+
+
+
+
+
+\section{Strategies and Pitfalls}
+
+GAs (Genetic Algorithms) and GP (Genetic Programming) are investigated
+for finding robust Technical Trading Strategies (TTSs). TTSs evolved with
+standard GA/GP techniques tend to suffer from over-fitting as the solutions
+evolved are very fragile to small disturbances in the data. The main objective
+of this thesis is to explore optimization techniques for GA/GP which
+produce robust TTSs that have a similar performance during both optimization
+and evaluation, and are also able to operate in all market conditions
+and withstand severe market shocks \cite{Lindquist2017}.
+
+
+
+
+We employ an elitist $\mu + \lambda$ evolutionary process where from $\mu$ parents we
+generate $\lambda$ offspring and the best individuals from both $\lambda$ and $\mu$ form the
+population of the next generation.  $\mu + \lambda$ has the advantage of not losing
+the best solutions during evolution as they are never replaced by inferior
+individuals \cite{Lindquist2017}.
+
+
+If the genes are floating point and initially randomly valued, any uniform crossover swapping will not change the randomness of the chromosomes is maintained and no new information is added to the chromosome.
+The problem with these point crossover methods is that no new information
+is introduced: each continuous value that was randomly initiated in the initial
+population is propagated to the next generation, only in different combinations.
+Although this strategy worked fine for binary representations, there is
+now a continuum of values, and in this continuum we are merely interchanging
+two data points. These approaches totally rely on mutation to introduce
+new genetic material.
+The blending methods remedy this problem by finding ways to combine
+variable values from the two parents into new variable values in the offspring.
+A single offspring variable value, $p_{new}$, comes from a combination of the two
+corresponding offspring variable values $p_{\text {new}}=\beta p_{m n}+(1-\beta) p_{d n}$,
+where $\beta$ is a random number on the interval [0,1] and the two genes are the nth variable in the father and mother chromosomes.
+When $\beta$ = 0.5 the result is an average of the variables of the two
+parents.This method is demonstrated to work well on several interesting problems.
+These blending
+methods effectively combine the information from the two parents and
+choose values of the variables between the values bracketed by the parents;
+however, they do not allow introduction of values beyond the extremes
+already represented in the population. To do this requires an extrapolating
+method.  For more information see Chapter~3 in \cite{Haupt2004}.
+
+
+
+
+%A place-holder is commonly called a variable, a locus (plural: loci), a position, or in a biology-oriented terminology a gene. An object on such a place can be called a value or an allele. Alternatively, chromosomes contain genes, which are in (usually fixed) positions called loci (sing. locus) and have a value (allele)
+
+%One of the possible advantages of evolutionary algorithms over neural networks, at least for some problems, is that they do not require gradients; i.e. evolutionary algorithms can explore a parameter space in order to decrease error without depending on backpropagation and differentiation that relates those weights to the error. This is important in environments where reward signals may be sparse and dependencies remote, or when you’re dealing with discrete parameters, similar to genes, rather than continuous curves.
