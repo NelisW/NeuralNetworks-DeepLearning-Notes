@@ -226,6 +226,16 @@ searches looking for a combination of genes that defines a sufficiently fit phen
 If the representation is badly designed the space may become impossibly convoluted
 and too difficult to search with any efficiency, rendering the EA useless. 
 
+A good example of how complex genes can be represented is given in \cite{Biles2007}: 
+``As every EC practitioner knows, the design of a genetic representation (genotype)
+and its mapping into the actual problem domain (phenotype) is critical to the efficacious
+use of EC. This is certainly true in representing music. Two representational
+dimensions have emerged from the literature, one dealing with how to represent
+individual pitches and durations, and the other with how to represent sequences or
+other structures in chromosomes.'' Biles then goes on to describe the three approaches to representing note pitch and duration. In the description it is clearly evident that the representation algorithm should not only capture information at the absolute or simplest level (frequency and time). For the purpose of listening to music the relative pitch (i.e., semitones above or below the root signature key) is more relevant and perhaps more useful. A third approach includes the effect of both absolute (the chord root note) and the relative pitch. Each approach has its advantages. Biles then continues to describe \cite{Bilesb2007} how music sections are built up from phrases and measures.  His GenType system has a phrase population of 48 phrase individuals, where each phrase comprises four measure individuals.  The measure population has 64 measure individuals (six-bit string). Each measure individual has eight events, with each event having 16 values (coded in a four-bit string) that represent note selection and duration.
+It is evident that this GA has a very complex hierarchical representation, with three evolving populations.
+
+
 \section{Populations, Individuals, Genes and Alleles}
 
 Starting at the macro level and zooming in to micro level the objects are related as follows:
@@ -235,6 +245,7 @@ Starting at the macro level and zooming in to micro level the objects are relate
 The population is the basic unit of evolution, the population is evolving, not the individuals.
 Selection operators act on population level, in genotype space.
 
+Example: 
 All the words in a book is a population.
 
 \item Individual:
@@ -248,11 +259,15 @@ Crossover requires two (normally two, but can be more) individuals and produces 
 
 Mutation requires one individual and produces one individual, where the original individual is destroyed.  
 
+Creation of a chromosome in GA in many cases can be considered as the art \cite{Saenko2015}. In an ideal, the chromosome has to meet two requirements: (1) not to create 'senseless' individuals during the crossing and a mutation, (2) to provide the widest distribution of new descendants and mutations on area of possible decisions.
+
+Example: 
 One word found in a book is an individual.
 
 \item Gene:
-The gene encodes one (or more) characteristics of an individual. Depending on the nature of the problem a genetype may have more than one instance in the individual, but its meaning is separately significant for each instant. 
+The gene encodes one (or more) characteristics of an individual. Depending on the nature of the problem a genotype may have more than one instance in the individual, but its meaning is separately significant for each instant. 
 
+Example: 
 The letters in a word can be considered the genes the word.
 
 
@@ -260,7 +275,8 @@ The letters in a word can be considered the genes the word.
 An allele is one of the possible variational values that a gene can have --- so its relationship to a gene is just like that of a specific value to a variable in mathematics. 
 There is an allele to describe a specific variation of the gene.
 
-The letters' allele will be one or more of the letters in the set called the alphabet.
+Example: 
+The letters' allele will be the letters in the set called the alphabet.
 \end{enumerate}
 
 
@@ -298,6 +314,22 @@ Crossover is the process of taking more than one parent and producing offspring 
 By recombining portions of good individuals, the GA could perhaps create a better individual.
 Various methods for combining the parents (One-point Crossover, Edge Recombination, and many more).
 
+Crossover techniques can follow simple rules (as described above) or it can be sensitive to the context. 
+Biles describes \cite{Bilesb2007} the following crossover algorithm that makes sense in music: 
+\begin{lstlisting}
+At each of the seven potential crossover points (in 4/4 time)
+     Compute horizontal intervals that would result in both children
+     Return the smaller interval as ``fitness'' for that point
+If more than one crossover point has the same fitness
+    If breeding two of GenJam's measures
+        Select crossover point closest to the centre of the measure
+    If breeding a GenJam measure with a human measure
+        Select crossover point that maximizes the human's contribution
+Perform crossover at selected point.
+\end{lstlisting}
+Biles has similar crossover algorithms at phrase level. To some extent he has done the perfectly correct thing by  implementing some of the rules followed by composers, into the crossover algorithms.
+Clearly, this algorithm has very strong input from the context and also from an external rule set for legal or acceptable crossover.  It would seem that if the crossover follows some intelligent rules (in contrast to random bit switches) the GA should reach its goal quicker and perhaps more accurately.
+
 \newthought{Mutation}
 
 As genes are copied and relayed from one generation to the next, mutations creep in. The genes’ order might be misread, and one piece of genetic information substituted for another. From one perspective, mutations look like mistakes, and many indeed lead to the death or impairment of the organism. From another perspective, mutations allow a species to explore the space of all possible genetic combinations, and in so doing, they show whether or not a totally new combination of genes is better than anything that was born before. Mutations ensure diversity, which itself is a hedge that populations make against disease. Mutations also support the continued exploration of a large combinatorial (and undifferentiable) problem, which is especially important given that environments change,1 and those changes can kill off a stagnant and homogeneous species, or favour a novel mutation in its ranks.
@@ -307,6 +339,12 @@ Genetic variation emerges due to damaged DNA, transposition, errors in DNA repli
 With crossover, offspring can get good traits of its parents, but they can't get traits that parents don't possess.
 Offspring can have traits which their parents don't have by mutation.  Mutation encourages genetic diversity among individuals and
 attempts to avoid getting stuck in local minima in the search space.
+
+In Holland's original GA work, the genotypes were bit strings and mutation meant changing single bits randomly. 
+This naive approach can be made more sophisticated on many levels.
+ If the genotype representation only contains bit-structured data such as float numbers, changing a bit might not have the intended meaning or it may destroy the number completely.  In this case, a valid mutation would be to change the floating point number by some arithmetic operator or randomly replace it with another number. The newly mutated number must comply with the range of legal values for the gene.
+ A higher level mutation may apply a context-dependent mutation, such as conditional on another gene.  If the other gene has a certain value the mutation must comply with some condition, as Biles did for real-time music evolution as described in \cite{Bilesb2007}.
+\marginnote{Biles describes the following mutations that make sense in music: transpose down, reverse, rotate, sort new notes up, sort new notes down, invert, invert reverse, sequence phrase, lick thinner, and orphan phrase. These mutation are some of the tools available to the composer to create meaningful music, so it only makes sense to use these as mutation operators.}
 
 \subsection{Termination}
 Eventually, the algorithm must end. There are two cases in which this usually occurs: either the algorithm has reached some maximum runtime, or the algorithm has reached some threshold of performance. At this point a final solution is selected and returned.
