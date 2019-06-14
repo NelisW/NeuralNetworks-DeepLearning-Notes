@@ -179,6 +179,9 @@ Decoding : genotype$\rightarrow$  phenotype (must be one to one)
 \end{figure*}
 
 
+
+
+
 \newthought{Binary string encoding} is the original coding used by Holland, and remains most commonly used encoding in examples, but Eiben and Smith believes that most modern GAs use a more sophisticated coding. 
 Each chromosome encodes a binary (bit) string. Each bit in the string can represent some characteristics of the solution. Every bit string therefore is a solution but not necessarily the best solution. Another possibility is that the whole string can represent a number. The way bit strings can code differs from problem to problem. Binary encoding gives many possible chromosomes with a smaller number of alleles. On the other hand this encoding is not natural for many problems and sometimes
 corrections must be made after genetic operation is completed. Binary coded strings with 1s and 0s are mostly used. The length of the string depends on the accuracy.
@@ -202,8 +205,11 @@ Every chromosome is a tree of some objects such as functions and commands
 of a programming language.
 
 \newthought{Approaches to code selection:} 
-Early GA work used binary representation with complex decoding and encoding procedures. Furthermore, when executing crossover and mutation, the algorithms must understand the structure encoded in the binary string (if such encoding is used). Modern GA work uses the most appropriate data structure (floating point numbers, structures, etc.), but the requirement still remains that the crossover and mutation algorithms must be able to understand and process the genotype.
+Early GA work used binary representation with complex decoding and encoding procedures. Furthermore, when executing crossover and mutation, the algorithms must understand the structure encoded in the binary string (if such encoding is used). Modern GA work uses the most appropriate data structure (floating point numbers, structures, etc.), but the requirement still remains that the crossover and mutation algorithms must be able to 
+understand and process the genotype.
 
+Corne writes \cite{Corne2018} 
+``In common with other optimisation algorithms, most EAs are designed to work with and optimise vectors (or, equivalently, lists or arrays) of decision variables. Solutions to many kinds of problems can be represented, either directly or indirectly, in this form. However, EAs are not limited to working with vectors, and there are often advantages to working directly with representations that are more natural for the problem domain: for example, matrices, trees, graphs, rule sets, etc. Specialised initialisation routines and variation operators are used to randomly create, mutate and recombine instances of the appropriate solution representation.''
 
 Generalised from \cite{Husbands2007} (this was originally written for evolutionary computing for music):
 The structures making up the population, the artificial genotypes, are usually strings
@@ -235,6 +241,13 @@ individual pitches and durations, and the other with how to represent sequences 
 other structures in chromosomes.'' Biles then goes on to describe the three approaches to representing note pitch and duration. In the description it is clearly evident that the representation algorithm should not only capture information at the absolute or simplest level (frequency and time). For the purpose of listening to music the relative pitch (i.e., semitones above or below the root signature key) is more relevant and perhaps more useful. A third approach includes the effect of both absolute (the chord root note) and the relative pitch. Each approach has its advantages. Biles then continues to describe \cite{Bilesb2007} how music sections are built up from phrases and measures.  His GenType system has a phrase population of 48 phrase individuals, where each phrase comprises four measure individuals.  The measure population has 64 measure individuals (six-bit string). Each measure individual has eight events, with each event having 16 values (coded in a four-bit string) that represent note selection and duration.
 It is evident that this GA has a very complex hierarchical representation, with three evolving populations.
 
+
+In his PhD thesis on GA optimisation of trading Lindquist \cite{Lindquist2017} codes 19 decision variables structured into a vector of real numbers, where some numbers are integers requiring rounding.  These numbers served as thresholds and weights in the model.  
+The first two values corresponded with some aspect of the model, the next three with another aspect,  etc. In other words, the genes were coded as a succession of number sets, of different lengths, adding up to a total of 19 numbers. For all individuals the meaning of a number in the vector at a given index will always be the same. In terms of the model details, the numbers applicable to one aspect of the model always uses some fixed range of indices into the vector. Using bitwise uniform crossover, Lindquist then seems to blend parent individuals' vector values without considering the remaining values in the values' membership to its fixed index range. In other words, if one model required vector values in the range [3:7] he would change variable [5], without considering the values in [3:4,6-7].
+\begin{marginfigure}
+\includegraphics{GA-uniform-CX}
+\end{marginfigure}
+Mutation is done using the Matlab GA toolbox \textit{adapt feasible mutation} function. My understanding (very scant information available) of this algorithm is that, given that the parameter is an N-dimensional vector, a new vector is added to the present vector such that the magnitude is calculated from a Gaussian random generator and the direction is a randomly generated vector, subject that the variable's constraints are met. If the constraints are not met, new random vectors with (1) ever decreasing magnitudes, and (2) increasingly more directions, are tested until the constraints are met. Meeting the constraints means that the constraints along each dimension are met, but also that the magnitude (linear) constraint is met.
 
 \section{Populations, Individuals, Genes and Alleles}
 
@@ -283,6 +296,8 @@ The letters' allele will be the letters in the set called the alphabet.
 \section{Steps in Evolutionary Computation}
 \subsection{Initialization}
 In order to begin our algorithm, we must first create an initial population of solutions. The population will contain an arbitrary number of possible solutions to the problem, oftentimes called members. It will often be created randomly (within the constraints of the problem) or, if some prior knowledge of the task is known, roughly centered around what is believed to be ideal. It is important that the population encompasses a wide range of solutions, because it essentially represents a gene pool; ergo, if we wish to explore many different possibilities over the course of the algorithm, we should aim to have many different genes present.
+
+The DEAP \cite{DEAPDocs2019} overview page makes an important point:  ``Once the types are created you need to fill them with sometimes random values, sometime guessed ones. '' So, if you have some idea of a good starting point, mix your best-guess estimates with  additional random guesses, to start with a blended set.  If your guesses are good, the GA should start better, but the randomness brings in some diversity. \marginnote{In DEAP, construct a best-guess individual with a fitness function and then insert it into the population using \lstinline{pop.append(guess_ind)} or \lstinline{population.insert(0, guess_ind)}. }
 
 \subsection{Selection}
 Once a population is created, members of the population must now be evaluated according to a fitness function. A fitness function is a function that takes in the characteristics of a member, and outputs a numerical representation of how viable (goodness) of a solution it is in terms of the problem. Creating the fitness function can often be very difficult, and it is important to find a good function that accurately represents the data; it is very problem-specific. Fitness may be determined by an objective function or by
