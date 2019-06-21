@@ -374,34 +374,64 @@ Eventually, the algorithm must end. There are two cases in which this usually oc
 
 \subsection{Maximising or Minimising?}
 
-
-The data below demonstrates the problem with maximising optimisations using a simple fitness measure. It is evident that the best choice depends on the task at hand.
+Some real-world problem objectives are to achieve a maximum in the outcome The problem with optimizing towards a maximum in a population with many large values is that the large values will completely swamp (and therefore hide) any smaller or poor performing values. 
 
 \begin{lstlisting}
 (1) Maximising towards +infinity:
 [   1. 1000. 1000. 1000. 1000. 1000. 1000. 1000.] 
 mean=875.125 max=1000.0
+\end{lstlisting}
 
+Taking the inverse values, the mean value (0.13) is now significantly affected by the poor performing individual, and less so by the well performing individuals:
+\begin{lstlisting}
 (2) Minimising the inverse towards zero:
 [1.    0.001 0.001 0.001 0.001 0.001 0.001 0.001] 
 mean=0.13 max=1.0
+\end{lstlisting}
 
+
+The Matlab documentation and Wikipedia \cite{wikipediaMultiobjectiveoptimization2019} propose to negate the value and then maximise this negated value (find the value closes to zero). This would work where a single value is sought, such as the maximum of a function.
+This approach will not work when the ensemble performance is required, such as when acceptable performance from all samples are required, compared to he good performance of a single sample.
+
+\begin{lstlisting}
 (3) Minimising the negative towards zero:
 [   -1. -1000. -1000. -1000. -1000. -1000. -1000. -1000.] 
 mean=-875.12 max=-1.0
 \end{lstlisting}
+
+The data above demonstrates the problem with maximising optimisations using a simple fitness measure. It is evident that the best choice depends on the task at hand.
+
 \begin{enumerate}
 \item Maximising $f(x)$ towards $+\infty$ causes the (undesired) smaller outcomes to disappear in the mean and the maximum of the data set.  Neither the mean nor the max functions will optimise the low performers.
 
 \item  Minimising $f(1/x)$ towards 0 causes the (undesired) smaller outcomes to rise and have a much stronger effect than the outcomes of the well-performing outcomes (which disappears towards 0). Either the mean or the max functions will optimise the low performers.
 
-\item  Minimising $-f(x)$ towards 0 only works when using the minimise-towards-zero function, because the mean function swamps the low performer outcomes with large negative values.
+\item  Minimising $-f(x)$ towards 0 only works when using the minimise-towards-zero function on the individual values, because the mean function swamps the low performer outcomes with large negative values. The mean of all values should not be used in this case.
 
 \end{enumerate}
 
-The Matlab documentation and Wikipedia \cite{wikipediaMultiobjectiveoptimization2019} propose to use (3) to find the minimum-towards-zero of a function. This would work where a single value is sought, such as the maximum of a function.
-Option (3) will not work when the ensemble performance is required, such as when acceptable performance from all samples are required, compared to he good performance of a single sample. For ensemble performance, use (2), the inverse method.
+To find the single maximum value of a function, optimise the single values (not the mean).   For ensemble performance, use (2), the inverse method, and the mean of the values.
 
+So the objective should be to optimise towards the best fit (approaching zero value), so that the well performing solutions will have  lower impact on fitness.  It is proposed that most  real-world optimisations should employ some 'inverted' fitness measure. The simple mathematical reciprocal may not be the best choice, some work may be required to find a good measure.
+Irrespective of the exact mapping the effect should be inverse-related.
+On the assumption of an inverse fitness measure, we define the best match to approach zero, either on mean value or singular value.
+
+
+%# to investigate the minimising options
+%
+%a = np.ones(8)*1000
+%a[0] = 1
+%b = a
+%print('(1) Maximising towards +infinity:')
+%print(f'{b} \nmean={np.mean(b)} max={np.max(b)}\n')
+%
+%print('(2) Minimising the inverse towards zero:')
+%b = 1 / a
+%print(f'{b} \nmean={np.mean(b):.2f} max={np.max(b)}\n')
+%
+%print('(3) Minimising the negative towards zero:')
+%b = - a
+%print(f'{b} \nmean={np.mean(b):.2f} max={np.max(b)}\n')
 
 
 
