@@ -186,13 +186,17 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % files making up this document
 
-\includeonly{cf00,c00,c01,c02,c03,c04,c05,c06,c07
-,c08,c09,c10,c11,c12,c13,c14
-,c0a,c0b,c0c,c0d,cbib
-,p04c01,p04c02,p04c03}
+\includeonly{
+ p00c00
+,p01c00
+,p01c01,p01c02,p01c03,p01c04,p01c05,p01c06,p01c07
+,p02c01,p02c02,p02c03,p02c04,p02c05,p02c06,p02c07
+,p03c01,p03c02,p03c03,p03c04
+,p04c01,p04c02,p04c03
+,cbib}
 
 %\includeonly{c14}
-\includeonly{p04c01,cbib}
+%\includeonly{p04c01,cbib}
 %\includeonly{cf00}
 
 % Generates the index
@@ -202,32 +206,32 @@
 \begin{document}
 
 
-\include{cf00} % front matter
+\include{p00c00} % front matter
 
 %\part{Neural Networks and Deep Learning: Michael Nielsen}
-\include{c00} % Nielsen front matter
-\include{c01} %[[Done]] Neural Nets Recognizing Handwritten Digits 
-\include{c02} %[[Done]] How the Backpropagation Algorithm Works 
-\include{c03} %Improving the Way Neural Networks Learn 
-\include{c04} %[Partly done] A Visual Proof That Neural Nets Can Compute Any Function 
-\include{c05} %Why are deep neural networks hard to train?
-\include{c06} %deep learning
-\include{c07} %[Partly done] algorithm for intelligence?   
+\include{p01c00} % Nielsen front matter
+\include{p01c01} %[[Done]] Neural Nets Recognizing Handwritten Digits 
+\include{p01c02} %[[Done]] How the Backpropagation Algorithm Works 
+\include{p01c03} %Improving the Way Neural Networks Learn 
+\include{p01c04} %[Partly done] A Visual Proof That Neural Nets Can Compute Any Function 
+\include{p01c05} %Why are deep neural networks hard to train?
+\include{p01c06} %deep learning
+\include{p01c07} %[Partly done] algorithm for intelligence?   
 
 %\part{Study Notes: Nelis Willers}
-\include{c08} % biological systems
-\include{c09} %visualising classifiers
-\include{c10} %Activation Functions
-\include{c11} %data preparation
-\include{c12} %loss functions
-\include{c13} %Regularization
-\include{c14} %Gradient descent
+\include{p02c01} % biological systems
+\include{p02c02} %visualising classifiers
+\include{p02c03} %Activation Functions
+\include{p02c04} %data preparation
+\include{p02c05} %loss functions
+\include{p02c06} %Regularization
+\include{p02c07} %Gradient descent
 
 %\part{Supplementary Notes}
-\include{c0a} %Environment Setup
-\include{c0b} %Python and Jupyter Code
-\include{c0c} % google colab
-\include{c0d} % underfitting and overfitting
+\include{p03c01} %Environment Setup
+\include{p03c02} %Python and Jupyter Code
+\include{p03c03} % google colab
+\include{p03c04} % underfitting and overfitting
 
 %\part{Evolutionary Algorithms}
 \include{p04c01} % Introduction
