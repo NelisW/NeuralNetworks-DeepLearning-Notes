@@ -506,58 +506,90 @@ Why use the \lstinline{validation_data} to prevent overfitting, rather than the 
 Of course, that doesn't in any way answer the question of why we're using the \lstinline{validation_data} to prevent overfitting, rather than the \lstinline{test_data}. Instead, it replaces it with a more general question, which is why we're using the  \lstinline{validation_data} rather than the \lstinline{test_data} to set good hyper-parameters? To understand why, consider that when setting hyper-parameters we're likely to try many different choices for the hyper-parameters. If we set the hyper-parameters based on evaluations of the \lstinline{test_data} it's possible we'll end up overfitting our hyper-parameters to the \lstinline{test_data}. That is, we may end up finding hyper-parameters which fit particular peculiarities of the \lstinline{test_data}, but where the performance of the network won't generalize to other data sets. We guard against that by figuring out the hyper-parameters using the \lstinline{validation_data}. Then, once we've got the hyper-parameters we want, we do a final evaluation of accuracy using the \lstinline{test_data}. That gives us confidence that our results on the \lstinline{test_data} are a true measure of how well our neural network generalizes. To put it another way, you can think of the validation data as a type of training data that helps us learn good hyper-parameters. This approach to finding good hyper-parameters is sometimes known as the hold out method, since the  \lstinline{validation_data} is kept apart or ``held out'' from the \lstinline{training_data}.
 
 
-\begin{lstlisting}
+Now, in practice, even after evaluating performance on the \lstinline{test_data} we may change our minds and want to try another approach - perhaps a different network architecture - which will involve finding a new set of hyper-parameters. If we do this, isn't there a danger we'll end up overfitting to the \lstinline{test_data} as well? Do we need a potentially infinite regress of data sets, so we can be confident our results will generalize? Addressing this concern fully is a deep and difficult problem. But for our practical purposes, we're not going to worry too much about this question. Instead, we'll plunge ahead, using the basic hold out method, based on the \lstinline{training_data}, \lstinline{validation_data}, and \lstinline{test_data}, as described above.
 
-Now, in practice, even after evaluating performance on the \lstinline{test_data} we may change our minds and want to try another approach - perhaps a different network architecture - which will involve finding a new set of hyper-parameters. If we do this, isn't there a danger we'll end up overfitting to the \lstinline{test_data} as well? Do we need a potentially infinite regress of data sets, so we can be confident our results will generalize? Addressing this concern fully is a deep and difficult problem. But for our practical purposes, we're not going to worry too much about this question. Instead, we'll plunge ahead, using the basic hold out method, based on the training_data, validation_data, and \lstinline{test_data}, as described above.
 We've been looking so far at overfitting when we're just using 1,000 training images. What happens when we use the full training set of 50,000 images? We'll keep all the other parameters the same (30 hidden neurons, learning rate 0.5, mini-batch size of 10), but train using all 50,000 images for 30 epochs. Here's a graph showing the results for the classification accuracy on both the training data and the test data. Note that I've used the test data here, rather than the validation data, in order to make the results more directly comparable with the earlier graphs.
+\begin{marginfigure}
+\includegraphics{ch03-snip12}
+\end{marginfigure}
 
-As you can see, the accuracy on the test and training data remain much closer together than when we were using 1,000 training examples. In particular, the best classification accuracy of 97.86
-percent on the training data is only 2.53 percent higher than the 95.33 percent on the test data. That's compared to the 17.73
-percent gap we had earlier! Overfitting is still going on, but it's been greatly reduced. Our network is generalizing much better from the training data to the test data. In general, one of the best ways of reducing overfitting is to increase the size of the training data. With enough training data it is difficult for even a very large network to overfit. Unfortunately, training data can be expensive or difficult to acquire, so this is not always a practical option.
-Regularization
+As you can see, the accuracy on the test and training data remain much closer together than when we were using 1,000 training examples. In particular, the best classification accuracy of 97.86~percent on the training data is only 2.53 percent higher than the 95.33~percent on the test data. That's compared to the 17.73~percent gap we had earlier! Overfitting is still going on, but it's been greatly reduced. Our network is generalizing much better from the training data to the test data. In general, one of the best ways of reducing overfitting is to increase the size of the training data. With enough training data it is difficult for even a very large network to overfit. Unfortunately, training data can be expensive or difficult to acquire, so this is not always a practical option.
+
+
+\section{Regularization}
+
 Increasing the amount of training data is one way of reducing overfitting. Are there other ways we can reduce the extent to which overfitting occurs? One possible approach is to reduce the size of our network. However, large networks have the potential to be more powerful than small networks, and so this is an option we'd only adopt reluctantly.
-Fortunately, there are other techniques which can reduce overfitting, even when we have a fixed network and fixed training data. These are known as regularization techniques. In this section I describe one of the most commonly used regularization techniques, a technique sometimes known as weight decay or L2 regularization. The idea of L2 regularization is to add an extra term to the cost function, a term called the regularization term. Here's the regularized cross-entropy:
-C=?1n?xj[yjln$a^l_j$+(1?yj)ln(1?$a^l_j$)]+?2n?w$w_2$.(85)
-The first term is just the usual expression for the cross-entropy. But we've added a second term, namely the sum of the squares of all the weights in the network. This is scaled by a factor ?/2n
-, where ?>0 is known as the regularization parameter, and n is, as usual, the size of our training set. I'll discuss later how ?
-is chosen. It's also worth noting that the regularization term doesn't include the biases. I'll also come back to that below.
+
+Fortunately, there are other techniques which can reduce overfitting, even when we have a fixed network and fixed training data. These are known as \textit{regularization} techniques. In this section I describe one of the most commonly used regularization techniques, a technique sometimes known as \textit{weight decay} or \textit{L2 regularization}. The idea of L2 regularization is to add an extra term to the cost function, a term called the \textit{regularization} term. Here's the regularized cross-entropy:
+
+\begin{equation}
+C=-\frac{1}{n} \sum_{x j}\left[y_{j} \ln a_{j}^{L}+\left(1-y_{j}\right) \ln \left(1-a_{j}^{L}\right)\right]+\frac{\lambda}{2 n} \sum_{w} w^{2}.
+\label{eq:c03-85} 
+\end{equation}
+
+The first term is just the usual expression for the cross-entropy. But we've added a second term, namely the sum of the squares of all the weights in the network. This is scaled by a factor$\lambda / 2 n$ , where $\lambda>0$ is known as the regularization parameter, and $n$ is, as usual, the size of our training set. I'll discuss later how $\lambda$ is chosen. It's also worth noting that the regularization term doesn't include the biases. I'll also come back to that below.
+
 Of course, it's possible to regularize other cost functions, such as the quadratic cost. This can be done in a similar way:
-C=12n?x?y?aL?2+?2n?w$w_2$.(86)
+\begin{equation}
+C=\frac{1}{2 n} \sum_{x}\left\|y-a^{L}\right\|^{2}+\frac{\lambda}{2 n} \sum_{w} w^{2}.
+\label{eq:c03-86} 
+\end{equation}
+
 In both cases we can write the regularized cost function as 
-C=C0+?2n?w$w_2$,(87)
-where C0
-is the original, unregularized cost function.
-Intuitively, the effect of regularization is to make it so the network prefers to learn small weights, all other things being equal. Large weights will only be allowed if they considerably improve the first part of the cost function. Put another way, regularization can be viewed as a way of compromising between finding small weights and minimizing the original cost function. The relative importance of the two elements of the compromise depends on the value of ?
-: when ? is small we prefer to minimize the original cost function, but when ?
-is large we prefer small weights.
+\begin{equation}
+C=C_{0}+\frac{\lambda}{2 n} \sum_{w} w^{2}
+\label{eq:c03-87} 
+\end{equation}
+where $C_{0}$ is the original, unregularized cost function.
+
+
+Intuitively, the effect of regularization is to make it so the network prefers to learn small weights, all other things being equal. Large weights will only be allowed if they considerably improve the first part of the cost function. Put another way, regularization can be viewed as a way of compromising between finding small weights and minimizing the original cost function. The relative importance of the two elements of the compromise depends on the value of $\lambda$: when $\lambda$ is small we prefer to minimize the original cost function, but when $\lambda$ is large we prefer small weights.
+
 Now, it's really not at all obvious why making this kind of compromise should help reduce overfitting! But it turns out that it does. We'll address the question of why it helps in the next section. But first, let's work through an example showing that regularization really does reduce overfitting.
-To construct such an example, we first need to figure out how to apply our stochastic gradient descent learning algorithm in a regularized neural network. In particular, we need to know how to compute the partial derivatives ?C/?w
-and ?C/?b
-for all the weights and biases in the network. Taking the partial derivatives of Equation (87) gives
-?C?w?C?b==?C0?w+?nw?C0?b.(88)(89)
-The ?C0/?w
-and ?C0/?b terms can be computed using backpropagation, as described in the last chapter. And so we see that it's easy to compute the gradient of the regularized cost function: just use backpropagation, as usual, and then add ?nw
-to the partial derivative of all the weight terms. The partial derivatives with respect to the biases are unchanged, and so the gradient descent learning rule for the biases doesn't change from the usual rule:
-b?b???C0?b.(90)
+
+To construct such an example, we first need to figure out how to apply our stochastic gradient descent learning algorithm in a regularized neural network. In particular, we need to know how to compute the partial derivatives 
+$\partial C / \partial w$ and $\partial C / \partial b$
+for all the weights and biases in the network. Taking the partial derivatives of Equation~\ref{eq:c03-87}  gives
+\begin{equation}
+\frac{\partial C}{\partial w} =\frac{\partial C_{0}}{\partial w}+\frac{\lambda}{n} w 
+\label{eq:c03-88} 
+\end{equation}
+\begin{equation}
+\frac{\partial C}{\partial b} =\frac{\partial C_{0}}{\partial b} 
+\label{eq:c03-89} 
+\end{equation}
+
+The $\frac{\partial C_{0}}{\partial w}$ and $\frac{\partial C_{0}}{\partial b} $ terms can be computed using backpropagation, as described in the last chapter. And so we see that it's easy to compute the gradient of the regularized cost function: just use backpropagation, as usual, and then add $\frac{\lambda}{n} w$ to the partial derivative of all the weight terms. The partial derivatives with respect to the biases are unchanged, and so the gradient descent learning rule for the biases doesn't change from the usual rule:
+\begin{equation}
+b \rightarrow b-\eta \frac{\partial C_{0}}{\partial b}
+\label{eq:c03-90} 
+\end{equation}
 The learning rule for the weights becomes:
-w?=w???C0?w???nw(1???n)w???C0?w.(91)(92)
-This is exactly the same as the usual gradient descent learning rule, except we first rescale the weight w
-by a factor 1???n
-. This rescaling is sometimes referred to as weight decay, since it makes the weights smaller. At first glance it looks as though this means the weights are being driven unstoppably toward zero. But that's not right, since the other term may lead the weights to increase, if so doing causes a decrease in the unregularized cost function.
-Okay, that's how gradient descent works. What about stochastic gradient descent? Well, just as in unregularized stochastic gradient descent, we can estimate ?C0/?w
-by averaging over a mini-batch of m
-training examples. Thus the regularized learning rule for stochastic gradient descent becomes (c.f. Equation (20))
-w?(1???n)w??m?x?Cx?w,(93)
-where the sum is over training examples x
-in the mini-batch, and Cx is the (unregularized) cost for each training example. This is exactly the same as the usual rule for stochastic gradient descent, except for the 1???n
-weight decay factor. Finally, and for completeness, let me state the regularized learning rule for the biases. This is, of course, exactly the same as in the unregularized case (c.f. Equation (21)),
-b?b??m?x?Cx?b,(94)
-where the sum is over training examples x
-in the mini-batch.
-Let's see how regularization changes the performance of our neural network. We'll use a network with 30
-hidden neurons, a mini-batch size of 10, a learning rate of 0.5, and the cross-entropy cost function. However, this time we'll use a regularization parameter of ?=0.1
-. Note that in the code, we use the variable name lambda, because lambda is a reserved word in Python, with an unrelated meaning. I've also used the \lstinline{test_data} again, not the validation_data. Strictly speaking, we should use the validation_data, for all the reasons we discussed earlier. But I decided to use the \lstinline{test_data} because it makes the results more directly comparable with our earlier, unregularized results. You can easily change the code to use the \lstinlivalidation_data} instead, and you'll find that it gives similar results. 
+\begin{equation}
+w \rightarrow w-\eta \frac{\partial C_{0}}{\partial w}-\frac{\eta \lambda}{n} w
+\label{eq:c03-91} 
+\end{equation}
+\begin{equation}
+=\left(1-\frac{\eta \lambda}{n}\right) w-\eta \frac{\partial C_{0}}{\partial w}
+\label{eq:c03-92} 
+\end{equation}
+This is exactly the same as the usual gradient descent learning rule, except we first rescale the weight $w$ by a factor $1-\frac{\eta \lambda}{n}$. This rescaling is sometimes referred to as \textit{weight decay}, since it makes the weights smaller. At first glance it looks as though this means the weights are being driven unstoppably toward zero. But that's not right, since the other term may lead the weights to increase, if so doing causes a decrease in the unregularized cost function.
+
+Okay, that's how gradient descent works. What about stochastic gradient descent? Well, just as in unregularized stochastic gradient descent, we can estimate $\partial C_{0} / \partial w$ by averaging over a mini-batch of $m$ training examples. Thus the regularized learning rule for stochastic gradient descent becomes (c.f. Equation~\ref{eq:c01-20-wkestimate})
+\begin{equation}
+w \rightarrow\left(1-\frac{\eta \lambda}{n}\right) w-\frac{\eta}{m} \sum_{x} \frac{\partial C_{x}}{\partial w}
+\label{eq:c03-93} 
+\end{equation}
+where the sum is over training examples $x$ in the mini-batch, and $C_x$ is the (unregularized) cost for each training example. This is exactly the same as the usual rule for stochastic gradient descent, except for the $1-\frac{\eta \lambda}{n}$ weight decay factor. Finally, and for completeness, let me state the regularized learning rule for the biases. This is, of course, exactly the same as in the unregularized case (c.f. Equation~\ref{eq:c01-21-blestimate}),
+\begin{equation}
+b \rightarrow b-\frac{\eta}{m} \sum_{x} \frac{\partial C_{x}}{\partial b}
+\label{eq:c03-94} 
+\end{equation}
+where the sum is over training examples $x$ in the mini-batch.
+
+Let's see how regularization changes the performance of our neural network. We'll use a network with 30 hidden neurons, a mini-batch size of 10, a learning rate of 0.5, and the cross-entropy cost function. However, this time we'll use a regularization parameter of $\lambda=0.1$. Note that in the code, we use the variable name \lstinline{lmbda}, because \lstinline{lambda} is a reserved word in Python, with an unrelated meaning. I've also used the \lstinline{test_data} again, not the \lstinline{validation_data}. Strictly speaking, we should use the \index{validation_data}, for all the reasons we discussed earlier. But I decided to use the \lstinline{test_data} because it makes the results more directly comparable with our earlier, unregularized results. You can easily change the code to use the \lstinline{validation_data} instead, and you'll find that it gives similar results. 
  
+\begin{lstlisting}
 >>> import mnist_loader 
 >>> training_data, validation_data, test_data = \
 ... mnist_loader.load_data_wrapper() 
@@ -568,73 +600,113 @@ hidden neurons, a mini-batch size of 10, a learning rate of 0.5, and the cross-e
 ... evaluation_data=test_data, lmbda = 0.1,
 ... monitor_evaluation_cost=True, monitor_evaluation_accuracy=True,
 ... monitor_training_cost=True, monitor_training_accuracy=True)
-The cost on the training data decreases over the whole time, much as it did in the earlier, unregularized case* *This and the next two graphs were produced with the program overfitting.py.:
-
+\end{lstlisting}
+The cost on the training data decreases over the whole time, much as it did in the earlier, unregularized case:
+\marginnote{This and the next two graphs were produced with the program overfitting.py.}
+\begin{marginfigure}
+\includegraphics{ch03-snip13}
+\end{marginfigure}
 But this time the accuracy on the \lstinline{test_data} continues to increase for the entire 400 epochs:
+\begin{marginfigure}
+\includegraphics{ch03-snip14}
+\end{marginfigure}
+Clearly, the use of regularization has suppressed overfitting. What's more, the accuracy is considerably higher, with a peak classification accuracy of 87.1~percent, compared to the peak of 82.27~percent obtained in the unregularized case. Indeed, we could almost certainly get considerably better results by continuing to train past 400 epochs. It seems that, empirically, regularization is causing our network to generalize better, and considerably reducing the effects of overfitting.
 
-Clearly, the use of regularization has suppressed overfitting. What's more, the accuracy is considerably higher, with a peak classification accuracy of 87.1
-percent, compared to the peak of 82.27
-percent obtained in the unregularized case. Indeed, we could almost certainly get considerably better results by continuing to train past 400 epochs. It seems that, empirically, regularization is causing our network to generalize better, and considerably reducing the effects of overfitting.
-What happens if we move out of the artificial environment of just having 1,000 training images, and return to the full 50,000 image training set? Of course, we've seen already that overfitting is much less of a problem with the full 50,000 images. Does regularization help any further? Let's keep the hyper-parameters the same as before - 30
-epochs, learning rate 0.5, mini-batch size of 10. However, we need to modify the regularization parameter. The reason is because the size n of the training set has changed from n=1,000 to n=50,000, and this changes the weight decay factor 1???n. If we continued to use ?=0.1 that would mean much less weight decay, and thus much less of a regularization effect. We compensate by changing to ?=5.0
-.
+What happens if we move out of the artificial environment of just having 1,000 training images, and return to the full 50,000 image training set? Of course, we've seen already that overfitting is much less of a problem with the full 50,000 images. Does regularization help any further? Let's keep the hyper-parameters the same as before - 30 epochs, learning rate 0.5, mini-batch size of 10. However, we need to modify the regularization parameter. The reason is because the size $n$ of the training set has changed from $n$=1,000 to $n$=50,000, and this changes the weight decay factor $1-\frac{\eta \lambda}{n}$. If we continued to use $\lambda$=0.1 that would mean much less weight decay, and thus much less of a regularization effect. We compensate by changing to $\lambda$=5.0.
+
 Okay, let's train our network, stopping first to re-initialize the weights: 
- 
+ \begin{lstlisting}
 >>> net.large_weight_initializer()
 >>> net.SGD(training_data, 30, 10, 0.5,
 ... evaluation_data=test_data, lmbda = 5.0,
 ... monitor_evaluation_accuracy=True, monitor_training_accuracy=True)
+\end{lstlisting}
 We obtain the results:
+\begin{marginfigure}
+\includegraphics{ch03-snip15}
+\end{marginfigure}
+There's lots of good news here. First, our classification accuracy on the test data is up, from 95.49~percent when running unregularized, to 96.49~percent. That's a big improvement. Second, we can see that the gap between results on the training and test data is much narrower than before, running at under a percent. That's still a significant gap, but we've obviously made substantial progress reducing overfitting.
 
-There's lots of good news here. First, our classification accuracy on the test data is up, from 95.49
-percent when running unregularized, to 96.49
-percent. That's a big improvement. Second, we can see that the gap between results on the training and test data is much narrower than before, running at under a percent. That's still a significant gap, but we've obviously made substantial progress reducing overfitting.
-Finally, let's see what test classification accuracy we get when we use 100 hidden neurons and a regularization parameter of ?=5.0
-. I won't go through a detailed analysis of overfitting here, this is purely for fun, just to see how high an accuracy we can get when we use our new tricks: the cross-entropy cost function and L2 regularization.
- 
+Finally, let's see what test classification accuracy we get when we use 100 hidden neurons and a regularization parameter of $\lambda$=5.0. I won't go through a detailed analysis of overfitting here, this is purely for fun, just to see how high an accuracy we can get when we use our new tricks: the cross-entropy cost function and L2 regularization.
+ \begin{lstlisting}
 >>> net = network2.Network([784, 100, 10], cost=network2.CrossEntropyCost)
 >>> net.large_weight_initializer()
 >>> net.SGD(training_data, 30, 10, 0.5, lmbda=5.0,
 ... evaluation_data=validation_data,
 ... monitor_evaluation_accuracy=True)
-The final result is a classification accuracy of 97.92
-percent on the validation data. That's a big jump from the 30 hidden neuron case. In fact, tuning just a little more, to run for 60 epochs at ?=0.1 and ?=5.0 we break the 98 percent barrier, achieving 98.04
-percent classification accuracy on the validation data. Not bad for what turns out to be 152 lines of code!
-I've described regularization as a way to reduce overfitting and to increase classification accuracies. In fact, that's not the only benefit. Empirically, when doing multiple runs of our MNIST networks, but with different (random) weight initializations, I've found that the unregularized runs will occasionally get ``stuck'', apparently caught in local minima of the cost function. The result is that different runs sometimes provide quite different results. By contrast, the regularized runs have provided much more easily replicable results.
+\end{lstlisting}
+The final result is a classification accuracy of 97.92~percent on the validation data. That's a big jump from the 30 hidden neuron case. In fact, tuning just a little more, to run for 60 epochs at $\eta$=0.1 and $\lambda$=5.0 we break the 98~percent barrier, achieving 98.04~percent classification accuracy on the validation data. Not bad for what turns out to be 152 lines of code!
+
+I've described regularization as a way to reduce overfitting and to increase classification accuracies. In fact, that's not the only benefit. Empirically, when doing multiple runs of our MNIST networks, but with different (random) weight initializations, I've found that the unregularized runs will occasionally get ''stuck'', apparently caught in local minima of the cost function. The result is that different runs sometimes provide quite different results. By contrast, the regularized runs have provided much more easily replicable results.
+
 Why is this going on? Heuristically, if the cost function is unregularized, then the length of the weight vector is likely to grow, all other things being equal. Over time this can lead to the weight vector being very large indeed. This can cause the weight vector to get stuck pointing in more or less the same direction, since changes due to gradient descent only make tiny changes to the direction, when the length is long. I believe this phenomenon is making it hard for our learning algorithm to properly explore the weight space, and consequently harder to find good minima of the cost function.
-Why does regularization help reduce overfitting?
+
+\section{Why does regularization help reduce overfitting?}
+
 We've seen empirically that regularization helps reduce overfitting. That's encouraging but, unfortunately, it's not obvious why regularization helps! A standard story people tell to explain what's going on is along the following lines: smaller weights are, in some sense, lower complexity, and so provide a simpler and more powerful explanation for the data, and should thus be preferred. That's a pretty terse story, though, and contains several elements that perhaps seem dubious or mystifying. Let's unpack the story and examine it critically. To do that, let's suppose we have a simple data set for which we wish to build a model:
-012345x012345678910
-y
-Implicitly, we're studying some real-world phenomenon here, with x
-and y representing real-world data. Our goal is to build a model which lets us predict y as a function of x. We could try using neural networks to build such a model, but I'm going to do something even simpler: I'll try to model y as a polynomial in x. I'm doing this instead of using neural nets because using polynomials will make things particularly transparent. Once we've understood the polynomial case, we'll translate to neural networks. Now, there are ten points in the graph above, which means we can find a unique 9th-order polynomial y=a0x9+a1x8+?+a9
-which fits the data exactly. Here's the graph of that polynomial* *I won't show the coefficients explicitly, although they are easy to find using a routine such as Numpy's polyfit. You can view the exact form of the polynomial in the source code for the graph if you're curious. It's the function p(x) defined starting on line 14 of the program which produces the graph.:
-012345x012345678910
-y
-That provides an exact fit. But we can also get a good fit using the linear model y=2x
-:
-012345x012345678910
-y
+\begin{marginfigure}
+\includegraphics{ch03-snip16}
+\end{marginfigure}
+
+Implicitly, we're studying some real-world phenomenon here, with $x$ and $y$ representing real-world data. Our goal is to build a model which lets us predict $y$ as a function of $x$. We could try using neural networks to build such a model, but I'm going to do something even simpler: I'll try to model y as a polynomial in $x$. I'm doing this instead of using neural nets because using polynomials will make things particularly transparent. Once we've understood the polynomial case, we'll translate to neural networks. Now, there are ten points in the graph above, which means we can find a unique 9th-order polynomial $y=a_{0} x^{9}+a_{1} x^{8}+\ldots+a_{9}$ which fits the data exactly. Here's the graph of that polynomial:\marginnote{I won't show the coefficients explicitly, although they are easy to find using a routine such as Numpy's polyfit. You can view the exact form of the polynomial in the source code for the graph if you're curious (\lstinline{http://neuralnetworksanddeeplearning.com/js/polynomial_model.js}). It's the function p(x) defined starting on line 14 of the program which produces the graph.
+%\begin{lstlisting}
+%function p(x) {return 2.20539187e-01*Math.pow(x, 9)
+%	       -5.49142821*(Math.pow(x, 8)) 
+%	       +5.87844045e+01*(Math.pow(x, 7))
+%	       -3.53892824e+02*(Math.pow(x, 6)) 
+%	       +1.31549254e+03*(Math.pow(x, 5))
+%	       -3.11809836e+03*(Math.pow(x, 4)) 
+%	       +4.69080366e+03*(Math.pow(x, 3))
+%	       -4.29612493e+03*(Math.pow(x, 2)) 
+%	       +2.16228823e+03*x 
+%	       -4.50983951e+02;};
+%\end{lstlisting}
+}
+\begin{marginfigure}
+\includegraphics{ch03-snip17}
+\end{marginfigure}
+That provides an exact fit. But we can also get a good fit using the linear model $y=2x$:
+\begin{marginfigure}
+\includegraphics{ch03-snip18}
+\end{marginfigure}
 Which of these is the better model? Which is more likely to be true? And which model is more likely to generalize well to other examples of the same underlying real-world phenomenon?
+
 These are difficult questions. In fact, we can't determine with certainty the answer to any of the above questions, without much more information about the underlying real-world phenomenon. But let's consider two possibilities: (1) the 9
-th order polynomial is, in fact, the model which truly describes the real-world phenomenon, and the model will therefore generalize perfectly; (2) the correct model is y=2x
-, but there's a little additional noise due to, say, measurement error, and that's why the model isn't an exact fit.
-It's not a priori possible to say which of these two possibilities is correct. (Or, indeed, if some third possibility holds). Logically, either could be true. And it's not a trivial difference. It's true that on the data provided there's only a small difference between the two models. But suppose we want to predict the value of y
-corresponding to some large value of x, much larger than any shown on the graph above. If we try to do that there will be a dramatic difference between the predictions of the two models, as the 9th order polynomial model comes to be dominated by the x9
+th order polynomial is, in fact, the model which truly describes the real-world phenomenon, and the model will therefore generalize perfectly; (2) the correct model is $y=2x$ , but there's a little additional noise due to, say, measurement error, and that's why the model isn't an exact fit.
+
+It's not \textit{a priori} possible to say which of these two possibilities is correct. (Or, indeed, if some third possibility holds). Logically, either could be true. And it's not a trivial difference. It's true that on the data provided there's only a small difference between the two models. But suppose we want to predict the value of $y$ corresponding to some large value of $x$, much larger than any shown on the graph above. If we try to do that there will be a dramatic difference between the predictions of the two models, as the 9th order polynomial model comes to be dominated by the $x^9$
 term, while the linear model remains, well, linear.
-One point of view is to say that in science we should go with the simpler explanation, unless compelled not to. When we find a simple model that seems to explain many data points we are tempted to shout ``Eureka!" After all, it seems unlikely that a simple explanation should occur merely by coincidence. Rather, we suspect that the model must be expressing some underlying truth about the phenomenon. In the case at hand, the model y=2x+noise
-seems much simpler than y=a0x9+a1x8+?. It would be surprising if that simplicity had occurred by chance, and so we suspect that y=2x+noise
-expresses some underlying truth. In this point of view, the 9th order model is really just learning the effects of local noise. And so while the 9th order model works perfectly for these particular data points, the model will fail to generalize to other data points, and the noisy linear model will have greater predictive power.
+
+One point of view is to say that in science we should go with the simpler explanation, unless compelled not to. When we find a simple model that seems to explain many data points we are tempted to shout ''Eureka!" After all, it seems unlikely that a simple explanation should occur merely by coincidence. Rather, we suspect that the model must be expressing some underlying truth about the phenomenon. 
+In the case at hand, the model $y=2x+\textrm{noise}$
+seems much simpler than $y=a_{0} x^{9}+a_{1} x^{8}+\ldots$. It would be surprising if that simplicity had occurred by chance, and so we suspect that  $y=2x+\textrm{noise}$ expresses some underlying truth. In this point of view, the 9th order model is really just learning the effects of local noise. And so while the 9th order model works perfectly for these particular data points, the model will fail to generalize to other data points, and the noisy linear model will have greater predictive power.
+
 Let's see what this point of view means for neural networks. Suppose our network mostly has small weights, as will tend to happen in a regularized network. The smallness of the weights means that the behaviour of the network won't change too much if we change a few random inputs here and there. That makes it difficult for a regularized network to learn the effects of local noise in the data. Think of it as a way of making it so single pieces of evidence don't matter too much to the output of the network. Instead, a regularized network learns to respond to types of evidence which are seen often across the training set. By contrast, a network with large weights may change its behaviour quite a bit in response to small changes in the input. And so an unregularized network can use large weights to learn a complex model that carries a lot of information about the noise in the training data. In a nutshell, regularized networks are constrained to build relatively simple models based on patterns seen often in the training data, and are resistant to learning peculiarities of the noise in the training data. The hope is that this will force our networks to do real learning about the phenomenon at hand, and to generalize better from what they learn.
-With that said, this idea of preferring simpler explanation should make you nervous. People sometimes refer to this idea as ``Occam's Razor'', and will zealously apply it as though it has the status of some general scientific principle. But, of course, it's not a general scientific principle. There is no a priori logical reason to prefer simple explanations over more complex explanations. Indeed, sometimes the more complex explanation turns out to be correct.
-Let me describe two examples where more complex explanations have turned out to be correct. In the 1940s the physicist Marcel Schein announced the discovery of a new particle of nature. The company he worked for, General Electric, was ecstatic, and publicized the discovery widely. But the physicist Hans Bethe was skeptical. Bethe visited Schein, and looked at the plates showing the tracks of Schein's new particle. Schein showed Bethe plate after plate, but on each plate Bethe identified some problem that suggested the data should be discarded. Finally, Schein showed Bethe a plate that looked good. Bethe said it might just be a statistical fluke. Schein: ``Yes, but the chance that this would be statistics, even according to your own formula, is one in five." Bethe: ``But we have already looked at five plates." Finally, Schein said: ``But on my plates, each one of the good plates, each one of the good pictures, you explain by a different theory, whereas I have one hypothesis that explains all the plates, that they are [the new particle]." Bethe replied: ``The sole difference between your and my explanations is that yours is wrong and all of mine are right. Your single explanation is wrong, and all of my multiple explanations are right." Subsequent work confirmed that Nature agreed with Bethe, and Schein's particle is no more* *The story is related by the physicist Richard Feynman in an interview with the historian Charles Weiner..
+
+With that said, this idea of preferring simpler explanation should make you nervous. People sometimes refer to this idea as ''Occam's Razor'', and will zealously apply it as though it has the status of some general scientific principle. But, of course, it's not a general scientific principle. There is no \textit{a priori} logical reason to prefer simple explanations over more complex explanations. Indeed, sometimes the more complex explanation turns out to be correct.
+
+Let me describe two examples where more complex explanations have turned out to be correct. In the 1940s the physicist Marcel Schein announced the discovery of a new particle of nature. The company he worked for, General Electric, was ecstatic, and publicized the discovery widely. But the physicist Hans Bethe was skeptical. Bethe visited Schein, and looked at the plates showing the tracks of Schein's new particle. Schein showed Bethe plate after plate, but on each plate Bethe identified some problem that suggested the data should be discarded. Finally, Schein showed Bethe a plate that looked good. Bethe said it might just be a statistical fluke. Schein: ''Yes, but the chance that this would be statistics, even according to your own formula, is one in five.'' Bethe: ''But we have already looked at five plates.'' Finally, Schein said: ''But on my plates, each one of the good plates, each one of the good pictures, you explain by a different theory, whereas I have one hypothesis that explains all the plates, that they are [the new particle].'' Bethe replied: ''The sole difference between your and my explanations is that yours is wrong and all of mine are right. Your single explanation is wrong, and all of my multiple explanations are right.'' Subsequent work confirmed that Nature agreed with Bethe, and Schein's particle is no more.\marginnote{The story is related by the physicist Richard Feynman in an interview \cite{RichardFeynmanSessionIV2019} with the historian Charles Weiner.}
+
 As a second example, in 1859 the astronomer Urbain Le Verrier observed that the orbit of the planet Mercury doesn't have quite the shape that Newton's theory of gravitation says it should have. It was a tiny, tiny deviation from Newton's theory, and several of the explanations proferred at the time boiled down to saying that Newton's theory was more or less right, but needed a tiny alteration. In 1916, Einstein showed that the deviation could be explained very well using his general theory of relativity, a theory radically different to Newtonian gravitation, and based on much more complex mathematics. Despite that additional complexity, today it's accepted that Einstein's explanation is correct, and Newtonian gravity, even in its modified forms, is wrong. This is in part because we now know that Einstein's theory explains many other phenomena which Newton's theory has difficulty with. Furthermore, and even more impressively, Einstein's theory accurately predicts several phenomena which aren't predicted by Newtonian gravity at all. But these impressive qualities weren't entirely obvious in the early days. If one had judged merely on the grounds of simplicity, then some modified form of Newton's theory would arguably have been more attractive.
-There are three morals to draw from these stories. First, it can be quite a subtle business deciding which of two explanations is truly ``simpler''. Second, even if we can make such a judgment, simplicity is a guide that must be used with great caution! Third, the true test of a model is not simplicity, but rather how well it does in predicting new phenomena, in new regimes of behaviour.
+
+There are three morals to draw from these stories. First, it can be quite a subtle business deciding which of two explanations is truly ''simpler''. Second, even if we can make such a judgment, simplicity is a guide that must be used with great caution! Third, the true test of a model is not simplicity, but rather how well it does in predicting new phenomena, in new regimes of behaviour.
+
 With that said, and keeping the need for caution in mind, it's an empirical fact that regularized neural networks usually generalize better than unregularized networks. And so through the remainder of the book we will make frequent use of regularization. I've included the stories above merely to help convey why no-one has yet developed an entirely convincing theoretical explanation for why regularization helps networks generalize. Indeed, researchers continue to write papers where they try different approaches to regularization, compare them to see which works better, and attempt to understand why different approaches work better or worse. And so you can view regularization as something of a kludge. While it often helps, we don't have an entirely satisfactory systematic understanding of what's going on, merely incomplete heuristics and rules of thumb.
-There's a deeper set of issues here, issues which go to the heart of science. It's the question of how we generalize. Regularization may give us a computational magic wand that helps our networks generalize better, but it doesn't give us a principled understanding of how generalization works, nor of what the best approach is* *These issues go back to the problem of induction, famously discussed by the Scottish philosopher David Hume in ``An Enquiry Concerning Human Understanding'' (1748). The problem of induction has been given a modern machine learning form in the no-free lunch theorem (link) of David Wolpert and William Macready (1997)..
+
+There's a deeper set of issues here, issues which go to the heart of science. It's the question of how we generalize. Regularization may give us a computational magic wand that helps our networks generalize better, but it doesn't give us a principled understanding of how generalization works, nor of what the best approach is.\marginnote{These issues go back to the problem of induction \cite{wikipediaProblemofinduction2019}, famously discussed by the Scottish philosopher David Hume in ''An Enquiry Concerning Human Understanding'' \cite{hume1748} (1748). The problem of induction has been given a modern machine learning form in the no-free lunch theorem of David Wolpert and William Macready \cite{Wolpert1997}.}
+
 This is particularly galling because in everyday life, we humans generalize phenomenally well. Shown just a few images of an elephant a child will quickly learn to recognize other elephants. Of course, they may occasionally make mistakes, perhaps confusing a rhinoceros for an elephant, but in general this process works remarkably accurately. So we have a system - the human brain - with a huge number of free parameters. And after being shown just one or a few training images that system learns to generalize to other images. Our brains are, in some sense, regularizing amazingly well! How do we do it? At this point we don't know. I expect that in years to come we will develop more powerful techniques for regularization in artificial neural networks, techniques that will ultimately enable neural nets to generalize well even from small data sets.
-In fact, our networks already generalize better than one might a priori expect. A network with 100 hidden neurons has nearly 80,000 parameters. We have only 50,000 images in our training data. It's like trying to fit an 80,000th degree polynomial to 50,000 data points. By all rights, our network should overfit terribly. And yet, as we saw earlier, such a network actually does a pretty good job generalizing. Why is that the case? It's not well understood. It has been conjectured* *In Gradient-Based Learning Applied to Document Recognition, by Yann LeCun, L?on Bottou, Yoshua Bengio, and Patrick Haffner (1998). that ``the dynamics of gradient descent learning in multilayer nets has a `self-regularization' effect''. This is exceptionally fortunate, but it's also somewhat disquieting that we don't understand why it's the case. In the meantime, we will adopt the pragmatic approach and use regularization whenever we can. Our neural networks will be the better for it.
-Let me conclude this section by returning to a detail which I left unexplained earlier: the fact that L2 regularization doesn't constrain the biases. Of course, it would be easy to modify the regularization procedure to regularize the biases. Empirically, doing this often doesn't change the results very much, so to some extent it's merely a convention whether to regularize the biases or not. However, it's worth noting that having a large bias doesn't make a neuron sensitive to its inputs in the same way as having large weights. And so we don't need to worry about large biases enabling our network to learn the noise in our training data. At the same time, allowing large biases gives our networks more flexibility in behaviour - in particular, large biases make it easier for neurons to saturate, which is sometimes desirable. For these reasons we don't usually include bias terms when regularizing.
+
+In fact, our networks already generalize better than one might \textit{a priori} expect. A network with 100 hidden neurons has nearly 80,000 parameters. We have only 50,000 images in our training data. It's like trying to fit an 80,000th degree polynomial to 50,000 data points. By all rights, our network should overfit terribly. And yet, as we saw earlier, such a network actually does a pretty good job generalizing. Why is that the case? It's not well understood. It has been conjectured \cite{Lecun98gradient-basedlearning} that ''the dynamics of gradient descent learning in multilayer nets has a 'self-regularization' effect''. This is exceptionally fortunate, but it's also somewhat disquieting that we don't understand why it's the case. In the meantime, we will adopt the pragmatic approach and use regularization whenever we can. Our neural networks will be the better for it.
+
+Let me conclude this section by returning to a detail which I left unexplained earlier: the fact that L2 regularization \textit{doesn't} constrain the biases. Of course, it would be easy to modify the regularization procedure to regularize the biases. Empirically, doing this often doesn't change the results very much, so to some extent it's merely a convention whether to regularize the biases or not. However, it's worth noting that having a large bias doesn't make a neuron sensitive to its inputs in the same way as having large weights. And so we don't need to worry about large biases enabling our network to learn the noise in our training data. At the same time, allowing large biases gives our networks more flexibility in behaviour - in particular, large biases make it easier for neurons to saturate, which is sometimes desirable. For these reasons we don't usually include bias terms when regularizing.
+
+
+
+
+
+\begin{lstlisting}
+
 Other techniques for regularization
 There are many regularization techniques other than L2 regularization. In fact, so many techniques have been developed that I can't possibly summarize them all. In this section I briefly describe three other approaches to reducing overfitting: L1 regularization, dropout, and artificially increasing the training set size. We won't go into nearly as much depth studying these techniques as we did earlier. Instead, the purpose is to get familiar with the main ideas, and to appreciate something of the diversity of regularization techniques available.
 L1 regularization: In this approach we modify the unregularized cost function by adding the sum of the absolute values of the weights:
