@@ -771,8 +771,8 @@ introducing the technique applied it to many different tasks. For us, it's of pa
 As you can see, the classification accuracies improve considerably as we use more training data. Presumably this improvement would continue still further if more data was available. Of course, looking at the graph above it does appear that we're getting near saturation. Suppose, however, that we redo the graph with the training set size plotted logarithmically:
 
 \begin{marginfigure}
-    \includegraphics{ch03-snip22}
-    \end{marginfigure}
+\includegraphics{ch03-snip22}
+\end{marginfigure}
 
 It seems clear that the graph is still going up toward the end. This suggests that if we used vastly more training data --- say, millions or even billions of handwriting samples, instead of just 50,000 - then we'd likely get considerably better performance, even from this very small network.
 
@@ -789,480 +789,569 @@ This idea is very powerful and has been widely used. Let's look at some of the r
 
 Variations on this idea can be used to improve performance on many learning tasks, not just handwriting recognition. The general principle is to expand the training data by applying operations that reflect real-world variation. It's not difficult to think of ways of doing this. Suppose, for example, that you're building a neural network to do speech recognition. We humans can recognize speech even in the presence of distortions such as background noise. And so you can expand your data by adding background noise. We can also recognize speech if it's sped up or slowed down. So that's another way we can expand the training data. These techniques are not always used - for instance, instead of expanding the training data by adding noise, it may well be more efficient to clean up the input to the network by first applying a noise reduction filter. Still, it's worth keeping the idea of expanding the training data in mind, and looking for opportunities to apply it.
 
+\textbf{Exercise}
+
+\begin{enumerate}
+\item As discussed above, one way of expanding the MNIST training data is to use small rotations of training images. What's a problem that might occur if we allow arbitrarily large rotations of training images? 
+\end{enumerate}
+
+
+
+\textbf{An aside on big data and what it means to compare classification accuracies}: Let's look again at how our neural network's accuracy varies with training set size.
+
+\begin{marginfigure}
+\includegraphics{ch03-snip25}
+\end{marginfigure}
+
+Suppose that instead of using a neural network we use some other machine learning technique to classify digits. For instance, let's try using the support vector machines (SVM) which we met briefly back in the first chapter. Don't worry if you're not familiar with SVMs, we don't need to understand their details. Instead, we'll use the SVM supplied by the scikit-learn library. Here's how SVM performance varies as a function of training set size. I've plotted the neural net results as well, to make comparison easy.
+\marginnote{This graph was produced with the program \lstinline{more_data.py} (as were the last few graphs).}
+
+\begin{marginfigure}
+\includegraphics{ch03-snip25}
+\end{marginfigure}
+
+Probably the first thing that strikes you about this graph is that our neural network outperforms the SVM for every training set size. That's nice, although you shouldn't read too much into it, since I just used the out-of-the-box settings from scikit-learn's SVM, while we've done a fair bit of work improving our neural network. A more subtle but more interesting fact about the graph is that if we train our SVM using 50,000 images then it actually has better performance (94.48~percent accuracy) than our neural network does when trained using 5,000 images (93.24~percent accuracy). In other words, more training data can sometimes compensate for differences in the machine learning algorithm used.
+
+Something even more interesting can occur. Suppose we're trying to solve a problem using two machine learning algorithms, algorithm A and algorithm B. It sometimes happens that algorithm A will outperform algorithm B with one set of training data, while algorithm B will outperform algorithm A with a different set of training data. We don't see that above - it would require the two graphs to cross - but it does happen.\marginnote{Striking examples may be found in \cite{Banko2001}.} The correct response to the question ''Is algorithm A better than algorithm B?'' is really: ''What training data set are you using?''
+
+All this is a caution to keep in mind, both when doing development, and when reading research papers. Many papers focus on finding new tricks to wring out improved performance on standard benchmark data sets. ''Our whiz-bang technique gave us an improvement of X~percent on standard benchmark Y'' is a canonical form of research claim. Such claims are often genuinely interesting, but they must be understood as applying only in the context of the specific training data set used. Imagine an alternate history in which the people who originally created the benchmark data set had a larger research grant. They might have used the extra money to collect more training data. It's entirely possible that the ''improvement'' due to the whiz-bang technique would disappear on a larger data set. In other words, the purported improvement might be just an accident of history. The message to take away, especially in practical applications, is that what we want is both better algorithms \textit{and} better training data. It's fine to look for better algorithms, but make sure you're not focusing on better algorithms to the exclusion of easy wins getting more or better training data.
+
+\textbf{Problem}
+
+
+
+\begin{enumerate}
+\item \textbf{(Research problem)} How do our machine learning algorithms perform in the limit of very large data sets? For any given algorithm it's natural to attempt to define a notion of asymptotic performance in the limit of truly big data. A quick-and-dirty approach to this problem is to simply try fitting curves to graphs like those shown above, and then to extrapolate the fitted curves out to infinity. An objection to this approach is that different approaches to curve fitting will give different notions of asymptotic performance. Can you find a principled justification for fitting to some particular class of curves? If so, compare the asymptotic performance of several different machine learning algorithms. 
+\end{enumerate}
+
+
+\textbf{Summing up:} We've now completed our dive into overfitting and regularization. Of course, we'll return again to the issue. As I've mentioned several times, overfitting is a major problem in neural networks, especially as computers get more powerful, and we have the ability to train larger networks. As a result there's a pressing need to develop powerful regularization techniques to reduce overfitting, and this is an extremely active area of current work.
+
+\section{Weight initialization}
+
+When we create our neural networks, we have to make choices for the initial weights and biases. Up to now, we've been choosing them according to a prescription which I discussed only briefly back in Chapter~\ref{sec:UsingNeuralNetsTorRcognizeHandWrittenDigits}. Just to remind you, that prescription was to choose both the weights and biases using independent Gaussian random variables, normalized to have mean 0 and standard deviation 1. While this approach has worked well, it was quite \textit{ad hoc}, and it's worth revisiting to see if we can find a better way of setting our initial weights and biases, and perhaps help our neural networks learn faster.
+
+It turns out that we can do quite a bit better than initializing with normalized Gaussians. To see why, suppose we're working with a network with a large number --- say 1,000 --- of input neurons. And let's suppose we've used normalized Gaussians to initialize the weights connecting to the first hidden layer. For now I'm going to concentrate specifically on the weights connecting the input neurons to the first neuron in the hidden layer, and ignore the rest of the network.
+
+\begin{marginfigure}
+    \includegraphics{ch03-snip27}
+    \end{marginfigure}
+    
+We'll suppose for simplicity that we're trying to train using a training input $x$ in which half the input neurons are on, i.e., set to 1, and half the input neurons are off, i.e., set to 0. The argument which follows applies more generally, but you'll get the gist from this special case. Let's consider the weighted sum $z=\sum_{j} w_{j} x_{j}+b$ of inputs to our hidden neuron. 500 terms in this sum vanish, because the corresponding input $x_j$ is zero. And so $z$ is a sum over a total of 501 normalized Gaussian random variables, accounting for the 500 weight terms and the 1 extra bias term. Thus $z$ is itself distributed as a Gaussian with mean zero and standard deviation $\sqrt{501} \approx 22.4$. That is, $z$ has a very broad Gaussian distribution, not sharply peaked at all.
+
+
+\begin{marginfigure}
+    \includegraphics{ch03-snip28}
+    \end{marginfigure}
+
+In particular, we can see from this graph that it's quite likely that $|z|$ will be pretty large, i.e., either $z\gg 1$ or $z\ll -1$. If that's the case then the output $\sigma(z)$ from the hidden neuron will be very close to either 1 or 0. That means our hidden neuron will have saturated. And when that happens, as we know, making small changes in the weights will make only absolutely miniscule changes in the activation of our hidden neuron. That miniscule change in the activation of the hidden neuron will, in turn, barely affect the rest of the neurons in the network at all, and we'll see a correspondingly miniscule change in the cost function. As a result, those weights will only learn very slowly when we use the gradient descent algorithm\marginnote{We discussed this in more detail in Chapter~\ref{chap:02HowtheBackpropagationAlgorithmWorks}, where we used the equations of backpropagation to show that weights input to saturated neurons learned slowly.}. It's similar to the problem we discussed earlier in this chapter, in which output neurons which saturated on the wrong value caused learning to slow down. We addressed that earlier problem with a clever choice of cost function. Unfortunately, while that helped with saturated output neurons, it does nothing at all for the problem with saturated hidden neurons.
+
+I've been talking about the weights input to the first hidden layer. Of course, similar arguments apply also to later hidden layers: if the weights in later hidden layers are initialized using normalized Gaussians, then activations will often be very close to 0 or 1, and learning will proceed very slowly.
+
+Is there some way we can choose better initializations for the weights and biases, so that we don't get this kind of saturation, and so avoid a learning slowdown? Suppose we have a neuron with $n\textrm{in}$ input weights. Then we shall initialize those weights as Gaussian random variables with mean 0 and standard deviation 1$/ \sqrt{n_{\mathrm{in}}}$. That is, we'll squash the Gaussians down, making it less likely that our neuron will saturate. We'll continue to choose the bias as a Gaussian with mean 0 and standard deviation 1, for reasons I'll return to in a moment. With these choices, the weighted sum $z=\sum_{j} w_{j} x_{j}+b$ will again be a Gaussian random variable with mean 0, but it'll be much more sharply peaked than it was before. Suppose, as we did earlier, that 500 of the inputs are zero and 500 are 1. Then it's easy to show (see the exercise below) that z has a Gaussian distribution with mean 0 and standard deviation $\sqrt{3/2}=1.22$. This is much more sharply peaked than before, so much so that even the graph below understates the situation, since I've had to rescale the vertical axis, when compared to the earlier graph
+\begin{marginfigure}
+    \includegraphics{ch03-snip29}
+    \end{marginfigure}
+Such a neuron is much less likely to saturate, and correspondingly much less likely to have problems with a learning slowdown.
+
+\textbf{Exercise}
+
+
+\begin{enumerate}
+\item  Verify that the standard deviation of $z=\sum_{j} w_{j} x_{j}+b$
+    in the paragraph above is $\sqrt{3/2}$. It may help to know that: (a) the variance of a sum of independent random variables is the sum of the variances of the individual random variables; and (b) the variance is the square of the standard deviation
+\end{enumerate}. 
+
+I stated above that we'll continue to initialize the biases as before, as Gaussian random variables with a mean of 0 and a standard deviation of 1. This is okay, because it doesn't make it too much more likely that our neurons will saturate. In fact, it doesn't much matter how we initialize the biases, provided we avoid the problem with saturation. Some people go so far as to initialize all the biases to 0, and rely on gradient descent to learn appropriate biases. But since it's unlikely to make much difference, we'll continue with the same initialization procedure as before.
+
+Let's compare the results for both our old and new approaches to weight initialization, using the MNIST digit classification task. As before, we'll use 30 hidden neurons, a mini-batch size of 10, a regularization parameter $\lambda=5.0$, and the cross-entropy cost function. We will decrease the learning rate slightly from $\eta$=0.5 to 0.1, since that makes the results a little more easily visible in the graphs. We can train using the old method of weight initialization: 
+
+
+\begin{lstlisting}
+        >>> import mnist_loader
+    >>> training_data, validation_data, test_data = \
+    ... mnist_loader.load_data_wrapper()
+    >>> import network2
+    >>> net = network2.Network([784, 30, 10], cost=network2.CrossEntropyCost)
+    >>> net.large_weight_initializer()
+    >>> net.SGD(training_data, 30, 10, 0.1, lmbda = 5.0,
+    ... evaluation_data=validation_data, 
+    ... monitor_evaluation_accuracy=True)
+\end{lstlisting}
+
+We can also train using the new approach to weight initialization. This is actually even easier, since `network2`'s default way of initializing the weights is using this new approach. That means we can omit the \lstinline{net.large_weight_initializer()} call above: 
+
+\begin{lstlisting}
+    >>> net = network2.Network([784, 30, 10], cost=network2.CrossEntropyCost)
+    >>> net.SGD(training_data, 30, 10, 0.1, lmbda = 5.0,
+    ... evaluation_data=validation_data, 
+    ... monitor_evaluation_accuracy=True)
+    
+\end{lstlisting}
+Plotting the results\marginnote{The program used to generate this and the next graph is \lstinline{weight_initialization.py}.}, we obtain this graph.
+
+\begin{marginfigure}
+    \includegraphics{ch03-snip30}
+    \end{marginfigure}
+
+In both cases, we end up with a classification accuracy somewhat over 96~percent. The final classification accuracy is almost exactly the same in the two cases. But the new initialization technique brings us there much, much faster. At the end of the first epoch of training the old approach to weight initialization has a classification accuracy under 87~percent, while the new approach is already almost 93~percent. What appears to be going on is that our new approach to weight initialization starts us off in a much better regime, which lets us get good results much more quickly. The same phenomenon is also seen if we plot results with 100 hidden neurons.
+
+\begin{marginfigure}
+    \includegraphics{ch03-snip31}
+    \end{marginfigure}
+
+In this case, the two curves don't quite meet. However, my experiments suggest that with just a few more epochs of training (not shown) the accuracies become almost exactly the same. So on the basis of these experiments it looks as though the improved weight initialization only speeds up learning, it doesn't change the final performance of our networks. However, in Chapter~\ref{sec:AVisualProofThatNeuralNetsCanComputeAnyFunction} we'll see examples of neural networks where the long-run behaviour is significantly better with the 1$/ \sqrt{n_{\mathrm{in}}}$ weight initialization. Thus it's not only the speed of learning which is improved, it's sometimes also the final performance.
+The 1$/ \sqrt{n_{\mathrm{in}}}$ approach to weight initialization helps improve the way our neural nets learn. Other techniques for weight initialization have also been proposed, many building on this basic idea. I won't review the other approaches here, since 1$/ \sqrt{n_{\mathrm{in}}}$ works well enough for our purposes. If you're interested in looking further, I recommend looking at the discussion on pages 14 and 15 of a 2012 paper by Yoshua Bengio 
+\cite{YoshuaBengio2012}, as well as the references therein.
+
+\textbf{Problems}
+
+
+\begin{enumerate}
+\item \textbf{Connecting regularization and the improved method of weight initialization} L2 regularization sometimes automatically gives us something similar to the new approach to weight initialization. Suppose we are using the old approach to weight initialization. Sketch a heuristic argument that: (1) supposing $\lambda$ is not too small, the first epochs of training will be dominated almost entirely by weight decay; (2) provided $\eta\lambda \ll n$ the weights will decay by a factor of $\exp (-\eta \lambda / m)$ per epoch; and (3) supposing $\lambda$ is not too large, the weight decay will tail off when the weights are down to a size around $\/\sqrt{n}$, where $n$ is the total number of weights in the network. Argue that these conditions are all satisfied in the examples graphed in this section. 
+\end{enumerate}
+
+
+\section{Handwriting recognition revisited: the code}
+
+Let's implement the ideas we've discussed in this chapter. We'll develop a new program, \lstinline{network2.py}, which is an improved version of the program \lstinline{network.py} we developed in 
+Chapter~\ref{sec:UsingNeuralNetsTorRcognizeHandWrittenDigits}. If you haven't looked at \lstinline{network.py} in a while then you may find it helpful to spend a few minutes quickly reading over the earlier discussion. It's only 74 lines of code, and is easily understood. 
+
+As was the case in \lstinline{network.py}, the star of \lstinline{network2.py} is the \lstinline{Network} class, which we use to represent our neural networks. We initialize an instance of \lstinline{Network} with a list of sizes for the respective layers in the network, and a choice for the cost to use, defaulting to the cross-entropy:
+\begin{lstlisting}
+    class Network(object):
+        def __init__(self, sizes, cost=CrossEntropyCost):
+            self.num_layers = len(sizes)
+            self.sizes = sizes
+            self.default_weight_initializer()
+            self.cost=cost
+\end{lstlisting}
+The first couple of lines of the \lstinline{__init__} method are the same as in \lstinline{network.py}, and are pretty self-explanatory. But the next two lines are new, and we need to understand what they're doing in detail.
+
+Let's start by examining the \lstinline{default_weight_initializer} method. This makes use of our new and improved approach to weight initialization. As we've seen, in that approach the weights input to a neuron are initialized as Gaussian random variables with mean 0 and standard deviation 1 divided by the square root of the number of connections input to the neuron. Also in this method we'll initialize the biases, using Gaussian random variables with mean 0 and standard deviation 1. Here's the code:
+\begin{lstlisting}
+        def default_weight_initializer(self):
+            self.biases = [np.random.randn(y, 1) for y in self.sizes[1:]]
+            self.weights = [np.random.randn(y, x)/np.sqrt(x) 
+                            for x, y in zip(self.sizes[:-1], self.sizes[1:])]
+\end{lstlisting}                        
+To understand the code, it may help to recall that \lstinline{np} is the Numpy library for doing linear algebra. We'll \lstinline{import} Numpy at the beginning of our program. Also, notice that we don't initialize any biases for the first layer of neurons. We avoid doing this because the first layer is an input layer, and so any biases would not be used. We did exactly the same thing in \lstinline{network.py}.
+
+Complementing the \lstinline{default_weight_initializer} we'll also include a \lstinline{large_weight_initializer} method. This method initializes the weights and biases using the old approach from Chapter~\ref{sec:UsingNeuralNetsTorRcognizeHandWrittenDigits}, with both weights and biases initialized as Gaussian random variables with mean 0 and standard deviation 1. The code is, of course, only a tiny bit different from the \lstinline{default_weight_initializer}:
+\begin{lstlisting}
+        def large_weight_initializer(self):
+            self.biases = [np.random.randn(y, 1) for y in self.sizes[1:]]
+            self.weights = [np.random.randn(y, x) 
+                            for x, y in zip(self.sizes[:-1], self.sizes[1:])]
+\end{lstlisting}
+I've included the \lstinline{large_weight_initializer} method mostly as a convenience to make it easier to compare the results in this chapter to those in Chapter~\ref{sec:UsingNeuralNetsTorRcognizeHandWrittenDigits}. I can't think of many practical situations where I would recommend using it!
+
+The second new thing in \lstinline{Network}'s \lstinline{__init__} method is that we now initialize a \lstinline{cost} attribute. To understand how that works, let's look at the class we use to represent the cross-entropy cost:\marginnote{If you're not familiar with Python's static methods you can ignore the \lstinline{@staticmethod} decorators, and just treat \lstinline{fn} and \lstinline{delta} as ordinary methods. If you're curious about details, all \lstinline{@staticmethod} does is tell the Python interpreter that the method which follows doesn't depend on the object in any way. That's why self isn't passed as a parameter to the \lstinline{fn} and \lstinline{delta} methods.}
+
+
+\begin{lstlisting}
+    class CrossEntropyCost(object):
+    
+        @staticmethod
+        def fn(a, y):
+            return np.sum(np.nan_to_num(-y*np.log(a)-(1-y)*np.log(1-a)))
+    
+        @staticmethod
+        def delta(z, a, y):
+            return (a-y)
+    
+\end{lstlisting}
+
+Let's break this down. The first thing to observe is that even though the cross-entropy is, mathematically speaking, a function, we've implemented it as a Python class, not a Python function. Why have I made that choice? The reason is that the cost plays two different roles in our network. The obvious role is that it's a measure of how well an output activation, \lstinline{a}, matches the desired output, \lstinline{y}. This role is captured by the \lstinline{CrossEntropyCost.fn} method. (Note, by the way, that \lstinline{the np.nan_to_num} call inside \lstinline{CrossEntropyCost.fn} ensures that Numpy deals correctly with the log of numbers very close to zero.) But there's also a second way the cost function enters our network. Recall from Chapter~\ref{chap:02HowtheBackpropagationAlgorithmWorks} that when running the backpropagation algorithm we need to compute the network's output error,  $\delta^{L}$. The form of the output error depends on the choice of cost function: different cost function, different form for the output error. For the cross-entropy the output error is, as we saw in Equation~\ref{eq:c03-66},
+
+\begin{equation}
+    \delta^{L}=a^{L}-y
+    \label{eq:c03-99}
+    \end{equation}
+
+For this reason we define a second method, \lstinline{CrossEntropyCost.delta}, whose purpose is to tell our network how to compute the output error. And then we bundle these two methods up into a single class containing everything our networks need to know about the cost function.
+
+In a similar way, \lstinline{network2.py} also contains a class to represent the quadratic cost function. This is included for comparison with the results of Chapter~\ref{sec:UsingNeuralNetsTorRcognizeHandWrittenDigits}, since going forward we'll mostly use the cross entropy. The code is just below. The \lstinline{QuadraticCost.fn} method is a straightforward computation of the quadratic cost associated to the actual output, \lstinline{a}, and the desired output, \lstinline{y}. The value returned by \lstinline{QuadraticCost.delta} is based on Equation~\ref{eq:c02-30} for the output error for the quadratic cost, which we derived back in Chapter~\ref{chap:02HowtheBackpropagationAlgorithmWorks}.
+
+
+\begin{lstlisting}
+    class QuadraticCost(object):
+    
+        @staticmethod
+        def fn(a, y):
+            return 0.5*np.linalg.norm(a-y)**2
+    
+        @staticmethod
+        def delta(z, a, y):
+            return (a-y) * sigmoid_prime(z)
+\end{lstlisting}        
+
+
+We've now understood the main differences between \lstinline{network2.py} and \lstinline{network.py}. It's all pretty simple stuff. There are a number of smaller changes, which I'll discuss below, including the implementation of L2 regularization. Before getting to that, let's look at the complete code for \lstinline{network2.py}. You don't need to read all the code in detail, but it is worth understanding the broad structure, and in particular reading the documentation strings, so you understand what each piece of the program is doing. Of course, you're also welcome to delve as deeply as you wish! If you get lost, you may wish to continue reading the prose below, and return to the code later. Anyway, here's the code:
+
+
+
+\begin{lstlisting}
+    """network2.py
+    ~~~~~~~~~~~~~~
+    
+    An improved version of network.py, implementing the stochastic
+    gradient descent learning algorithm for a feedforward neural network.
+    Improvements include the addition of the cross-entropy cost function,
+    regularization, and better initialization of network weights.  Note
+    that I have focused on making the code simple, easily readable, and
+    easily modifiable.  It is not optimized, and omits many desirable
+    features.
+    
+    """
+    
+    #### Libraries
+    # Standard library
+    import json
+    import random
+    import sys
+    
+    # Third-party libraries
+    import numpy as np
+    
+    
+    #### Define the quadratic and cross-entropy cost functions
+    
+    class QuadraticCost(object):
+    
+        @staticmethod
+        def fn(a, y):
+            """Return the cost associated with an output ''a`` and desired output
+            ``y``.
+    
+            """
+            return 0.5*np.linalg.norm(a-y)**2
+    
+        @staticmethod
+        def delta(z, a, y):
+            """Return the error delta from the output layer."""
+            return (a-y) * sigmoid_prime(z)
+    
+    
+    class CrossEntropyCost(object):
+    
+        @staticmethod
+        def fn(a, y):
+            """Return the cost associated with an output ``a`` and desired output
+            ``y``.  Note that np.nan_to_num is used to ensure numerical
+            stability.  In particular, if both ``a`` and ``y`` have a 1.0
+            in the same slot, then the expression (1-y)*np.log(1-a)
+            returns nan.  The np.nan_to_num ensures that that is converted
+            to the correct value (0.0).
+    
+            """
+            return np.sum(np.nan_to_num(-y*np.log(a)-(1-y)*np.log(1-a)))
+    
+        @staticmethod
+        def delta(z, a, y):
+            """Return the error delta from the output layer.  Note that the
+            parameter ``z`` is not used by the method.  It is included in
+            the method's parameters in order to make the interface
+            consistent with the delta method for other cost classes.
+    
+            """
+            return (a-y)
+    
+    
+    #### Main Network class
+    class Network(object):
+    
+        def __init__(self, sizes, cost=CrossEntropyCost):
+            """The list ``sizes`` contains the number of neurons in the respective
+            layers of the network.  For example, if the list was [2, 3, 1]
+            then it would be a three-layer network, with the first layer
+            containing 2 neurons, the second layer 3 neurons, and the
+            third layer 1 neuron.  The biases and weights for the network
+            are initialized randomly, using
+            ``self.default_weight_initializer`` (see docstring for that
+            method).
+    
+            """
+            self.num_layers = len(sizes)
+            self.sizes = sizes
+            self.default_weight_initializer()
+            self.cost=cost
+    
+        def default_weight_initializer(self):
+            """Initialize each weight using a Gaussian distribution with mean 0
+            and standard deviation 1 over the square root of the number of
+            weights connecting to the same neuron.  Initialize the biases
+            using a Gaussian distribution with mean 0 and standard
+            deviation 1.
+    
+            Note that the first layer is assumed to be an input layer, and
+            by convention we won't set any biases for those neurons, since
+            biases are only ever used in computing the outputs from later
+            layers.
+    
+            """
+            self.biases = [np.random.randn(y, 1) for y in self.sizes[1:]]
+            self.weights = [np.random.randn(y, x)/np.sqrt(x)
+                            for x, y in zip(self.sizes[:-1], self.sizes[1:])]
+    
+        def large_weight_initializer(self):
+            """Initialize the weights using a Gaussian distribution with mean 0
+            and standard deviation 1.  Initialize the biases using a
+            Gaussian distribution with mean 0 and standard deviation 1.
+    
+            Note that the first layer is assumed to be an input layer, and
+            by convention we won't set any biases for those neurons, since
+            biases are only ever used in computing the outputs from later
+            layers.
+    
+            This weight and bias initializer uses the same approach as in
+            Chapter 1, and is included for purposes of comparison.  It
+            will usually be better to use the default weight initializer
+            instead.
+    
+            """
+            self.biases = [np.random.randn(y, 1) for y in self.sizes[1:]]
+            self.weights = [np.random.randn(y, x)
+                            for x, y in zip(self.sizes[:-1], self.sizes[1:])]
+    
+        def feedforward(self, a):
+            """Return the output of the network if ``a`` is input."""
+            for b, w in zip(self.biases, self.weights):
+                a = sigmoid(np.dot(w, a)+b)
+            return a
+    
+        def SGD(self, training_data, epochs, mini_batch_size, eta,
+                lmbda = 0.0,
+                evaluation_data=None,
+                monitor_evaluation_cost=False,
+                monitor_evaluation_accuracy=False,
+                monitor_training_cost=False,
+                monitor_training_accuracy=False):
+            """Train the neural network using mini-batch stochastic gradient
+            descent.  The ``training_data`` is a list of tuples ``(x, y)``
+            representing the training inputs and the desired outputs.  The
+            other non-optional parameters are self-explanatory, as is the
+            regularization parameter ``lmbda``.  The method also accepts
+            ``evaluation_data``, usually either the validation or test
+            data.  We can monitor the cost and accuracy on either the
+            evaluation data or the training data, by setting the
+            appropriate flags.  The method returns a tuple containing four
+            lists: the (per-epoch) costs on the evaluation data, the
+            accuracies on the evaluation data, the costs on the training
+            data, and the accuracies on the training data.  All values are
+            evaluated at the end of each training epoch.  So, for example,
+            if we train for 30 epochs, then the first element of the tuple
+            will be a 30-element list containing the cost on the
+            evaluation data at the end of each epoch. Note that the lists
+            are empty if the corresponding flag is not set.
+    
+            """
+            if evaluation_data: n_data = len(evaluation_data)
+            n = len(training_data)
+            evaluation_cost, evaluation_accuracy = [], []
+            training_cost, training_accuracy = [], []
+            for j in xrange(epochs):
+                random.shuffle(training_data)
+                mini_batches = [
+                    training_data[k:k+mini_batch_size]
+                    for k in xrange(0, n, mini_batch_size)]
+                for mini_batch in mini_batches:
+                    self.update_mini_batch(
+                        mini_batch, eta, lmbda, len(training_data))
+                print ``Epoch %s training complete'' % j
+                if monitor_training_cost:
+                    cost = self.total_cost(training_data, lmbda)
+                    training_cost.append(cost)
+                    print ``Cost on training data: {}".format(cost)
+                if monitor_training_accuracy:
+                    accuracy = self.accuracy(training_data, convert=True)
+                    training_accuracy.append(accuracy)
+                    print ``Accuracy on training data: {} / {}".format(
+                        accuracy, n)
+                if monitor_evaluation_cost:
+                    cost = self.total_cost(evaluation_data, lmbda, convert=True)
+                    evaluation_cost.append(cost)
+                    print ``Cost on evaluation data: {}".format(cost)
+                if monitor_evaluation_accuracy:
+                    accuracy = self.accuracy(evaluation_data)
+                    evaluation_accuracy.append(accuracy)
+                    print ``Accuracy on evaluation data: {} / {}".format(
+                        self.accuracy(evaluation_data), n_data)
+                print
+            return evaluation_cost, evaluation_accuracy, \
+                training_cost, training_accuracy
+    
+        def update_mini_batch(self, mini_batch, eta, lmbda, n):
+            """Update the network's weights and biases by applying gradient
+            descent using backpropagation to a single mini batch.  The
+            ``mini_batch`` is a list of tuples ``(x, y)``, ``eta`` is the
+            learning rate, ``lmbda`` is the regularization parameter, and
+            ``n`` is the total size of the training data set.
+    
+            """
+            nabla_b = [np.zeros(b.shape) for b in self.biases]
+            nabla_w = [np.zeros(w.shape) for w in self.weights]
+            for x, y in mini_batch:
+                delta_nabla_b, delta_nabla_w = self.backprop(x, y)
+                nabla_b = [nb+dnb for nb, dnb in zip(nabla_b, delta_nabla_b)]
+                nabla_w = [nw+dnw for nw, dnw in zip(nabla_w, delta_nabla_w)]
+            self.weights = [(1-eta*(lmbda/n))*w-(eta/len(mini_batch))*nw
+                            for w, nw in zip(self.weights, nabla_w)]
+            self.biases = [b-(eta/len(mini_batch))*nb
+                           for b, nb in zip(self.biases, nabla_b)]
+    
+        def backprop(self, x, y):
+            """Return a tuple ``(nabla_b, nabla_w)`` representing the
+            gradient for the cost function C_x.  ``nabla_b`` and
+            ``nabla_w`` are layer-by-layer lists of numpy arrays, similar
+            to ``self.biases`` and ``self.weights``."""
+            nabla_b = [np.zeros(b.shape) for b in self.biases]
+            nabla_w = [np.zeros(w.shape) for w in self.weights]
+            # feedforward
+            activation = x
+            activations = [x] # list to store all the activations, layer by layer
+            zs = [] # list to store all the z vectors, layer by layer
+            for b, w in zip(self.biases, self.weights):
+                z = np.dot(w, activation)+b
+                zs.append(z)
+                activation = sigmoid(z)
+                activations.append(activation)
+            # backward pass
+            delta = (self.cost).delta(zs[-1], activations[-1], y)
+            nabla_b[-1] = delta
+            nabla_w[-1] = np.dot(delta, activations[-2].transpose())
+            # Note that the variable l in the loop below is used a little
+            # differently to the notation in Chapter 2 of the book.  Here,
+            # l = 1 means the last layer of neurons, l = 2 is the
+            # second-last layer, and so on.  It's a renumbering of the
+            # scheme in the book, used here to take advantage of the fact
+            # that Python can use negative indices in lists.
+            for l in xrange(2, self.num_layers):
+                z = zs[-l]
+                sp = sigmoid_prime(z)
+                delta = np.dot(self.weights[-l+1].transpose(), delta) * sp
+                nabla_b[-l] = delta
+                nabla_w[-l] = np.dot(delta, activations[-l-1].transpose())
+            return (nabla_b, nabla_w)
+    
+        def accuracy(self, data, convert=False):
+            """Return the number of inputs in ``data`` for which the neural
+            network outputs the correct result. The neural network's
+            output is assumed to be the index of whichever neuron in the
+            final layer has the highest activation.
+    
+            The flag ``convert`` should be set to False if the data set is
+            validation or test data (the usual case), and to True if the
+            data set is the training data. The need for this flag arises
+            due to differences in the way the results ``y`` are
+            represented in the different data sets.  In particular, it
+            flags whether we need to convert between the different
+            representations.  It may seem strange to use different
+            representations for the different data sets.  Why not use the
+            same representation for all three data sets?  It's done for
+            efficiency reasons -- the program usually evaluates the cost
+            on the training data and the accuracy on other data sets.
+            These are different types of computations, and using different
+            representations speeds things up.  More details on the
+            representations can be found in
+            mnist_loader.load_data_wrapper.
+    
+            """
+            if convert:
+                results = [(np.argmax(self.feedforward(x)), np.argmax(y))
+                           for (x, y) in data]
+            else:
+                results = [(np.argmax(self.feedforward(x)), y)
+                            for (x, y) in data]
+            return sum(int(x == y) for (x, y) in results)
+    
+        def total_cost(self, data, lmbda, convert=False):
+            """Return the total cost for the data set ``data``.  The flag
+            ``convert`` should be set to False if the data set is the
+            training data (the usual case), and to True if the data set is
+            the validation or test data.  See comments on the similar (but
+            reversed) convention for the ``accuracy`` method, above.
+            """
+            cost = 0.0
+            for x, y in data:
+                a = self.feedforward(x)
+                if convert: y = vectorized_result(y)
+                cost += self.cost.fn(a, y)/len(data)
+            cost += 0.5*(lmbda/len(data))*sum(
+                np.linalg.norm(w)**2 for w in self.weights)
+            return cost
+    
+        def save(self, filename):
+            """Save the neural network to the file ``filename``."""
+            data = {"sizes": self.sizes,
+                    ``weights": [w.tolist() for w in self.weights],
+                    ``biases": [b.tolist() for b in self.biases],
+                    ``cost": str(self.cost.__name__)}
+            f = open(filename, ``w")
+            json.dump(data, f)
+            f.close()
+    
+    #### Loading a Network
+    def load(filename):
+        """Load a neural network from the file ``filename``.  Returns an
+        instance of Network.
+    
+        """
+        f = open(filename, ``r")
+        data = json.load(f)
+        f.close()
+        cost = getattr(sys.modules[__name__], data["cost"])
+        net = Network(data["sizes"], cost=cost)
+        net.weights = [np.array(w) for w in data["weights"]]
+        net.biases = [np.array(b) for b in data["biases"]]
+        return net
+    
+    #### Miscellaneous functions
+    def vectorized_result(j):
+        """Return a 10-dimensional unit vector with a 1.0 in the j'th position
+        and zeroes elsewhere.  This is used to convert a digit (0...9)
+        into a corresponding desired output from the neural network.
+    
+        """
+        e = np.zeros((10, 1))
+        e[j] = 1.0
+        return e
+    
+    def sigmoid(z):
+        """The sigmoid function."""
+        return 1.0/(1.0+np.exp(-z))
+    
+    def sigmoid_prime(z):
+        """Derivative of the sigmoid function."""
+        return sigmoid(z)*(1-sigmoid(z))
+    
+\end{lstlisting}
+
+One of the more interesting changes in the code is to include L2 regularization. Although this is a major conceptual change, it's so trivial to implement that it's easy to miss in the code. For the most part it just involves passing the parameter \lstinline{lmbda} to various methods, notably the \lstinline{Network.SGD} method. The real work is done in a single line of the program, the fourth-last line of the \lstinline{Network.update_mini_batch} method. That's where we modify the gradient descent update rule to include weight decay. But although the modification is tiny, it has a big impact on results!
+
+This is, by the way, common when implementing new techniques in neural networks. We've spent thousands of words discussing regularization. It's conceptually quite subtle and difficult to understand. And yet it was trivial to add to our program! It occurs surprisingly often that sophisticated techniques can be implemented with small changes to code.
+
+Another small but important change to our code is the addition of several optional flags to the stochastic gradient descent method, \lstinline{Network.SGD}. These flags make it possible to monitor the cost and accuracy either on the \lstinline{training_data} or on a set of \lstinline{evaluation_data} which can be passed to Network.SGD. We've used these flags often earlier in the chapter, but let me give an example of how it works, just to remind you:
+
+
+\begin{lstlisting}
+    >>> import mnist_loader
+    >>> training_data, validation_data, test_data = \
+    ... mnist_loader.load_data_wrapper()
+    >>> import network2
+    >>> net = network2.Network([784, 30, 10], cost=network2.CrossEntropyCost)
+    >>> net.SGD(training_data, 30, 10, 0.5,
+    ... lmbda = 5.0,
+    ... evaluation_data=validation_data,
+    ... monitor_evaluation_accuracy=True,
+    ... monitor_evaluation_cost=True,
+    ... monitor_training_accuracy=True,
+    ... monitor_training_cost=True)
+    
+\end{lstlisting}
+
 \begin{lstlisting}
 
-Exercise
-
-* As discussed above, one way of expanding the MNIST training data is to use small rotations of training images. What's a problem that might occur if we allow arbitrarily large rotations of training images? 
-An aside on big data and what it means to compare classification accuracies: Let's look again at how our neural network's accuracy varies with training set size:
-
-Suppose that instead of using a neural network we use some other machine learning technique to classify digits. For instance, let's try using the support vector machines (SVM) which we met briefly back in Chapter 1. As was the case in Chapter 1, don't worry if you're not familiar with SVMs, we don't need to understand their details. Instead, we'll use the SVM supplied by the scikit-learn library. Here's how SVM performance varies as a function of training set size. I've plotted the neural net results as well, to make comparison easy* *This graph was produced with the program more_data.py (as were the last few graphs).:
-
-Probably the first thing that strikes you about this graph is that our neural network outperforms the SVM for every training set size. That's nice, although you shouldn't read too much into it, since I just used the out-of-the-box settings from scikit-learn's SVM, while we've done a fair bit of work improving our neural network. A more subtle but more interesting fact about the graph is that if we train our SVM using 50,000 images then it actually has better performance (94.48 percent accuracy) than our neural network does when trained using 5,000 images (93.24 percent accuracy). In other words, more training data can sometimes compensate for differences in the machine learning algorithm used.
-Something even more interesting can occur. Suppose we're trying to solve a problem using two machine learning algorithms, algorithm A and algorithm B. It sometimes happens that algorithm A will outperform algorithm B with one set of training data, while algorithm B will outperform algorithm A with a different set of training data. We don't see that above - it would require the two graphs to cross - but it does happen* *Striking examples may be found in Scaling to very very large corpora for natural language disambiguation, by Michele Banko and Eric Brill (2001).. The correct response to the question ''Is algorithm A better than algorithm B?'' is really: ''What training data set are you using?''
-All this is a caution to keep in mind, both when doing development, and when reading research papers. Many papers focus on finding new tricks to wring out improved performance on standard benchmark data sets. ''Our whiz-bang technique gave us an improvement of X percent on standard benchmark Y'' is a canonical form of research claim. Such claims are often genuinely interesting, but they must be understood as applying only in the context of the specific training data set used. Imagine an alternate history in which the people who originally created the benchmark data set had a larger research grant. They might have used the extra money to collect more training data. It's entirely possible that the ''improvement'' due to the whiz-bang technique would disappear on a larger data set. In other words, the purported improvement might be just an accident of history. The message to take away, especially in practical applications, is that what we want is both better algorithms and better training data. It's fine to look for better algorithms, but make sure you're not focusing on better algorithms to the exclusion of easy wins getting more or better training data.
-Problem
-* (Research problem) How do our machine learning algorithms perform in the limit of very large data sets? For any given algorithm it's natural to attempt to define a notion of asymptotic performance in the limit of truly big data. A quick-and-dirty approach to this problem is to simply try fitting curves to graphs like those shown above, and then to extrapolate the fitted curves out to infinity. An objection to this approach is that different approaches to curve fitting will give different notions of asymptotic performance. Can you find a principled justification for fitting to some particular class of curves? If so, compare the asymptotic performance of several different machine learning algorithms. 
-Summing up: We've now completed our dive into overfitting and regularization. Of course, we'll return again to the issue. As I've mentioned several times, overfitting is a major problem in neural networks, especially as computers get more powerful, and we have the ability to train larger networks. As a result there's a pressing need to develop powerful regularization techniques to reduce overfitting, and this is an extremely active area of current work.
-Weight initialization
-When we create our neural networks, we have to make choices for the initial weights and biases. Up to now, we've been choosing them according to a prescription which I discussed only briefly back in Chapter 1. Just to remind you, that prescription was to choose both the weights and biases using independent Gaussian random variables, normalized to have mean 0
-and standard deviation 1
-. While this approach has worked well, it was quite ad hoc, and it's worth revisiting to see if we can find a better way of setting our initial weights and biases, and perhaps help our neural networks learn faster.
-It turns out that we can do quite a bit better than initializing with normalized Gaussians. To see why, suppose we're working with a network with a large number - say 1,000
-- of input neurons. And let's suppose we've used normalized Gaussians to initialize the weights connecting to the first hidden layer. For now I'm going to concentrate specifically on the weights connecting the input neurons to the first neuron in the hidden layer, and ignore the rest of the network:
-
-We'll suppose for simplicity that we're trying to train using a training input x
-in which half the input neurons are on, i.e., set to 1, and half the input neurons are off, i.e., set to 0. The argument which follows applies more generally, but you'll get the gist from this special case. Let's consider the weighted sum z=?jwjxj+b of inputs to our hidden neuron. 500 terms in this sum vanish, because the corresponding input xj is zero. And so z is a sum over a total of 501 normalized Gaussian random variables, accounting for the 500 weight terms and the 1 extra bias term. Thus z is itself distributed as a Gaussian with mean zero and standard deviation 501?????22.4. That is, z
-has a very broad Gaussian distribution, not sharply peaked at all:
--30-20-1001020300.02
-In particular, we can see from this graph that it's quite likely that |z|
-will be pretty large, i.e., either z?1 or z??1. If that's the case then the output ?(z) from the hidden neuron will be very close to either 1 or 0
-. That means our hidden neuron will have saturated. And when that happens, as we know, making small changes in the weights will make only absolutely miniscule changes in the activation of our hidden neuron. That miniscule change in the activation of the hidden neuron will, in turn, barely affect the rest of the neurons in the network at all, and we'll see a correspondingly miniscule change in the cost function. As a result, those weights will only learn very slowly when we use the gradient descent algorithm* *We discussed this in more detail in Chapter 2, where we used the equations of backpropagation to show that weights input to saturated neurons learned slowly.. It's similar to the problem we discussed earlier in this chapter, in which output neurons which saturated on the wrong value caused learning to slow down. We addressed that earlier problem with a clever choice of cost function. Unfortunately, while that helped with saturated output neurons, it does nothing at all for the problem with saturated hidden neurons.
-I've been talking about the weights input to the first hidden layer. Of course, similar arguments apply also to later hidden layers: if the weights in later hidden layers are initialized using normalized Gaussians, then activations will often be very close to 0
-or 1
-, and learning will proceed very slowly.
-Is there some way we can choose better initializations for the weights and biases, so that we don't get this kind of saturation, and so avoid a learning slowdown? Suppose we have a neuron with nin
-input weights. Then we shall initialize those weights as Gaussian random variables with mean 0 and standard deviation 1/nin????. That is, we'll squash the Gaussians down, making it less likely that our neuron will saturate. We'll continue to choose the bias as a Gaussian with mean 0 and standard deviation 1, for reasons I'll return to in a moment. With these choices, the weighted sum z=?jwjxj+b will again be a Gaussian random variable with mean 0, but it'll be much more sharply peaked than it was before. Suppose, as we did earlier, that 500 of the inputs are zero and 500 are 1. Then it's easy to show (see the exercise below) that z has a Gaussian distribution with mean 0 and standard deviation 3/2????=1.22?
-. This is much more sharply peaked than before, so much so that even the graph below understates the situation, since I've had to rescale the vertical axis, when compared to the earlier graph:
--30-20-1001020300.4 
-Such a neuron is much less likely to saturate, and correspondingly much less likely to have problems with a learning slowdown.
-Exercise
-* Verify that the standard deviation of z=?jwjxj+b
-in the paragraph above is 3/2????
-* . It may help to know that: (a) the variance of a sum of independent random variables is the sum of the variances of the individual random variables; and (b) the variance is the square of the standard deviation. 
-I stated above that we'll continue to initialize the biases as before, as Gaussian random variables with a mean of 0
-and a standard deviation of 1. This is okay, because it doesn't make it too much more likely that our neurons will saturate. In fact, it doesn't much matter how we initialize the biases, provided we avoid the problem with saturation. Some people go so far as to initialize all the biases to 0
-, and rely on gradient descent to learn appropriate biases. But since it's unlikely to make much difference, we'll continue with the same initialization procedure as before.
-Let's compare the results for both our old and new approaches to weight initialization, using the MNIST digit classification task. As before, we'll use 30
-hidden neurons, a mini-batch size of 10, a regularization parameter ?=5.0, and the cross-entropy cost function. We will decrease the learning rate slightly from ?=0.5 to 0.1
-, since that makes the results a little more easily visible in the graphs. We can train using the old method of weight initialization: 
->>> import mnist_loader
->>> training_data, validation_data, test_data = \
-... mnist_loader.load_data_wrapper()
->>> import network2
->>> net = network2.Network([784, 30, 10], cost=network2.CrossEntropyCost)
->>> net.large_weight_initializer()
->>> net.SGD(training_data, 30, 10, 0.1, lmbda = 5.0,
-... evaluation_data=validation_data, 
-... monitor_evaluation_accuracy=True)
-We can also train using the new approach to weight initialization. This is actually even easier, since network2's default way of initializing the weights is using this new approach. That means we can omit the net.large_weight_initializer() call above: 
->>> net = network2.Network([784, 30, 10], cost=network2.CrossEntropyCost)
->>> net.SGD(training_data, 30, 10, 0.1, lmbda = 5.0,
-... evaluation_data=validation_data, 
-... monitor_evaluation_accuracy=True)
-Plotting the results* *The program used to generate this and the next graph is weight_initialization.py., we obtain:
-
-In both cases, we end up with a classification accuracy somewhat over 96 percent. The final classification accuracy is almost exactly the same in the two cases. But the new initialization technique brings us there much, much faster. At the end of the first epoch of training the old approach to weight initialization has a classification accuracy under 87 percent, while the new approach is already almost 93 percent. What appears to be going on is that our new approach to weight initialization starts us off in a much better regime, which lets us get good results much more quickly. The same phenomenon is also seen if we plot results with 100
-hidden neurons:
-
-In this case, the two curves don't quite meet. However, my experiments suggest that with just a few more epochs of training (not shown) the accuracies become almost exactly the same. So on the basis of these experiments it looks as though the improved weight initialization only speeds up learning, it doesn't change the final performance of our networks. However, in Chapter 4 we'll see examples of neural networks where the long-run behaviour is significantly better with the 1/nin????
-weight initialization. Thus it's not only the speed of learning which is improved, it's sometimes also the final performance.
-The 1/nin????
-approach to weight initialization helps improve the way our neural nets learn. Other techniques for weight initialization have also been proposed, many building on this basic idea. I won't review the other approaches here, since 1/nin????
-works well enough for our purposes. If you're interested in looking further, I recommend looking at the discussion on pages 14 and 15 of a 2012 paper by Yoshua Bengio* *Practical Recommendations for Gradient-Based Training of Deep Architectures, by Yoshua Bengio (2012)., as well as the references therein.
-Problem
-* Connecting regularization and the improved method of weight initialization L2 regularization sometimes automatically gives us something similar to the new approach to weight initialization. Suppose we are using the old approach to weight initialization. Sketch a heuristic argument that: (1) supposing ?
-is not too small, the first epochs of training will be dominated almost entirely by weight decay; (2) provided ???n the weights will decay by a factor of exp(???/m) per epoch; and (3) supposing ? is not too large, the weight decay will tail off when the weights are down to a size around 1/n???, where n
-* is the total number of weights in the network. Argue that these conditions are all satisfied in the examples graphed in this section. 
-Handwriting recognition revisited: the code
-Let's implement the ideas we've discussed in this chapter. We'll develop a new program, network2.py, which is an improved version of the program network.py we developed in Chapter 1. If you haven't looked at network.py in a while then you may find it helpful to spend a few minutes quickly reading over the earlier discussion. It's only 74 lines of code, and is easily understood. 
-As was the case in network.py, the star of network2.py is the Network class, which we use to represent our neural networks. We initialize an instance of Network with a list of sizes for the respective layers in the network, and a choice for the cost to use, defaulting to the cross-entropy:
-class Network(object):
-
-    def __init__(self, sizes, cost=CrossEntropyCost):
-        self.num_layers = len(sizes)
-        self.sizes = sizes
-        self.default_weight_initializer()
-        self.cost=cost
-The first couple of lines of the __init__ method are the same as in network.py, and are pretty self-explanatory. But the next two lines are new, and we need to understand what they're doing in detail.
-Let's start by examining the default_weight_initializer method. This makes use of our new and improved approach to weight initialization. As we've seen, in that approach the weights input to a neuron are initialized as Gaussian random variables with mean 0 and standard deviation 1
-divided by the square root of the number of connections input to the neuron. Also in this method we'll initialize the biases, using Gaussian random variables with mean 0 and standard deviation 1
-. Here's the code:
-    def default_weight_initializer(self):
-        self.biases = [np.random.randn(y, 1) for y in self.sizes[1:]]
-        self.weights = [np.random.randn(y, x)/np.sqrt(x) 
-                        for x, y in zip(self.sizes[:-1], self.sizes[1:])]
-To understand the code, it may help to recall that np is the Numpy library for doing linear algebra. We'll import Numpy at the beginning of our program. Also, notice that we don't initialize any biases for the first layer of neurons. We avoid doing this because the first layer is an input layer, and so any biases would not be used. We did exactly the same thing in network.py.
-Complementing the default_weight_initializer we'll also include a large_weight_initializer method. This method initializes the weights and biases using the old approach from Chapter 1, with both weights and biases initialized as Gaussian random variables with mean 0
-and standard deviation 1
-. The code is, of course, only a tiny bit different from the default_weight_initializer:
-    def large_weight_initializer(self):
-        self.biases = [np.random.randn(y, 1) for y in self.sizes[1:]]
-        self.weights = [np.random.randn(y, x) 
-                        for x, y in zip(self.sizes[:-1], self.sizes[1:])]
-I've included the large_weight_initializer method mostly as a convenience to make it easier to compare the results in this chapter to those in Chapter 1. I can't think of many practical situations where I would recommend using it!
-The second new thing in Network's __init__ method is that we now initialize a cost attribute. To understand how that works, let's look at the class we use to represent the cross-entropy cost* *If you're not familiar with Python's static methods you can ignore the @staticmethod decorators, and just treat fn and delta as ordinary methods. If you're curious about details, all @staticmethod does is tell the Python interpreter that the method which follows doesn't depend on the object in any way. That's why self isn't passed as a parameter to the fn and delta methods.:
-class CrossEntropyCost(object):
-
-    @staticmethod
-    def fn(a, y):
-        return np.sum(np.nan_to_num(-y*np.log(a)-(1-y)*np.log(1-a)))
-
-    @staticmethod
-    def delta(z, a, y):
-        return (a-y)
-Let's break this down. The first thing to observe is that even though the cross-entropy is, mathematically speaking, a function, we've implemented it as a Python class, not a Python function. Why have I made that choice? The reason is that the cost plays two different roles in our network. The obvious role is that it's a measure of how well an output activation, a, matches the desired output, y. This role is captured by the CrossEntropyCost.fn method. (Note, by the way, that the np.nan_to_num call inside CrossEntropyCost.fn ensures that Numpy deals correctly with the log of numbers very close to zero.) But there's also a second way the cost function enters our network. Recall from Chapter 2 that when running the backpropagation algorithm we need to compute the network's output error,  $\delta^{l}$
-. The form of the output error depends on the choice of cost function: different cost function, different form for the output error. For the cross-entropy the output error is, as we saw in Equation (66),
-?L=aL?y.(99)
-For this reason we define a second method, CrossEntropyCost.delta, whose purpose is to tell our network how to compute the output error. And then we bundle these two methods up into a single class containing everything our networks need to know about the cost function.
-In a similar way, network2.py also contains a class to represent the quadratic cost function. This is included for comparison with the results of Chapter 1, since going forward we'll mostly use the cross entropy. The code is just below. The QuadraticCost.fn method is a straightforward computation of the quadratic cost associated to the actual output, a, and the desired output, y. The value returned by QuadraticCost.delta is based on the expression (30) for the output error for the quadratic cost, which we derived back in Chapter 2.
-class QuadraticCost(object):
-
-    @staticmethod
-    def fn(a, y):
-        return 0.5*np.linalg.norm(a-y)**2
-
-    @staticmethod
-    def delta(z, a, y):
-        return (a-y) * sigmoid_prime(z)
-We've now understood the main differences between network2.py and network.py. It's all pretty simple stuff. There are a number of smaller changes, which I'll discuss below, including the implementation of L2 regularization. Before getting to that, let's look at the complete code for network2.py. You don't need to read all the code in detail, but it is worth understanding the broad structure, and in particular reading the documentation strings, so you understand what each piece of the program is doing. Of course, you're also welcome to delve as deeply as you wish! If you get lost, you may wish to continue reading the prose below, and return to the code later. Anyway, here's the code:
-"""network2.py
-~~~~~~~~~~~~~~
-
-An improved version of network.py, implementing the stochastic
-gradient descent learning algorithm for a feedforward neural network.
-Improvements include the addition of the cross-entropy cost function,
-regularization, and better initialization of network weights.  Note
-that I have focused on making the code simple, easily readable, and
-easily modifiable.  It is not optimized, and omits many desirable
-features.
-
-"""
-
-#### Libraries
-# Standard library
-import json
-import random
-import sys
-
-# Third-party libraries
-import numpy as np
-
-
-#### Define the quadratic and cross-entropy cost functions
-
-class QuadraticCost(object):
-
-    @staticmethod
-    def fn(a, y):
-        """Return the cost associated with an output ''a`` and desired output
-        ``y``.
-
-        """
-        return 0.5*np.linalg.norm(a-y)**2
-
-    @staticmethod
-    def delta(z, a, y):
-        """Return the error delta from the output layer."""
-        return (a-y) * sigmoid_prime(z)
-
-
-class CrossEntropyCost(object):
-
-    @staticmethod
-    def fn(a, y):
-        """Return the cost associated with an output ``a`` and desired output
-        ``y``.  Note that np.nan_to_num is used to ensure numerical
-        stability.  In particular, if both ``a`` and ``y`` have a 1.0
-        in the same slot, then the expression (1-y)*np.log(1-a)
-        returns nan.  The np.nan_to_num ensures that that is converted
-        to the correct value (0.0).
-
-        """
-        return np.sum(np.nan_to_num(-y*np.log(a)-(1-y)*np.log(1-a)))
-
-    @staticmethod
-    def delta(z, a, y):
-        """Return the error delta from the output layer.  Note that the
-        parameter ``z`` is not used by the method.  It is included in
-        the method's parameters in order to make the interface
-        consistent with the delta method for other cost classes.
-
-        """
-        return (a-y)
-
-
-#### Main Network class
-class Network(object):
-
-    def __init__(self, sizes, cost=CrossEntropyCost):
-        """The list ``sizes`` contains the number of neurons in the respective
-        layers of the network.  For example, if the list was [2, 3, 1]
-        then it would be a three-layer network, with the first layer
-        containing 2 neurons, the second layer 3 neurons, and the
-        third layer 1 neuron.  The biases and weights for the network
-        are initialized randomly, using
-        ``self.default_weight_initializer`` (see docstring for that
-        method).
-
-        """
-        self.num_layers = len(sizes)
-        self.sizes = sizes
-        self.default_weight_initializer()
-        self.cost=cost
-
-    def default_weight_initializer(self):
-        """Initialize each weight using a Gaussian distribution with mean 0
-        and standard deviation 1 over the square root of the number of
-        weights connecting to the same neuron.  Initialize the biases
-        using a Gaussian distribution with mean 0 and standard
-        deviation 1.
-
-        Note that the first layer is assumed to be an input layer, and
-        by convention we won't set any biases for those neurons, since
-        biases are only ever used in computing the outputs from later
-        layers.
-
-        """
-        self.biases = [np.random.randn(y, 1) for y in self.sizes[1:]]
-        self.weights = [np.random.randn(y, x)/np.sqrt(x)
-                        for x, y in zip(self.sizes[:-1], self.sizes[1:])]
-
-    def large_weight_initializer(self):
-        """Initialize the weights using a Gaussian distribution with mean 0
-        and standard deviation 1.  Initialize the biases using a
-        Gaussian distribution with mean 0 and standard deviation 1.
-
-        Note that the first layer is assumed to be an input layer, and
-        by convention we won't set any biases for those neurons, since
-        biases are only ever used in computing the outputs from later
-        layers.
-
-        This weight and bias initializer uses the same approach as in
-        Chapter 1, and is included for purposes of comparison.  It
-        will usually be better to use the default weight initializer
-        instead.
-
-        """
-        self.biases = [np.random.randn(y, 1) for y in self.sizes[1:]]
-        self.weights = [np.random.randn(y, x)
-                        for x, y in zip(self.sizes[:-1], self.sizes[1:])]
-
-    def feedforward(self, a):
-        """Return the output of the network if ``a`` is input."""
-        for b, w in zip(self.biases, self.weights):
-            a = sigmoid(np.dot(w, a)+b)
-        return a
-
-    def SGD(self, training_data, epochs, mini_batch_size, eta,
-            lmbda = 0.0,
-            evaluation_data=None,
-            monitor_evaluation_cost=False,
-            monitor_evaluation_accuracy=False,
-            monitor_training_cost=False,
-            monitor_training_accuracy=False):
-        """Train the neural network using mini-batch stochastic gradient
-        descent.  The ``training_data`` is a list of tuples ``(x, y)``
-        representing the training inputs and the desired outputs.  The
-        other non-optional parameters are self-explanatory, as is the
-        regularization parameter ``lmbda``.  The method also accepts
-        ``evaluation_data``, usually either the validation or test
-        data.  We can monitor the cost and accuracy on either the
-        evaluation data or the training data, by setting the
-        appropriate flags.  The method returns a tuple containing four
-        lists: the (per-epoch) costs on the evaluation data, the
-        accuracies on the evaluation data, the costs on the training
-        data, and the accuracies on the training data.  All values are
-        evaluated at the end of each training epoch.  So, for example,
-        if we train for 30 epochs, then the first element of the tuple
-        will be a 30-element list containing the cost on the
-        evaluation data at the end of each epoch. Note that the lists
-        are empty if the corresponding flag is not set.
-
-        """
-        if evaluation_data: n_data = len(evaluation_data)
-        n = len(training_data)
-        evaluation_cost, evaluation_accuracy = [], []
-        training_cost, training_accuracy = [], []
-        for j in xrange(epochs):
-            random.shuffle(training_data)
-            mini_batches = [
-                training_data[k:k+mini_batch_size]
-                for k in xrange(0, n, mini_batch_size)]
-            for mini_batch in mini_batches:
-                self.update_mini_batch(
-                    mini_batch, eta, lmbda, len(training_data))
-            print ``Epoch %s training complete'' % j
-            if monitor_training_cost:
-                cost = self.total_cost(training_data, lmbda)
-                training_cost.append(cost)
-                print ``Cost on training data: {}".format(cost)
-            if monitor_training_accuracy:
-                accuracy = self.accuracy(training_data, convert=True)
-                training_accuracy.append(accuracy)
-                print ``Accuracy on training data: {} / {}".format(
-                    accuracy, n)
-            if monitor_evaluation_cost:
-                cost = self.total_cost(evaluation_data, lmbda, convert=True)
-                evaluation_cost.append(cost)
-                print ``Cost on evaluation data: {}".format(cost)
-            if monitor_evaluation_accuracy:
-                accuracy = self.accuracy(evaluation_data)
-                evaluation_accuracy.append(accuracy)
-                print ``Accuracy on evaluation data: {} / {}".format(
-                    self.accuracy(evaluation_data), n_data)
-            print
-        return evaluation_cost, evaluation_accuracy, \
-            training_cost, training_accuracy
-
-    def update_mini_batch(self, mini_batch, eta, lmbda, n):
-        """Update the network's weights and biases by applying gradient
-        descent using backpropagation to a single mini batch.  The
-        ``mini_batch`` is a list of tuples ``(x, y)``, ``eta`` is the
-        learning rate, ``lmbda`` is the regularization parameter, and
-        ``n`` is the total size of the training data set.
-
-        """
-        nabla_b = [np.zeros(b.shape) for b in self.biases]
-        nabla_w = [np.zeros(w.shape) for w in self.weights]
-        for x, y in mini_batch:
-            delta_nabla_b, delta_nabla_w = self.backprop(x, y)
-            nabla_b = [nb+dnb for nb, dnb in zip(nabla_b, delta_nabla_b)]
-            nabla_w = [nw+dnw for nw, dnw in zip(nabla_w, delta_nabla_w)]
-        self.weights = [(1-eta*(lmbda/n))*w-(eta/len(mini_batch))*nw
-                        for w, nw in zip(self.weights, nabla_w)]
-        self.biases = [b-(eta/len(mini_batch))*nb
-                       for b, nb in zip(self.biases, nabla_b)]
-
-    def backprop(self, x, y):
-        """Return a tuple ``(nabla_b, nabla_w)`` representing the
-        gradient for the cost function C_x.  ``nabla_b`` and
-        ``nabla_w`` are layer-by-layer lists of numpy arrays, similar
-        to ``self.biases`` and ``self.weights``."""
-        nabla_b = [np.zeros(b.shape) for b in self.biases]
-        nabla_w = [np.zeros(w.shape) for w in self.weights]
-        # feedforward
-        activation = x
-        activations = [x] # list to store all the activations, layer by layer
-        zs = [] # list to store all the z vectors, layer by layer
-        for b, w in zip(self.biases, self.weights):
-            z = np.dot(w, activation)+b
-            zs.append(z)
-            activation = sigmoid(z)
-            activations.append(activation)
-        # backward pass
-        delta = (self.cost).delta(zs[-1], activations[-1], y)
-        nabla_b[-1] = delta
-        nabla_w[-1] = np.dot(delta, activations[-2].transpose())
-        # Note that the variable l in the loop below is used a little
-        # differently to the notation in Chapter 2 of the book.  Here,
-        # l = 1 means the last layer of neurons, l = 2 is the
-        # second-last layer, and so on.  It's a renumbering of the
-        # scheme in the book, used here to take advantage of the fact
-        # that Python can use negative indices in lists.
-        for l in xrange(2, self.num_layers):
-            z = zs[-l]
-            sp = sigmoid_prime(z)
-            delta = np.dot(self.weights[-l+1].transpose(), delta) * sp
-            nabla_b[-l] = delta
-            nabla_w[-l] = np.dot(delta, activations[-l-1].transpose())
-        return (nabla_b, nabla_w)
-
-    def accuracy(self, data, convert=False):
-        """Return the number of inputs in ``data`` for which the neural
-        network outputs the correct result. The neural network's
-        output is assumed to be the index of whichever neuron in the
-        final layer has the highest activation.
-
-        The flag ``convert`` should be set to False if the data set is
-        validation or test data (the usual case), and to True if the
-        data set is the training data. The need for this flag arises
-        due to differences in the way the results ``y`` are
-        represented in the different data sets.  In particular, it
-        flags whether we need to convert between the different
-        representations.  It may seem strange to use different
-        representations for the different data sets.  Why not use the
-        same representation for all three data sets?  It's done for
-        efficiency reasons -- the program usually evaluates the cost
-        on the training data and the accuracy on other data sets.
-        These are different types of computations, and using different
-        representations speeds things up.  More details on the
-        representations can be found in
-        mnist_loader.load_data_wrapper.
-
-        """
-        if convert:
-            results = [(np.argmax(self.feedforward(x)), np.argmax(y))
-                       for (x, y) in data]
-        else:
-            results = [(np.argmax(self.feedforward(x)), y)
-                        for (x, y) in data]
-        return sum(int(x == y) for (x, y) in results)
-
-    def total_cost(self, data, lmbda, convert=False):
-        """Return the total cost for the data set ``data``.  The flag
-        ``convert`` should be set to False if the data set is the
-        training data (the usual case), and to True if the data set is
-        the validation or test data.  See comments on the similar (but
-        reversed) convention for the ``accuracy`` method, above.
-        """
-        cost = 0.0
-        for x, y in data:
-            a = self.feedforward(x)
-            if convert: y = vectorized_result(y)
-            cost += self.cost.fn(a, y)/len(data)
-        cost += 0.5*(lmbda/len(data))*sum(
-            np.linalg.norm(w)**2 for w in self.weights)
-        return cost
-
-    def save(self, filename):
-        """Save the neural network to the file ``filename``."""
-        data = {"sizes": self.sizes,
-                ``weights": [w.tolist() for w in self.weights],
-                ``biases": [b.tolist() for b in self.biases],
-                ``cost": str(self.cost.__name__)}
-        f = open(filename, ``w")
-        json.dump(data, f)
-        f.close()
-
-#### Loading a Network
-def load(filename):
-    """Load a neural network from the file ``filename``.  Returns an
-    instance of Network.
-
-    """
-    f = open(filename, ``r")
-    data = json.load(f)
-    f.close()
-    cost = getattr(sys.modules[__name__], data["cost"])
-    net = Network(data["sizes"], cost=cost)
-    net.weights = [np.array(w) for w in data["weights"]]
-    net.biases = [np.array(b) for b in data["biases"]]
-    return net
-
-#### Miscellaneous functions
-def vectorized_result(j):
-    """Return a 10-dimensional unit vector with a 1.0 in the j'th position
-    and zeroes elsewhere.  This is used to convert a digit (0...9)
-    into a corresponding desired output from the neural network.
-
-    """
-    e = np.zeros((10, 1))
-    e[j] = 1.0
-    return e
-
-def sigmoid(z):
-    """The sigmoid function."""
-    return 1.0/(1.0+np.exp(-z))
-
-def sigmoid_prime(z):
-    """Derivative of the sigmoid function."""
-    return sigmoid(z)*(1-sigmoid(z))
-One of the more interesting changes in the code is to include L2 regularization. Although this is a major conceptual change, it's so trivial to implement that it's easy to miss in the code. For the most part it just involves passing the parameter lmbda to various methods, notably the Network.SGD method. The real work is done in a single line of the program, the fourth-last line of the Network.update_mini_batch method. That's where we modify the gradient descent update rule to include weight decay. But although the modification is tiny, it has a big impact on results!
-This is, by the way, common when implementing new techniques in neural networks. We've spent thousands of words discussing regularization. It's conceptually quite subtle and difficult to understand. And yet it was trivial to add to our program! It occurs surprisingly often that sophisticated techniques can be implemented with small changes to code.
-Another small but important change to our code is the addition of several optional flags to the stochastic gradient descent method, Network.SGD. These flags make it possible to monitor the cost and accuracy either on the training_data or on a set of evaluation_data which can be passed to Network.SGD. We've used these flags often earlier in the chapter, but let me give an example of how it works, just to remind you:
->>> import mnist_loader
->>> training_data, validation_data, test_data = \
-... mnist_loader.load_data_wrapper()
->>> import network2
->>> net = network2.Network([784, 30, 10], cost=network2.CrossEntropyCost)
->>> net.SGD(training_data, 30, 10, 0.5,
-... lmbda = 5.0,
-... evaluation_data=validation_data,
-... monitor_evaluation_accuracy=True,
-... monitor_evaluation_cost=True,
-... monitor_training_accuracy=True,
-... monitor_training_cost=True)
 Here, we're setting the evaluation_data to be the validation_data. But we could also have monitored performance on the \lstinline{test_data} or any other data set. We also have four flags telling us to monitor the cost and accuracy on both the evaluation_data and the training_data. Those flags are False by default, but they've been turned on here in order to monitor our Network's performance. Furthermore, network2.py's Network.SGD method returns a four-element tuple representing the results of the monitoring. We can use this as follows:
 >>> evaluation_cost, evaluation_accuracy, 
 ... training_cost, training_accuracy = net.SGD(training_data, 30, 10, 0.5,
