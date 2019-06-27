@@ -1540,18 +1540,23 @@ This no-improvement-in-ten rule is good for initial exploration of MNIST. Howeve
 
 We haven't used early stopping in our MNIST experiments to date. The reason is that we've been doing a lot of comparisons between different approaches to learning. For such comparisons it's helpful to use the same number of epochs in each case. However, it's well worth modifying \lstinline{network2.py} to implement early stopping
 
+\textbf{Problem}
+
+\begin{enumerate}
+\item Modify \lstinline{network2.py} so that it implements early stopping using a no-improvement-in-$n$ epochs strategy, where $n$ is a parameter that can be set.
+\item Can you think of a rule for early stopping \textit{other} than no-improvement-in-$n$ Ideally, the rule should compromise between getting high validation accuracies and not training too long. Add your rule to \lstinline{network2.py}, and run three experiments comparing the validation accuracies and number of epochs of training to no-improvement-in-10.
+    \end{enumerate}
+
+\textbf{Learning rate schedule:} We've been holding the learning rate $\eta$
+constant. However, it's often advantageous to vary the learning rate. Early on during the learning process it's likely that the weights are badly wrong. And so it's best to use a large learning rate that causes the weights to change quickly. Later, we can reduce the learning rate as we make more fine-tuned adjustments to our weights.
+
+How should we set our learning rate schedule? Many approaches are possible. One natural approach is to use the same basic idea as early stopping. The idea is to hold the learning rate constant until the validation accuracy starts to get worse. Then decrease the learning rate by some amount, say a factor of two or ten. We repeat this many times, until, say, the learning rate is a factor of 1,024 (or 1,000) times lower than the initial value. Then we terminate.
+
+A variable learning schedule can improve performance, but it also opens up a world of possible choices for the learning schedule. Those choices can be a headache - you can spend forever trying to optimize your learning schedule. For first experiments my suggestion is to use a single, constant value for the learning rate. That'll get you a good first approximation. Later, if you want to obtain the best performance from your network, it's worth experimenting with a learning schedule, along the lines I've described.
+\marginnote{A readable recent paper \cite{Ciresan2010} demonstrates the benefits of variable learning rates in attacking MNIST.}
+
 \begin{lstlisting}
 
-Problem
-* Modify network2.py so that it implements early stopping using a no-improvement-in-n
-epochs strategy, where n
-*  is a parameter that can be set.
-*  Can you think of a rule for early stopping other than no-improvement-in-n? Ideally, the rule should compromise between getting high validation accuracies and not training too long. Add your rule to network2.py, and run three experiments comparing the validation accuracies and number of epochs of training to no-improvement-in-10
-* .
-Learning rate schedule: We've been holding the learning rate ?
-constant. However, it's often advantageous to vary the learning rate. Early on during the learning process it's likely that the weights are badly wrong. And so it's best to use a large learning rate that causes the weights to change quickly. Later, we can reduce the learning rate as we make more fine-tuned adjustments to our weights.
-How should we set our learning rate schedule? Many approaches are possible. One natural approach is to use the same basic idea as early stopping. The idea is to hold the learning rate constant until the validation accuracy starts to get worse. Then decrease the learning rate by some amount, say a factor of two or ten. We repeat this many times, until, say, the learning rate is a factor of 1,024 (or 1,000) times lower than the initial value. Then we terminate.
-A variable learning schedule can improve performance, but it also opens up a world of possible choices for the learning schedule. Those choices can be a headache - you can spend forever trying to optimize your learning schedule. For first experiments my suggestion is to use a single, constant value for the learning rate. That'll get you a good first approximation. Later, if you want to obtain the best performance from your network, it's worth experimenting with a learning schedule, along the lines I've described* *A readable recent paper which demonstrates the benefits of variable learning rates in attacking MNIST is Deep, Big, Simple Neural Nets Excel on Handwritten Digit Recognition, by Dan Claudiu Cire?an, Ueli Meier, Luca Maria Gambardella, and J?rgen Schmidhuber (2010)..
 Exercise
 * Modify network2.py so that it implements a learning schedule that: halves the learning rate each time the validation accuracy satisfies the no-improvement-in-10
 rule; and terminates when the learning rate has dropped to 1/128
