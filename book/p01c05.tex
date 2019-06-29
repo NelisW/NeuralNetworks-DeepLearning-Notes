@@ -68,12 +68,10 @@ So, what goes wrong when we try to train a deep network?
 
 To answer that question, let's first revisit the case of a network with just a single hidden layer. As per usual, we'll use the MNIST digit classification problem as our playground for learning and experimentation.\marginnote{I introduced the MNIST problem and data on pages \pageref{sec:Learningwithgradientdescent} and \pageref{sec:Implementingournetworktoclassifydigits}.}
 
-If you wish, you can follow along by training networks on your computer. It is also, of course, fine to just read along. If you do wish to follow live, then you'll need Python, Numpy, and a copy of the code, which you can get by cloning the relevant repository from the command line: 
+If you wish, you can follow along by training networks on your computer. It is also, of course, fine to just read along. If you do wish to follow live, then you'll need Python, Numpy, and a copy of the code, which you can get by cloning the relevant repository from the command line. The code is available here:
 
-For Python 2.7:
-\lstinline{git clone https://github.com/mnielsen/neural-networks-and-deep-learning.git}\\
-For Python 3:
-\lstinline{git clone https://github.com/MichalDanielDobrzanski/DeepLearningPython35.git}
+For Python 2.7: \cite{Nielsengithub2019}\\
+For Python 3: \cite{MDDobrzanskigithub2019}
 
 If you don't use git then you can download the data and code from the GitHub repos shown above. You'll need to change into the src subdirectory.
 Then, from a Python shell we load the MNIST data:
@@ -236,7 +234,7 @@ Dividing by $\Delta b_1$ we do indeed get the desired expression for the gradien
 
 
 
-\textbf{Why the vanishing gradient problem occurs: }\label{page:Whythevanishinggradientproblemoccurs}
+\newthought{Why the vanishing gradient problem occurs: }\label{page:Whythevanishinggradientproblemoccurs}
 To understand why the vanishing gradient problem occurs, let's explicitly write out the entire expression for the gradient: 
 \begin{equation}
     \frac{\partial C}{\partial b_{1}}=\sigma^{\prime}\left(z_{1}\right) w_{2} \sigma^{\prime}\left(z_{2}\right) w_{3} \sigma^{\prime}\left(z_{3}\right) w_{4} \sigma^{\prime}\left(z_{4}\right) \frac{\partial C}{\partial a_{4}}
@@ -260,11 +258,11 @@ The two expressions share many terms. But the gradient $\partial C / \partial b_
 
 Of course, this is an informal argument, not a rigorous proof that the vanishing gradient problem will occur. There are several possible escape clauses. In particular, we might wonder whether the weights $w_j$ could grow during training. If they do, it's possible the terms $w_{j} \sigma^{\prime}\left(z_{j}\right)$ in the product will no longer satisfy $\left|w_{j} \sigma^{\prime}\left(z_{j}\right)\right|<1 / 4$. Indeed, if the terms get large enough - greater than 1 - then we will no longer have a vanishing gradient problem. Instead, the gradient will actually grow exponentially as we move backward through the layers. Instead of a vanishing gradient problem, we'll have an exploding gradient problem.
 
-\textbf{The exploding gradient problem:} Let's look at an explicit example where exploding gradients occur. The example is somewhat contrived: I'm going to fix parameters in the network in just the right way to ensure we get an exploding gradient. But even though the example is contrived, it has the virtue of firmly establishing that exploding gradients aren't merely a hypothetical possibility, they really can happen.
+\newthought{The exploding gradient problem:} Let's look at an explicit example where exploding gradients occur. The example is somewhat contrived: I'm going to fix parameters in the network in just the right way to ensure we get an exploding gradient. But even though the example is contrived, it has the virtue of firmly establishing that exploding gradients aren't merely a hypothetical possibility, they really can happen.
 
 There are two steps to getting an exploding gradient. First, we choose all the weights in the network to be large, say $w_1$=$w_2$=$w_3$=$w_4$=100. Second, we'll choose the biases so that the$\sigma^{\prime}\left(z_{j}\right)$ terms are not too small. That's actually pretty easy to do: all we need do is choose the biases to ensure that the weighted input to each neuron is $z_j$=0 (and so $\sigma^{\prime}\left(z_{j}\right)=1 / 4$). So, for instance, we want $z_{1}=w_{1} a_{0}+b_{1}=0$. We can achieve this by setting $b_{1}=-100  a_{0}$. We can use the same idea to select the other biases. When we do this, we see that all the terms $w_{j} \sigma^{\prime}\left(z_{j}\right)$ are equal to $100 \times\frac{1}{4}=25$. With these choices we get an exploding gradient.
 
-\textbf{The unstable gradient problem}: The fundamental problem here isn't so much the vanishing gradient problem or the exploding gradient problem. It's that the gradient in early layers is the product of terms from all the later layers. When there are many layers, that's an intrinsically unstable situation. The only way all layers can learn at close to the same speed is if all those products of terms come close to balancing out. Without some mechanism or underlying reason for that balancing to occur, it's highly unlikely to happen simply by chance. In short, the real problem here is that neural networks suffer from an \textit{unstable gradient problem}. As a result, if we use standard gradient-based learning techniques, different layers in the network will tend to learn at wildly different speeds.
+\newthought{The unstable gradient problem}: The fundamental problem here isn't so much the vanishing gradient problem or the exploding gradient problem. It's that the gradient in early layers is the product of terms from all the later layers. When there are many layers, that's an intrinsically unstable situation. The only way all layers can learn at close to the same speed is if all those products of terms come close to balancing out. Without some mechanism or underlying reason for that balancing to occur, it's highly unlikely to happen simply by chance. In short, the real problem here is that neural networks suffer from an \textit{unstable gradient problem}. As a result, if we use standard gradient-based learning techniques, different layers in the network will tend to learn at wildly different speeds.
 
 
 
@@ -276,34 +274,35 @@ There are two steps to getting an exploding gradient. First, we choose all the w
     
 \end{enumerate}
 
-\textbf{The prevalence of the vanishing gradient problem:} We've seen that the gradient can either vanish or explode in the early layers of a deep network. In fact, when using sigmoid neurons the gradient will usually vanish. To see why, consider again the expression $\left|w \sigma^{\prime}(z)\right|$. To avoid the vanishing gradient problem we need $\left|w \sigma^{\prime}(z)\right| \geq 1$. You might think this could happen easily if $w$ is very large. However, it's more difficult than it looks. The reason is that the $\sigma^{\prime}(z)$ term also depends on $w$:
+\newthought{The prevalence of the vanishing gradient problem:} We've seen that the gradient can either vanish or explode in the early layers of a deep network. In fact, when using sigmoid neurons the gradient will usually vanish. To see why, consider again the expression $\left|w \sigma^{\prime}(z)\right|$. To avoid the vanishing gradient problem we need $\left|w \sigma^{\prime}(z)\right| \geq 1$. You might think this could happen easily if $w$ is very large. However, it's more difficult than it looks. The reason is that the $\sigma^{\prime}(z)$ term also depends on $w$:
 $\sigma^{\prime}(z)=\sigma^{\prime}(w a+b)$, where $a$ is the input activation. So when we make $w$ large, we need to be careful that we're not simultaneously making $\sigma^{\prime}(w a+b)$ small. That turns out to be a considerable constraint. The reason is that when we make $w$ large we tend to make $wa+b$ very large. Looking at the graph of $\sigma^\prime$ you can see that this puts us off in the ``wings'' of the $\sigma^\prime$ function, where it takes very small values. The only way to avoid this is if the input activation falls within a fairly narrow range of values (this qualitative explanation is made quantitative in the first problem below). Sometimes that will chance to happen. More often, though, it does not happen. And so in the generic case we have vanishing gradients.
 
 \textbf{Problems}
 
 
 \begin{enumerate}
-    \item Consider the product $\left|w \sigma^{\prime}(w a+b)\right|$. Suppose$\left|w \sigma^{\prime}(w a+b)\right| \geq 1$. 
-    (1) Argue that this can only ever occur if $|w| \geq 4$. \\
-    (2) Supposing that $|w| \geq 4$, consider the set of input activations $a$ for which $\left|w \sigma^{\prime}(w a+b)\right| \geq 1$. Show that the set of $a$ satisfying that constraint can range over an interval no greater in width than 
-    \begin{equation}
-        \frac{2}{|w|} \ln \left(\frac{|w|(1+\sqrt{1-4 /|w|})}{2}-1\right)
-        \label{eq:c05-123}
-        \end{equation}
-    (3) Show numerically that the above expression bounding the width of the range is greatest at $|w| \approx$ 6.9, where it takes a value $\approx$0.45. And so even given that everything lines up just perfectly, we still have a fairly narrow range of input activations which can avoid the vanishing gradient problem.
+\item Consider the product $\left|w \sigma^{\prime}(w a+b)\right|$. Suppose$\left|w \sigma^{\prime}(w a+b)\right| \geq 1$. 
+(1) Argue that this can only ever occur if $|w| \geq 4$. \\
+(2) Supposing that $|w| \geq 4$, consider the set of input activations $a$ for which $\left|w \sigma^{\prime}(w a+b)\right| \geq 1$. Show that the set of $a$ satisfying that constraint can range over an interval no greater in width than 
+\begin{equation}
+\frac{2}{|w|} \ln \left(\frac{|w|(1+\sqrt{1-4 /|w|})}{2}-1\right)
+\label{eq:c05-123}
+\end{equation}
+(3) Show numerically that the above expression bounding the width of the range is greatest at $|w| \approx$ 6.9, where it takes a value $\approx$0.45. And so even given that everything lines up just perfectly, we still have a fairly narrow range of input activations which can avoid the vanishing gradient problem.
     
-    \item \textbf{Identity neuron:}\label{page:Identityneuron} Consider a neuron with a single input, $x$, a corresponding weight, $w_1$, $a$ bias $b$, and a weight $w_2$ on the output. Show that by choosing the weights and bias appropriately, we can ensure $w_{2} \sigma\left(w_{1} x+b\right) \approx x$ for $x \in[0,1]$. Such a neuron can thus be used as a kind of identity neuron, that is, a neuron whose output is the same (up to rescaling by a weight factor) as its input. Hint: \textit{It helps to rewrite $x=1 / 2+\Delta$, to assume $w_1$ is small, and to use a Taylor series expansion in $w_1\Delta$.}
-    
+\item \newthought{Identity neuron:}\label{page:Identityneuron} Consider a neuron with a single input, $x$, a corresponding weight, $w_1$, $a$ bias $b$, and a weight $w_2$ on the output. Show that by choosing the weights and bias appropriately, we can ensure $w_{2} \sigma\left(w_{1} x+b\right) \approx x$ for $x \in[0,1]$. Such a neuron can thus be used as a kind of identity neuron, that is, a neuron whose output is the same (up to rescaling by a weight factor) as its input. Hint: \textit{It helps to rewrite $x=1 / 2+\Delta$, to assume $w_1$ is small, and to use a Taylor series expansion in $w_1\Delta$.}
+
 \end{enumerate}
+
 
 
 \section{Unstable gradients in more complex networks}
 
 We've been studying toy networks, with just one neuron in each hidden layer. What about more complex deep networks, with many neurons in each hidden layer?
 \begin{figure*}[tph]
-    \includegraphics[width=0.6\textwidth]{ch05-snip13}
-    \label{fig:ch05-snip13}
-    \end{figure*}
+\includegraphics[width=0.6\textwidth]{ch05-snip13}
+\label{fig:ch05-snip13}
+\end{figure*}
 
 In fact, much the same behaviour occurs in such networks. In the earlier chapter on backpropagation we saw that the gradient in the \mth{]} layer of an $L$ layer network is given by:
 \begin{equation}
