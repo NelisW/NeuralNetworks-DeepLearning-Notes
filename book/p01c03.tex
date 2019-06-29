@@ -828,7 +828,7 @@ All this is a caution to keep in mind, both when doing development, and when rea
 \textbf{Summing up:} We've now completed our dive into overfitting and regularization. Of course, we'll return again to the issue. As I've mentioned several times, overfitting is a major problem in neural networks, especially as computers get more powerful, and we have the ability to train larger networks. As a result there's a pressing need to develop powerful regularization techniques to reduce overfitting, and this is an extremely active area of current work.
 
 \section{Weight initialization}
-
+\label{sec:Weightinitialization}
 When we create our neural networks, we have to make choices for the initial weights and biases. Up to now, we've been choosing them according to a prescription which I discussed only briefly back in Chapter~\ref{sec:UsingNeuralNetsTorRcognizeHandWrittenDigits}. Just to remind you, that prescription was to choose both the weights and biases using independent Gaussian random variables, normalized to have mean 0 and standard deviation 1. While this approach has worked well, it was quite \textit{ad hoc}, and it's worth revisiting to see if we can find a better way of setting our initial weights and biases, and perhaps help our neural networks learn faster.
 
 It turns out that we can do quite a bit better than initializing with normalized Gaussians. To see why, suppose we're working with a network with a large number --- say 1,000 --- of input neurons. And let's suppose we've used normalized Gaussians to initialize the weights connecting to the first hidden layer. For now I'm going to concentrate specifically on the weights connecting the input neurons to the first neuron in the hidden layer, and ignore the rest of the network.
@@ -902,7 +902,7 @@ In both cases, we end up with a classification accuracy somewhat over 96~percent
 
 In this case, the two curves don't quite meet. However, my experiments suggest that with just a few more epochs of training (not shown) the accuracies become almost exactly the same. So on the basis of these experiments it looks as though the improved weight initialization only speeds up learning, it doesn't change the final performance of our networks. However, in Chapter~\ref{sec:AVisualProofThatNeuralNetsCanComputeAnyFunction} we'll see examples of neural networks where the long-run behaviour is significantly better with the 1$/ \sqrt{n_{\mathrm{in}}}$ weight initialization. Thus it's not only the speed of learning which is improved, it's sometimes also the final performance.
 The 1$/ \sqrt{n_{\mathrm{in}}}$ approach to weight initialization helps improve the way our neural nets learn. Other techniques for weight initialization have also been proposed, many building on this basic idea. I won't review the other approaches here, since 1$/ \sqrt{n_{\mathrm{in}}}$ works well enough for our purposes. If you're interested in looking further, I recommend looking at the discussion on pages 14 and 15 of a 2012 paper by Yoshua Bengio 
-\cite{YoshuaBengio2012}, as well as the references therein.
+\cite{Bengio2012}, as well as the references therein.
 
 \textbf{Problems}
 
@@ -1598,7 +1598,7 @@ w' = w-\eta \nabla C_x
 for online learning. Even if it only takes 50 times as long to do the mini-batch update, it still seems likely to be better to do online learning, because we'd be updating so much more frequently. Suppose, however, that in the mini-batch case we increase the learning rate by a factor 100, so the update rule becomes 
 \begin{equation} 
     w \rightarrow w' = w-\eta \sum_x \nabla C_x. 
-    \label{eq:c03-101}
+    \label{eq:c03-102}
 \end{equation}
 That's a lot like doing 100 separate instances of online learning with a learning rate of $\eta$. But it only takes 50 times as long as doing a single instance of online learning. Of course, it's not truly the same as 100 instances of online learning, since in the mini-batch the $\nabla C_x$'s are all evaluated for the same set of weights, as opposed to the cumulative learning that occurs in the online case. Still, it seems distinctly possible that using the larger mini-batch would speed things up.
 
@@ -1772,7 +1772,7 @@ Because the activations are positive the sign of this gradient will be the same 
 
 \section{On stories in neural networks}
     
-\newthought{From question and answer} with neural networks researcher Yann LeCun, \cite{YannLeCun2019}.
+\newthought{From question and answer} with neural networks researcher Yann LeCun, \cite{YannLeCunreddit2019}.
 
 \textbf{ Question:} \textit{How do you approach utilizing and researching machine learning techniques that are supported almost entirely empirically, as opposed to mathematically? Also in what situations have you noticed some of these techniques fail?}
     

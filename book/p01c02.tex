@@ -114,8 +114,8 @@ This kind of elementwise multiplication is sometimes called the \textit{Hadamard
 
 
 \section{The four fundamental equations behind backpropagation}
-
-Backpropagation is about understanding how changing the weights and biases in a network changes the cost function. Ultimately, this means computing the partial derivatives $\partial C / \partial w_{j k}^{l}$ and $\partial C / \partial b_{j}^{l}$. But to compute those, we first introduce an intermediate quantity, $\delta_{j}^{l}$, which we call the \textit{error} in the \mth{j} neuron in the \mth{l} layer. 
+\label{sec:Thefourfundamentalequationsbehindbackpropagation}
+Backpropagation is  about understanding how changing the weights and biases in a network changes the cost function. Ultimately, this means computing the partial derivatives $\partial C / \partial w_{j k}^{l}$ and $\partial C / \partial b_{j}^{l}$. But to compute those, we first introduce an intermediate quantity, $\delta_{j}^{l}$, which we call the \textit{error} in the \mth{j} neuron in the \mth{l} layer. 
 
 Backpropagation will give us a procedure to compute the error $\delta^{l}_j$, and then will relate $\delta_{j}^{l}$ to $\partial C / \partial w_{j k}^{l}$ and $\partial C / \partial b_{j}^{l}$.
 
