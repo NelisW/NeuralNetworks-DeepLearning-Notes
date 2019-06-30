@@ -710,7 +710,7 @@ All the method does is applies Equation~\ref{eq:ch01-22} for each layer:
 \begin{fullwidth}
 \begin{lstlisting}[language=Python]
     def feedforward(self, a):
-        """Return the output of the network if ``a'' is input."""
+        """Return the output of the network if "a" is input."""
         for b, w in zip(self.biases, self.weights):
             a = sigmoid(np.dot(w, a)+b)
         return a
@@ -723,10 +723,10 @@ Of course, the main thing we want our \lstinline{Network} objects to do is to le
 def SGD(self, training_data, epochs, mini_batch_size, eta,
             test_data=None):
         """Train the neural network using mini-batch stochastic
-        gradient descent.  The ``training_data'' is a list of tuples
+        gradient descent.  The "training_data" is a list of tuples
         "(x, y)" representing the training inputs and the desired
         outputs.  The other non-optional parameters are
-        self-explanatory.  If ``test_data'' is provided then the
+        self-explanatory.  If "test_data" is provided then the
         network will be evaluated against the test data after each
         epoch, and partial progress printed out.  This is useful for
         tracking progress, but slows things down substantially."""
@@ -756,7 +756,7 @@ The code works as follows. In each epoch, it starts by randomly shuffling the tr
     def update_mini_batch(self, mini_batch, eta):
         """Update the network's weights and biases by applying
         gradient descent using backpropagation to a single mini batch.
-        The ``mini_batch'' is a list of tuples "(x, y)", and ``eta"
+        The "mini_batch" is a list of tuples "(x, y)", and "eta"
         is the learning rate."""
         nabla_b = [np.zeros(b.shape) for b in self.biases]
         nabla_w = [np.zeros(w.shape) for w in self.weights]
@@ -807,7 +807,7 @@ import numpy as np
 class Network(object):
 
     def __init__(self, sizes):
-        """The list ``sizes`` contains the number of neurons in the
+        """The list "sizes" contains the number of neurons in the
         respective layers of the network.  For example, if the list
         was [2, 3, 1] then it would be a three-layer network, with the
         first layer containing 2 neurons, the second layer 3 neurons,
@@ -824,7 +824,7 @@ class Network(object):
                         for x, y in zip(sizes[:-1], sizes[1:])]
 
     def feedforward(self, a):
-        """Return the output of the network if ``a`` is input."""
+        """Return the output of the network if "a" is input."""
         for b, w in zip(self.biases, self.weights):
             a = sigmoid(np.dot(w, a)+b)
         return a
@@ -832,10 +832,10 @@ class Network(object):
     def SGD(self, training_data, epochs, mini_batch_size, eta,
             test_data=None):
         """Train the neural network using mini-batch stochastic
-        gradient descent.  The ``training_data`` is a list of tuples
-        ``(x, y)`` representing the training inputs and the desired
+        gradient descent.  The "training_data" is a list of tuples
+        "(x, y)" representing the training inputs and the desired
         outputs.  The other non-optional parameters are
-        self-explanatory.  If ``test_data`` is provided then the
+        self-explanatory.  If "test_data" is provided then the
         network will be evaluated against the test data after each
         epoch, and partial progress printed out.  This is useful for
         tracking progress, but slows things down substantially."""
@@ -857,7 +857,7 @@ class Network(object):
     def update_mini_batch(self, mini_batch, eta):
         """Update the network's weights and biases by applying
         gradient descent using backpropagation to a single mini batch.
-        The ``mini_batch`` is a list of tuples ``(x, y)``, and ``eta``
+        The "mini_batch" is a list of tuples "(x, y)", and "eta"
         is the learning rate."""
         nabla_b = [np.zeros(b.shape) for b in self.biases]
         nabla_w = [np.zeros(w.shape) for w in self.weights]
@@ -871,10 +871,10 @@ class Network(object):
                        for b, nb in zip(self.biases, nabla_b)]
 
     def backprop(self, x, y):
-        """Return a tuple ``(nabla_b, nabla_w)`` representing the
-        gradient for the cost function C_x.  ``nabla_b`` and
-        ``nabla_w`` are layer-by-layer lists of numpy arrays, similar
-        to ``self.biases`` and ``self.weights``."""
+        """Return a tuple "(nabla_b, nabla_w)" representing the
+        gradient for the cost function C_x.  "nabla_b" and
+        "nabla_w" are layer-by-layer lists of numpy arrays, similar
+        to "self.biases" and "self.weights"."""
         nabla_b = [np.zeros(b.shape) for b in self.biases]
         nabla_w = [np.zeros(w.shape) for w in self.weights]
         # feedforward
@@ -1027,8 +1027,8 @@ Earlier, I skipped over the details of how the MNIST data is loaded. It's pretty
 mnist_loader
 ~~~~~~~~~~~~
 A library to load the MNIST image data.  For details of the data
-structures that are returned, see the doc strings for ``load_data``
-and ``load_data_wrapper``.  In practice, ``load_data_wrapper`` is the
+structures that are returned, see the doc strings for "load_data"
+and "load_data_wrapper".  In practice, "load_data_wrapper" is the
 function usually called by our neural network code.
 """
 
@@ -1043,20 +1043,20 @@ import numpy as np
 def load_data():
     """Return the MNIST data as a tuple containing the training data,
     the validation data, and the test data.
-    The ``training_data`` is returned as a tuple with two entries.
+    The "training_data" is returned as a tuple with two entries.
     The first entry contains the actual training images.  This is a
     numpy ndarray with 50,000 entries.  Each entry is, in turn, a
     numpy ndarray with 784 values, representing the 28 * 28 = 784
     pixels in a single MNIST image.
-    The second entry in the ``training_data`` tuple is a numpy ndarray
+    The second entry in the "training_data" tuple is a numpy ndarray
     containing 50,000 entries.  Those entries are just the digit
     values (0...9) for the corresponding images contained in the first
     entry of the tuple.
-    The ``validation_data`` and ``test_data`` are similar, except
+    The "validation_data" and "test_date" are similar, except
     each contains only 10,000 images.
     This is a nice data format, but for use in neural networks it's
-    helpful to modify the format of the ``training_data`` a little.
-    That's done in the wrapper function ``load_data_wrapper()``, see
+    helpful to modify the format of the "training_data" a little.
+    That's done in the wrapper function "load_data_wrapper()", see
     below.
     """
     f = gzip.open('mnist.pkl.gz', 'rb')
@@ -1065,19 +1065,19 @@ def load_data():
     return (training_data, validation_data, test_data)
 
 def load_data_wrapper():
-    """Return a tuple containing ``(training_data, validation_data,
-    test_data)``. Based on ``load_data``, but the format is more
+    """Return a tuple containing "(training_data, validation_data,
+    test_data)". Based on "load_data", but the format is more
     convenient for use in our implementation of neural networks.
-    In particular, ``training_data`` is a list containing 50,000
-    2-tuples ``(x, y)``.  ``x`` is a 784-dimensional numpy.ndarray
-    containing the input image.  ``y`` is a 10-dimensional
+    In particular, "training_data" is a list containing 50,000
+    2-tuples "(x, y)".  "x" is a 784-dimensional numpy.ndarray
+    containing the input image.  "y" is a 10-dimensional
     numpy.ndarray representing the unit vector corresponding to the
-    correct digit for ``x``.
-    ``validation_data`` and ``test_data`` are lists containing 10,000
-    2-tuples ``(x, y)``.  In each case, ``x`` is a 784-dimensional
-    numpy.ndarry containing the input image, and ``y`` is the
+    correct digit for "x".
+    "validation_data" and "test_data" are lists containing 10,000
+    2-tuples "(x, y)".  In each case, "x" is a 784-dimensional
+    numpy.ndarry containing the input image, and" y" is the
     corresponding classification, i.e., the digit values (integers)
-    corresponding to ``x``.
+    corresponding to "x".
     Obviously, this means we're using slightly different formats for
     the training data and the validation / test data.  These formats
     turn out to be the most convenient for use in our neural network
