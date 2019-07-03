@@ -1,337 +1,298 @@
 % -*- TeX -*- -*- UK -*- -*- Soft -*-
 
-\chapter{Estimating Probabilities with Bayesian Modeling in Python}
-\label{chap:EstimatingProbabilitieswithBayesianModelinginPython}
+\chapter{Bayesian Glossary}
+\label{chap:BayesianGlossary}
 
 
-This material is taken from \cite{KoehrsenEstiBayes2018}.
+This material is taken from \cite{RavinKumarBayesianGlossary2019}, several refinements and corrections.
 
-A simple application of Probabilistic Programming with PyMC3 in Python
-
-Will Koehrsen, Nov 28, 2018.
-
-It started, as the best projects always do, with a few tweets shown in Figure~\ref{fig:p05c02-snip01}.
-
-% \begin{marginfigure}
-%     \includegraphics{504192}
-%     \end{marginfigure}
-
-\begin{figure*}[h]
-    \includegraphics[width=0.56\textwidth]{p05c02-snip01}
-    \caption{Allen Downey tweets}
-    \label{fig:p05c02-snip01}
-    \end{figure*}
-
-
-This may seem like a simple problem --- the prevalences are simply the same as the observed data (50\% lions, 33\% tigers and 17\% bears) right? If you believe observations we make are a perfect representation of the underlying truth, then yes, this problem could not be easier. However, as a Bayesian \cite{RationalWikiBayesian2019}, this view of the world and the subsequent reasoning is deeply unsatisfying.
-
-First, how can we be sure this single trip to the preserve was indicative of all trips? What if we went during the winter when the bears were hibernating? We need to include uncertainty in our estimate considering the limited data. Second, how can we incorporate prior beliefs about the situation into this estimate? If we have heard from a friend the preserve has an equal number of each animal, then surely this should play some role in our estimate.
-
-\textit{Fortunately, there is a solution that allows to express uncertainty and incorporate prior information into our estimate: Bayesian Inference.}
-
-In this article, we'll explore the problem of estimating probabilities from data in a Bayesian framework, along the way learning about probability distributions, 
-Bayesian Inference \cite{wikipediaBayesianinference2019}, and 
-basic probabilistic programming \cite{CameronDavidsonPilonGitHub2019} \cite{CameronDavidsonPilonBlog2019} 
-with PyMC3 \cite{PyMC3API2019}. The complete code is available as a Jupyter Notebook on GitHub \cite{KoehrsenEstiBayesGithub2018}.
-
-    \begin{figure*}[h]
-        \includegraphics[width=0.56\textwidth]{p05c02-snip02}
-        \caption{PDF and trace values from PyMC3}
-        \label{fig:p05c02-snip02}
-        \end{figure*}
-    
-\section{Background Concepts}
-
-Often, especially in statistics, I find the theory behind a solution \textit{more confusing} than actually solving the problem. (I'm convinced statisticians complicate statistics to justify their existence.) Coding an answer and visualizing the solution usually does more for me than reading endless equations. Therefore, when I approached this problem, I studied just enough of the ideas to code a solution, and only \textit{after} did I dig back into the concepts.
-
-This reflects my general \textit{top-down} \cite{RachelThomas2019} approach to learning new topics. Instead of starting with the fundamentals --- which are usually tedious and difficult to grasp --- find out how to implement an idea so you know \textit{why it's useful} and then go back to the formalisms. So, if you feel yourself getting frustrated with the theory, move on to the solution (starting with the Inference section below), and then come back to the concepts if you're still interested.
-
-(This top-down philosophy is exemplified in the excellent fast.ai courses on deep learning \cite{RachelThomas2019}. These courses, besides effectively teaching neural networks, have been influential in my approach to learning new techniques.)
-
-\section{Bayesian Model}
-
-Since we want to solve this problem with Bayesian methods, we need to construct a model of the situation. The basic set-up is we have a series of observations: 3 tigers, 2 lions, and 1 bear, and from this data, we want to estimate the prevalence of each species at the wildlife preserve. That is, we are looking for the posterior probability of seeing each species given the data.
-
-Before we begin we want to establish our assumptions:
-
-
-\begin{itemize}
-\item Treat each observation of one species as an independent trial.
-\item Our initial (prior) belief is each species is equally represented.
-\end{itemize}
-
-The overall system, where we have 3 \textbf{discrete} choices (species) each with an unknown probability and 6 total observations is a\textbf{ multinomial distribution}. The multinomial distribution is the extension of the binomial distribution to the case where there are more than 2 outcomes. A simple application of a multinomial is 5 rolls of a dice each of which has 6 possible outcomes.
-
-A probability mass function \cite{WikipeadiaProbabilitymassfunction2019} of a multinomial with 3 discrete outcomes is shown in the figure.
-
-\begin{marginfigure}
-    \includegraphics{p05c02-snip03}
-    \caption{Probability Mass Function (PMF) of a multinomial with 3 outcomes}
-    \end{marginfigure}
-
-A Multinomial distribution is characterized by $k$, the number of outcomes, $n$, the number of trials, and 
-$\mathbf {p}$, a vector of probabilities for each of the outcomes. For this problem, $\mathbf {p}$ is our ultimate objective: we want to figure out the probability of seeing each species from the observed data. In Bayesian statistics, the parameter vector for a multinomial is drawn from a \textbf{Dirichlet Distribution}, which forms the prior distribution for the parameter.
-
-The Dirichlet Distribution, in turn, is characterized by, $k$, the number of outcomes, and  $\boldsymbol {\alpha }$, a vector of positive real values called the concentration parameter. This is called a \textbf{hyperparameter} because it is a \textit{parameter of the prior}. (This chain can keep going: if  $\boldsymbol {\alpha }$ comes from another distribution then this is a \textit{hyperprior} which could have its \textit{own parameters} called \textit{hyperyhyperparameters}!). We'll stop our model at this level by explicitly setting the values of alpha, which has one entry for each outcome.
-
-\section{Hyperparameters and Prior Beliefs}
-
-The best way to think of the Dirichlet parameter vector is as pseudocounts, observations of each outcome that occur before the actual data is collected. These pseudocounts \textit{capture our prior belief about the situation}. For example, because we think the prevalence of each animal is the same before going to the preserve, we set all of the alpha values to be equal, say  $\boldsymbol {\alpha }$ = [1, 1, 1].
-
-Conversely, if we expected to see more bears, we could use a hyperparameter vector like [1, 1, 2] (where the ordering is [lions, tigers, bears]. The exact value of the pseudocounts reflects the level of confidence we have in our prior beliefs. Larger pseudocounts will have a greater effect on the posterior estimate while smaller values will have a smaller effect and will let the data dominate the posterior. We'll see this when we get into inference, but for now, remember that the hyperparameter vector is pseudocounts, which in turn, represent our prior belief.
-
-A Dirichlet distribution with 3 outcomes is shown below \cite{FrancisTsengBayesianLearning2019} with different values of the hyperparameter vector. Color indicates the concentration weighting.
-
-    \begin{figure*}[h]
-        \includegraphics[width=0.8\textwidth]{p05c02-snip04}
-        \caption{Effect of the hyperparameter vector $\boldsymbol {\alpha }$ on the Dirichlet Distribution}
-    \end{figure*}
-
-There's a lot more detail we don't need to get into here, but if you're still curious, see some of the sources listed below.
-
-Our ultimate goal is to estimate the posterior distribution for the probability of observing each species, $\mathbf {p}$, conditioned on the data and hyperparameters. The posterior distribution of the parameter is our objective. $\mathbb {X}$ is observations and $\boldsymbol {\alpha }$ is hyperparameters.
-
-\begin{equation}
-    \mathbf {p}\mid \mathbb {X} ,{\boldsymbol {\alpha }}
-\end{equation}
-
-Our final model, consisting of a multinomial distribution with Dirichlet priors is called a Dirichlet-Multinomial and is visualized below:
-
-\begin{figure*}[h]
-    \includegraphics[width=0.5\textwidth]{p05c02-snip05}
-    \caption{Model of the problem}
-\end{figure*}
-
-A summary of the problem specifics is below:
-
-\begin{figure*}[h]
-    \includegraphics[width=0.5\textwidth]{p05c02-snip06}
-    \caption{Model specifics}
-\end{figure*}
-
-
-If you still want more background details, here are some of the sources I relied on (the first is probably the most valuable):
-
-Sources:
-
-
+When reading Bayesian texts, or listening to lectures, terms like ''posterior'' or ''data'' are used, but often without explanation leaving the audience confused. I also find that even after learning the concepts once, its easy to mix them up. To that end I put together this glossary to serve as a quick reference to the terms, with examples. The writing is colloquial, for precise definitions I recommend the following references:
 \begin{enumerate}
-\item Bayesian Inference for Dirichlet-Multinomials \cite{MarkJohnsonDirichletMultinomials2019}.
-\item Categorical Data / Multinomial Distribution \cite{ChristianHertaCategoricaldata2019}.
-\item Dirichlet-Multinomial Wikipedia Article \cite{WikiPediaDirichletmultinomial2019}.
-\item Multinomial Distribution Wikipedia Article \cite{WikiPediaMultinomialdistribution2019}.
-\item Alpha in the Dirichlet Distribution \cite{stackexchangealphaDirichlet2019}.
-\item Dirichlet Distribution Wikipedia Article \cite{WikiPediaDirichletdistributionl2019}.
-\item Hyperparameter Wikipedia Article \cite{WikiPediaHyperparameter2019}.
-\item Deriving the MAP estimate for Dirichlet-Multinomials \cite{stackexchangeMAPMultinomialDirichlet2019}.
+\item Bayesian Analysis with Python \cite{martin2018}. 
+\item Bayesian Data Analysis \cite{gelmanbda04}.
+\item Statistical Rethinking \cite{McElreath2015}. For further background I highly suggest purchasing his book and watching his lectures on YouTube.
 \end{enumerate}
 
-There are also other ways to approach this problem; see here for Allen Downey's solution \cite{AllenBDowneyThinkBayes2018} which yields similar results.
+\section{Motivating Example: Proportion of water on a globe}
 
-\section{Inference: Making Estimates from Data}
+We will be using this example from Richard McElreath \cite{McElreath2015} to help define all terms. In his example, we want to know the proportion of water on a given globe. We make estimations by independent tosses of a globe, catching it, and seeing whether our right index finger is on water (W, probability $p$) or Land (L, probability $1-p$).  For this example assume the results to be \lstinline{W L W W W L W L W}.
 
-Now that we have the model of the problem, we can solve for the posteriors using Bayesian methods. Inference in statistics is the process of estimating (inferring) the unknown parameters of a probability distribution from data \cite{WikiPediaStatisticalinference2019}. Our unknown parameters are the prevalence of each species while the data is our single set of observations from the wildlife preserve. Our goal is to find the posterior distribution of the probability of seeing each species.
-
-Our approach to deriving the posterior will use Bayesian inference. This means we build the model and then use it to \textit{sample from the posterior to approximate the posterior} with Markov Chain Monte Carlo (MCMC) methods \cite{KoehrsenMCMCPython2018}. We use MCMC when exact inference is intractable, and, as the number of samples increases, the estimated posterior converges to the true posterior.
-
-The result of MCMC is not just one number for our answer, but rather a range of samples that lets us quantify our uncertainty especially with limited data. We'll see how to perform Bayesian inference in Python shortly, but if we do want a single estimate, we can use the \textit{Expected Value} of the distribution.
-
-\section{Expected Value}
-
-The Expected Value is the mean of the posterior distribution. For a Dirichlet-Multinomial priors, the expected value  can be analytically expressed \cite{MarkJohnsonDirichletMultinomials2019}:
-\begin{equation}
-    \mathrm{E}\left[p_{i} | \mathbb{X}, \boldsymbol{\alpha}\right]=\frac{c_{i}+\alpha_{i}}{N+\sum_{k} \alpha_{k}}
-    \end{equation}
-
-Once we start plugging in numbers, this becomes easy to solve. N is the number of trials, 6, $c_i$ is the \textit{observed count} for each category, and $alpha_i$ is the \textit{pseudocount} (hyperparameter) for each category. Setting all $\boldsymbol{\alpha}$ equal to 1, the expected species probabilities can be calculated:
-
+We will be calculating some values, with the code shown in line with the text.
 \begin{lstlisting}
-species = ['lions', 'tigers', 'bears']
-# Observations
-c = np.array([3, 2, 1])
-#Pseudocounts
-alphas = np.array([1, 1, 1])
-
-expected = (alphas + c) / (c.sum() + alphas.sum())
-
-Species: lions    Prevalence: 44.44%.
-Species: tigers   Prevalence: 33.33%.
-Species: bears    Prevalence: 22.22%.
-\end{lstlisting}
-This represents the expected value taking into account the pseudocounts which corporate our initial belief about the situation.
-
-We can adjust our level of confidence in this prior belief by increasing the magnitude of the pseudocounts. This forces the expected values closer to our initial belief that the prevalence of each species is equal. The expected values for several different hyperparameters are shown below:
-
-
-\begin{figure*}[h]
-    \includegraphics[width=0.5\textwidth]{p05c02-snip07}
-    \caption{Expected values for different pseudocounts}
-\end{figure*}
-
-Our choice of hyperparameters has a large effect. If we are more confident in our belief, then we increase the weight of the hyperparameters. On the other hand, if we want the data to have more weight, we reduce the pseudocounts.
-
-While this result provides a point estimate, it's misleading because it does not express any uncertainty. We only went to the wildlife preserve once, so there should be a large amount of uncertainty in these estimates. With Bayesian Inference, we can get both point estimates and the uncertainty.
-
-\section{Bayesian Inference in Python with PyMC3}
-
-To get a range of estimates, we use Bayesian inference by constructing a model of the situation and then \textit{sampling from the posterior to approximate the posterior}. This is implemented through Markov Chain Monte Carlo (or a more efficient variant called the No-U-Turn Sampler) \cite{Hoffman:2014:NSA:2627435.2638586} in PyMC3. Compared to the theory behind the model, setting it up in code is simple:
-
-
-\begin{lstlisting}
-    import pymc3 as pm
     import numpy as np
-    
-    alphas = np.array([1, 1, 1])
-    c = np.array([3, 2, 1])
-    
-    # Create model
-    with pm.Model() as model:
-        # Parameters of the Multinomial are from a Dirichlet
-        parameters = pm.Dirichlet('parameters', a=alphas, shape=3)
-        # Observed data is from a Multinomial distribution
-        observed_data = pm.Multinomial(
-            'observed_data', n=6, p=parameters, shape=3, observed=c)   
-    
+    from scipy import stats
+    import arviz as az
+    import pymc3 as pm
+    import matplotlib.pyplot as plt
+    import seaborn as sns
+    import pandas as pd
 \end{lstlisting}
 
-Then, we can sample from the posterior:
+\section{Glossary}
+
+\newthought{Data} in Bayesian analysis is the fixed truth of what has been observed. There is no uncertainty or probability. In our example the globe was tossed, the sequence of events observed is \lstinline{Water, Land, Water Water Water, Land, Water, Land, Water}.
+
+\newthought{A Model} is a representation of some other thing.  In Bayesian analysis a model is a representation of the data generating process made of out mathematical distributions. Below is a model of the globe tossing example, written in pseudo mathematical notation.
 
 \begin{lstlisting}
-    with model:
-        # Sample from the posterior
-        trace = pm.sample(draws=1000, chains=2, tune=500, 
-                          discard_tuned_samples=True)
+proportion_of_water=p=Uniform(0,1)
+count_water_obs=Binomial(p,number_of_tosses)
 \end{lstlisting}
+It is important to know that models, unlike data, are not fixed and are completely human made. Two models can exist at the same time. For example, here is another model of the globe tosses:
+\begin{lstlisting}
+lamda=Uniform(0,1)
+count_water_obs=Poisson(lamda)
+\end{lstlisting}
+Neither model is correct, nor is either model wrong! Both models are only a representation of the globe tossing, and justifying model choice is a core activity of Bayesian analysis.
 
-This code draws 1000 samples from the posterior in 2 different chains (with 500 samples for tuning that are discarded). We are left with a trace which contains all of the samples drawn during the run. We use this trace to estimate the posterior distribution.
+\newthought{Bayes Theorem} is the probability event, taking into account past events that provide information about the event. The most generic formulation is 
 
-PyMC3 has many methods for inspecting the trace such as \lstinline{pm.traceplot} (Figure~\ref{fig:p05c02-snip02b}).
+\begin{equation}
+P(A|B) = \frac{P(B|A)P(A)}{P(B)}
+\end{equation}
+A representation that I find more intuitive however is this one 
 
-\begin{figure*}[h]
-    \includegraphics[width=0.5\textwidth]{p05c02-snip02}
-    \caption{PDF and trace of samples}
-    \label{fig:p05c02-snip02b}
-\end{figure*}
+\begin{equation}
+    P(\textrm{parameters}|\textrm{data}) = 
+    \frac{P(\textrm{data}|\textrm{parameters})P(\textrm{parameters})} {P(\textrm{data})}
+\end{equation}
 
-On the left we have a kernel density estimate for the sampled parameters --- a PDF of the event probabilities. On the right, we have the complete samples drawn for each free parameter in the model. We can see from the KDE that $p_\textrm{bears}<p_\textrm{tigers}<p_\textrm{lions}$ as expected but there is some uncertainty. A better way to view this uncertainty is through \lstinline{pm.posterior_plot} (Figure~\ref{fig:p05c02-snip09}).
+Sometimes Bayes Theorem is written as shown below \cite{WikiPediaLikelihoodfunction2019}. This perhaps is the most ''technically correct'' because it differentiates between likelihood and probability. (See likelihood and probability glossary terms below)
+\begin{equation}
+    P(\textrm{parameters}|\textrm{data}) = 
+    \frac{{\cal L}(\textrm{data}|\textrm{parameters})P(\textrm{parameters})} {P(\textrm{data})}
+\end{equation}
 
-\begin{figure*}[h]
-    \includegraphics[width=0.5\textwidth]{p05c02-snip09}
-    \caption{Posterior plots from PyMC3}
-    \label{fig:p05c02-snip09}
-\end{figure*}
+\newthought{Bayesian inference} is a way to update probabilities by using Bayes formula. In other words Inference is solving for the posterior, or left hand side, of Bayes formula. Inference can be performed numerous ways, a partial list includes
+\begin{itemize}
+\item  Direct solution with point probabilities
+\item  Conjugate prior formulas
+\item  Grid Search
+\item  Quadratic Approximation
+\item  Markov Chain Monte Carlo
+\item  Variational Inference
+\end{itemize}
+Different methods of inference each have their own advantages and disadvantages. It is important to note that his also is a human choice, and different books, guides, and tutorials may show different ways of solving for the posterior.
 
-Figure~\ref{fig:p05c02-snip09} shows histograms indicating the number of times each probability was sampled from the posterior. We have a point estimate for the probabilities --- the mean --- as well as the Bayesian equivalent of the confidence interval --- the 95\% highest probability density (also known as a credible interval). We see an extreme level of uncertainty in these estimates, as befits the limited data.
+\newthought{The prior} is the probability of an event before witnessing any data.
 
-To quantify the level of uncertainty we can get a dataframe of the results:
+For our globe tossing example before tossing the globe and making any observations, how much of the globe do you think covered in water? Some people would say 70\% because they took a geography class in a prior life. Others would make a reaction similar to this emoji, \includegraphics[height=4mm]{emoji-shrug}, indicating they are equally unsure about all possibilities.
 
-\begin{figure*}[h]
-    \includegraphics[width=0.5\textwidth]{p05c02-snip10}
-    \caption{Posterior plots from PyMC3}
-\end{figure*}
+The choice of priors is a choice the Bayesian modeler must make. There is no fundamental truth. But luckily there is some help, for example the Stan Devs have a great tutorial providing recommendations on choice of priors \cite{StanwikiPriors2019}:
+\begin{itemize}
+\item Flat prior;
+\item Super-vague but proper prior: normal(0, 1e6);
+\item Weakly informative prior, very weak: normal(0, 10);
+\item Generic weakly informative prior: normal(0, 1);
+\item Specific informative prior: normal(0.4, 0.2) or whatever. Sometimes this can be expressed as a scaling followed by a generic prior: \\$\theta = 0.4 + 0.2*z$, $z\sim$ normal(0, 1).
+\end{itemize}
 
-This shows the best estimate (mean) for the prevalence but also that the 95\% credible interval is very large. We can only nail down the prevalence of lions to between 16.3\% and 73.6\% based on our single trip to the preserve!
 
-Bayesian Inference is so powerful because of this built-in uncertainty. In the real-world, data is always noisy, and we usually have less than we want. Therefore, any time we make an estimate from data we have to show this uncertainty. For this problem, no one is going to be hurt if we get the percentage of bears at the wildlife preserve incorrect, but what if we were doing a similar method with medical data and inferring disease probability?
-
-\section{Sampling from the Posterior}
-
-Once we have the trace, we can draw samples from the posterior to simulate additional trips to the preserve. For example, let's consider going 1000 more times. How many of each species can we expect to see on each trip?
-
+\begin{marginfigure}
+    \includegraphics{bayesglos01}
+    \caption{Prior probability of \lstinline{Water} is 0.1}
+    \end{marginfigure}
 
 
 \begin{lstlisting}
-    # Sample from the posterior
-    with model:
-        samples = pm.sample_ppc(trace, samples = 1000)
-\end{lstlisting}
-
-\begin{figure*}[h]
-    \includegraphics[width=0.5\textwidth]{p05c02-snip11}
-    \caption{1000 samples drawn from the estimated posterior}
-\end{figure*}
-
-Based on the evidence, there are times when we go to the preserve and see 5 bears and 1 tiger! Granted, this is not very likely, graphs such as these show the entire range of possible outcomes instead of only one. Our single trip to the preserve was just one outcome: 1000 simulations show that we can't expect the exact observations every time we go to the preserve.
-
-If we want to see the new Dirichlet distribution after sampling, it looks like:
-
-\begin{figure*}[h]
-    \includegraphics[width=0.3\textwidth]{p05c02-snip12}
-    \caption{Dirichlet distribution after sampling}
-\end{figure*}
-
-
-\section{Incorporating Additional Information}
-
-What happens when we go 4 times to the preserve and want to incorporate additional observations in our model? In PyMC3, this is simple:
-
-\begin{lstlisting}
-    # Observations from multiple trips
-    c = np.array([[3, 2, 1],
-                  [2, 3, 1],
-                  [3, 2, 1],
-                  [2, 3, 1]])
+    # Create a prior in numpy
+    possible_proportion_of_water = np.linspace(0,1,100)
+    probability_of_possible = np.repeat(.1, 100)
     
-    with pm.Model() as model:
-        # Parameters are a dirichlet distribution
-        parameters = pm.Dirichlet('parameters', a=alphas, shape=3)
-        # Observed data is a multinomial distribution
-        observed_data = pm.Multinomial(
-            'observed_data', n=6, p=parameters, shape=3, observed=c)    
-        
-        trace = pm.sample(draws=1000, chains=2, tune=500, discard_tuned_samples=True)
+    fig,ax=plt.subplots()
+    ax.plot(possible_proportion_of_water, probability_of_possible)
+    fig.suptitle("Prior probability of Water")
+    plt.savefig('bayesglos01.pdf')
 \end{lstlisting}
 
-The uncertainty in the posterior should be reduced with a greater number of observations, and indeed, that is what we see both quantitatively and visually. Intuitively, this again makes sense: as we gather more data, we become more sure of the state of the world. In the case of infinite data, our estimate will converge on the true values and the priors will play no role.
+\newthought{The likelihood} is the probability of data, given a model and parameters.  
+Assuming a binomial model, the likelihood of $W$ water events out of $N$ tosses, with proportion of \lstinline{Water} of $p$ is given by
+\begin{equation}
+P(W|N,p) = \frac{N!}{W!(N-W!)}p^W(1-p)^{N-W}
+\end{equation}
+The likelihood of $W$=6 \lstinline{Water} events given $N$=9 tosses, with a proportion of water of $p$=0.5 can be calculated
+\begin{lstlisting}
+count_of_water_observation = 6
+count_of_tosses = 9
+likelihood = stats.binom.pmf(k=count_of_water_observation,
+                             n=count_of_tosses, p=.5)
+print(f'likelihood={likelihood}')    
+>>> likelihood=0.16406250000000006
+\end{lstlisting}
+The likelihood of $W$=6 \lstinline{Water} events given $N$=9 tosses, for all possible values of $p$ (between 0 and 1) can be calculated as shown in the graph.
+\begin{marginfigure}
+    \includegraphics{bayesglos02}
+    \caption{Likelihood of 6 out of 9 tosses being water for $0\leq p\leq 1$}
+    \end{marginfigure}
+\begin{lstlisting}
+likelihood = stats.binom.pmf(k=count_of_water_observation, 
+n=count_of_tosses,
+p=possible_proportion_of_water)
+fig,ax=plt.subplots()
+ax.plot(possible_proportion_of_water, likelihood)
+fig.suptitle("Likelihood of 6 Water Observations given 9 tosses \n \
+over all possible Proportions of Water")
+plt.savefig('bayesglos02.pdf')
+\end{lstlisting}
 
-\begin{figure*}[h]
-    \includegraphics[width=0.5\textwidth]{p05c02-snip13}
-\end{figure*}
-\begin{figure*}[h]
-    \includegraphics[width=0.5\textwidth]{p05c02-snip14}
-    \caption{Posteriors with more data}
-\end{figure*}
+\textbf{Note:} Likelihood is not a probability distribution, meaning that the total area of the curve is not equal to 1. This is why the syntax 
+${\cal L}(\textrm{data}|\textrm{parameters})$
+can be a bit more clear than $P(\textrm{data}|\textrm{parameters})$
 
 
-\section{Increasing and Decreasing Confidence in Prior Beliefs}
+\newthought{Marginal Likelihood of Evidence/Evidence/Average Likelihood}.
+The ''Bayesian way'' to compare competing models $\alpha_i$ is to compute the marginal likelihood of each model $p(\textrm{data}|\alpha_1)$, i.e. the probability of the observed data $\textrm{data}$ given the $\alpha_i$ model \cite{PyMC3marglikeli2019}.
 
-Earlier we discussed how the hyperparameters can be thought of as pseudocounts that represent our prior belief. If we set all the values of $\bm \alpha$ equal to 1, we get the results we've seen so far. What about if we decrease or increase our confidence in our initial theory that the prevalence is equal? To do so, all we have to do is alter the alpha vector. Then, we sample from the posterior again (using the original observations) and inspect the results.
+The marginal likelihood, also known as the evidence, or model evidence, is the denominator of the Bayes equation. Its only role is to guarantee that the posterior is a valid probability by making its area sum to 1. It is a likelihood function in which some parameter variables have been marginalized (integrated or summed out). 
+If $\theta$ is the parameter being marginalised 
+\begin{equation}
+P(\textrm{data}|\alpha) = \int_\theta p(\textrm{data}|\theta)P(\theta|\alpha)d\theta
+\end{equation}
+Integrate the data given a parameter, weighted by the parameter value.
 
-\begin{figure*}[h]
-    \includegraphics[width=0.7\textwidth]{p05c02-snip15}
-\end{figure*}
+We can see the normalising effect if we write Bayes' theorem and make explicit the fact that all inferences are model-dependant.
+\begin{equation*}
+    P(\textrm{parameters}|\textrm{data},\alpha_i) = 
+    \frac{P(\textrm{data}|\textrm{parameters},\alpha_i)P(\textrm{parameters}|\alpha_i} {P(\textrm{data}|\alpha_i)}
+\end{equation*}
 
-
-
-The hyperparameters have a large influence on the outcome! A lower value means the data itself has a greater weighting in the posterior, while a higher value results in greater weight placed on the pseudocounts. As the value is increased, the distributions converge on one another. We'd need a lot of data to overcome our strong hyperparameters in the last case.
-
-We can compare the posterior plots with $\bm \alpha$ = 0.1 and $\bm \alpha$ = 15 in Figure~\ref{fig:p05c02-snip16}.
-
-
-\begin{figure*}[h]
-    \includegraphics[width=0.7\textwidth]{p05c02-snip16}\\
-    \includegraphics[width=0.7\textwidth]{p05c02-snip17}
-    \caption{Posterior plots with different $\bm \alpha$ }
-    \label{fig:p05c02-snip16}
-\end{figure*}
+In most inference methods however this term is readily ignored, and ends up being derived out of the inference. The reason being its non trivial to calculate analytically, and very hard to simulate in multi-dimensional problems.
 
 
-Ultimately, our choice of the hyperparameters depends on our confidence in our belief. If we have a good reason to think the prevalence of species is equal, then we should make the hyperparameters have a greater weight. If we want to let the data speak, then we can lower the effect of the hyperparameters.
+From \cite{Quoramarginallikelihoodandposterior2019}:
+The marginal likelihood's only role is to guarantee that the posterior is a valid probability by making its area sum to 1.
+Therefore, its only effect in the posterior is that it scales it up or down, but the shape of the posterior does not change.
+Here you have the Bayes formula to get a posterior distribution. I express it in different ways in case some of the expressions is more familiar to you:
+\begin{eqnarray}
+\overbrace{p(\boldsymbol{\theta} | \mathbf{X})}^{\text { posterior }}
+&=&
+\frac{\overbrace{p(\mathbf{X} | \boldsymbol{\theta}) p(\boldsymbol{\theta} | \alpha)}^{\text { likelihood prior }}}
+{
+    \underbrace{ \int_{\boldsymbol{\theta}} p(\mathbf{X} | \boldsymbol{\theta}) p(\boldsymbol{\theta} | \alpha)}_{\text { marginal likelihood }}
+    }\nonumber\\
+&=& \frac{
+    \overbrace{p(\mathbf{X} | \boldsymbol{\theta})}^{\text { likelihood}}
+    \overbrace{p(\boldsymbol{\theta} | \alpha)}^{\text {prior }}
+    }{
+        \underbrace{p(\mathbf{X} | \alpha)}_{\text { marginal likelihood }}
+        }\nonumber\\
+&=&\frac{\overbrace{p(\mathbf{X}, \boldsymbol{\theta})}^{\text { joint probability }}}
+{
+    \underbrace{p(\mathbf{X} | \alpha)}_{\textrm{marginal likelihood}}
+    }
+\nonumber\\
+&=&K p(\mathbf{X}, \boldsymbol{\theta}) \nonumber\\
+&\propto& p(\mathbf{X}, \boldsymbol{\theta})\nonumber
+\end{eqnarray}
+where the $\alpha$ parameter that controls the prior is often implicit and we just write things like $p(\boldsymbol{\theta})$  or $p(\mathbf{X})$. As you can see, the marginal likelihood (marginal means that we marginalised, integrated, the variable $\boldsymbol{\theta}$) is different from the posterior. It is only one of the three elements needed to get the exact posterior.
 
-\FloatBarrier
-\section{Conclusions}
 
-Well, what should our final answer be to the question of prevalences? If we are good Bayesians, then we can present a point estimate, but only with attached uncertainty (95\% credible intervals):
+
+Therefore the  Bayes formula often written where the denominator is removed, and a proportional to is shown rather than an equal:
+\begin{equation*}
+    P(\textrm{parameters}|\textrm{data},\alpha_i) \propto
+    P(\textrm{data}|\textrm{parameters},\alpha_i)P(\textrm{parameters}|\alpha_i)
+\end{equation*}
+For our globe tossing example we are able to calculate the Marginal Likelihood because we are using a Grid Search Inference method can use the formulation below.
+\begin{lstlisting}
+    # Marginal Likelihood in Grid Search formulation
+    numerator  = possible_proportion_of_water * likelihood
+    denominator = sum(numerator)
+    denominator
+    
+    6.300000720691165
+    
+\end{lstlisting}
+
+\newthought{The posterior, or posterior probability}, is the probability of model parameters after incorporating the data. In the our water example, prior to the experiment, we were equally sure, (or unsure) what the proportion of water on the planet was. After using our model in conjunction with the data, we the posterior distribution reflects our certainty in the parameters.
+
+Note that the posterior distribution is a distribution of possible model parameters and not a distribution of data.
+
+This example is very nicely explained in McElreath's book \cite[Chapter 2]{McElreath2015} and video series.
 
 \begin{lstlisting}
-    Lions: 44.5% (16.9% --- 75.8%)
-    Tigers: 32.7% (6.7% --- 60.5%)
-    Bears: 22.7% (1.7% --- 50.0%)
+posterior = numerator/denominator
+fig, axes =plt.subplots(1,2, figsize=(12,5))
+axes[1].plot(possible_proportion_of_water, posterior)
+axes[1].set_title("Posterior Probability of Proportion of Water")
+axes[0].plot(possible_proportion_of_water, probability_of_possible) 
+axes[0].set_title("Prior Probability of Proportion of Water")
+plt.savefig('bayesglos03.pdf')
 \end{lstlisting}
-And our estimate that the next observation is a bear? Based on the posterior sampling, about 23\%. While these results may not be satisfying to people who want a simple answer, they should remember that the real world is uncertain.
+\begin{figure*}[h]
+    \includegraphics[width=0.56\textwidth]{bayesglos03}
+    \caption{Prior and posterior probability of water}
+    \end{figure*}
 
-The benefits of Bayesian Inference \cite{RStatModCausalRisks2019} are we can incorporate our prior beliefs and we get uncertainty estimates with our answers. The world is uncertain, and, as responsible data scientists, Bayesian methods provide us with a framework for dealing with uncertainty.
+\newthought{Posterior Predictive} 
+An advantage of Bayesian models is being able to calculate data after the model has been updated. The simulation of data, taking into account observed data, is called the posterior predictive. The mathematical formulation is as follows.
+\begin{equation}
+    \operatorname{Pr}\left(y^{\prime} | y\right)=\int \operatorname{Pr}\left(y^{\prime} | \theta\right) \operatorname{Pr}(\theta | y) d \theta
+    \end{equation}
+We can simulate the posterior predictive distribution using python. 
+\begin{lstlisting}
+posterior_samples = np.random.choice(possible_proportion_of_water, p=posterior, size=1000, replace=True)
+posterior_predictive = stats.binom.rvs(n=9, p=posterior_samples)
+counts = np.bincount(posterior_predictive)
 
-Furthermore, as we get more data, our answers become more accurate. As with many aspects of Bayesian Inference, this is in line with our intuitions and how we naturally go about the world, becoming less wrong with additional information. Ultimately, Bayesian statistics is enjoyable and useful because it is statistics that finally makes sense.
+fig, ax = plt.subplots()
+ax.bar(x=np.arange(counts.shape[0]), height=np.bincount(posterior_predictive))
+ax.set_xlabel("Count of Water Observations out of 9 globe tosses")
+ax.set_ylabel("Number of simulations with count")
+plt.savefig('bayesglos04.pdf')
+\end{lstlisting}
 
-As always, I welcome feedback and constructive criticism. I can be reached on Twitter \lstinline{@koehrsen_will} or through my personal website \lstinline{willk.online}.
+\begin{marginfigure}
+    \includegraphics{bayesglos04}
+    \caption{Posterior Predictive}
+    \end{marginfigure}
+
+It is important to note that this distribution is not probability. It is in the units of data, in this case it is the distribution of ''counts of water observations for 9 globe tosses''. The distribution highlights the uncertainty in the globe outcome given the 9 data points that were originally observed.
+
+\newthought{Prior Predictive Distribution}. 
+Prior Predictive models are similar to posterior predictive distributions, except that you use samples from the prior distribution of parameters, not from the posterior distribution of samples.
+\begin{equation}
+    p(y)=\int_{\theta} p(\theta) p(y | \theta) \mathrm{d} \theta
+    \end{equation}
+Prior Predictive distributions are useful for checking if your model seems to be outputting reasonable data, for example in our globe tossing experiment, if we were seeing negative counts for ''Number of water observations'', that impossibility would suggest that the model is not appropriate for the data
+\begin{lstlisting}
+    prior_samples = stats.uniform(0,1).rvs(1000)
+    prior_predictive_samples = stats.binom.rvs(n=9, p=prior_samples)
+    counts = np.bincount(prior_predictive_samples)
+    
+    fig, ax = plt.subplots()
+    ax.bar(x=np.arange(counts.shape[0]), height=np.bincount(prior_predictive_samples))
+    ax.set_xlabel("Count of Water Observations out of 9 globe tosses")
+    ax.set_ylabel("Number of simulations with count")
+    plt.savefig('bayesglos05.pdf')
+\end{lstlisting}
+
+\begin{marginfigure}
+    \includegraphics{bayesglos05}
+    \caption{Posterior Predictive}
+    \end{marginfigure}
+
+\newthought{Forward Sampling} is the same as Prior Predictive except that it includes the prior samples. Whereas Prior Predictive is just the distribution of simulated data, Forward Sampling is that in addition to the sampled parameters from the posterior.
+
+\newthought{Hierarchical modelling} is a mechanism in Bayesian models where you ''tell'' the model that data points may share similarity. The hierarchy words implies multiple ''levels'' of effect.
+
+For example assume you're trying to estimate the height of an individual. Your data tells you the gender and which family the individual comes from. The relation between height and family is not constant, it's not as if coming from one family guarantees all members of a family will be double the height of another for example. But it would be unwise to assume that your samples are independent either, family genetics is well correlated with final height. But with hierarchical models allow us to split the difference, by allowing the model to ''say'' a families heights come from a taller distribution, than from another family with shorter family members.
+
+The Radon Model \cite{PyMC3multilevel2019} provides a rigorous explanation accompanied by a great visual explainer
+
+\newthought{Hierarchical Funnel}
+
+% Hierarchical funnels are a particular parameter space topology that makes it hard for particular Inference Engines to explore the whole space. Basically what ends up happening is this, where the Bayesian sampler doesn't quite do the thing you want, but instead of your donation coin taking a long time to fall a short vertical distance, your sampler can't traverse the entire space efficiently.
+
+Michael Betancourt wrote a full explanation on the Stan website \cite{MichaelBetancourtdivergence2017}. The tutorial has also been rewritten in PyMC3 \cite{PyMC3Divergences2019}.
+
+
+\section{Acknowledgements}
+
+I would like to extend thanks to the following people for providing feedback and corrections
+\begin{lstlisting}
+George Ho (Twitter: @_eigenfoo)
+Alexander Etz (Twitter: @AlxEtz)
+Ari Hartikainen (Twitter: @a_hartikainen)
+\end{lstlisting}
+
