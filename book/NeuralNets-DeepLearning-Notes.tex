@@ -171,6 +171,32 @@
   { \formatpart
 }%
 
+% redefine parindent and parskip for Tufte class
+%https://tex.stackexchange.com/questions/77999/remove-indent-of-paragraph-and-add-line-skip-with-tufte-latex
+\makeatletter
+% Paragraph indentation and separation for normal text
+\renewcommand{\@tufte@reset@par}{%
+  \setlength{\RaggedRightParindent}{0pt}%
+  \setlength{\JustifyingParindent}{0pt}%
+  \setlength{\parindent}{0pt}%
+  \setlength{\parskip}{0.3\bigskipamount plus \smallskipamount minus \smallskipamount}%
+}
+\@tufte@reset@par
+
+% Paragraph indentation and separation for marginal text
+\renewcommand{\@tufte@margin@par}{%
+  \setlength{\RaggedRightParindent}{0pt}%
+  \setlength{\JustifyingParindent}{0pt}%
+  \setlength{\parindent}{0pt}%
+  \setlength{\parskip}{0.3\bigskipamount plus \smallskipamount minus \smallskipamount}%
+}
+\makeatother
+
+% Generates the index
+\usepackage{makeidx}
+\makeindex
+
+
 %the following is required for carriage return symbol
 %ftp://ftp.botik.ru/rented/znamensk/CTAN/fonts/mathabx/texinputs/mathabx.dcl
 %https://secure.kitserve.org.uk/content/mathabx-font-symbol-redefinition-clash-latex
@@ -182,6 +208,11 @@
 \DeclareSymbolFont{mathb}{U}{mathb}{m}{n}
 \DeclareMathSymbol{\dlsh}{3}{mathb}{"EA}
 
+% paragrapg separation and indent
+%\setlength{\parindent}{0pt}
+%\setlength{\parskip}{0.5\bigskipamount plus \smallskipamount minus \smallskipamount}
+
+%\usepackage{parskip}[indent=0pt]
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % files making up this document
@@ -193,16 +224,13 @@
 ,p02c01,p02c02,p02c03,p02c04,p02c05,p02c06,p02c07
 ,p03c01,p03c02,p03c03,p03c04
 ,p04c01,p04c02,p04c03
-,p05c01,p05c02,p05c03,p05c04
+,p05c01,p05c02,p05c03,p05c04,p05c05
 ,cbib}
 
 %\includeonly{c14}
-\includeonly{p05c01,p05c02,cbib}
-%\includeonly{cf00}
+%\includeonly{p05c01,p05c02,cbib}
+%\includeonly{p05c05,cbib}
 
-% Generates the index
-\usepackage{makeidx}
-\makeindex
 
 \begin{document}
 
@@ -244,6 +272,7 @@
 \include{p05c02} % Intro 
 \include{p05c03} % Estimating Probabilities with Bayesian Modeling in Python Koehrsen
 \include{p05c04} % Linear regression
+\include{p05c05} % Introduction to Probability and Computational Bayesian Statistics
 
 %\part{Reference}
 \include{cbib} %[[Done]] bibliography   
