@@ -206,11 +206,11 @@ g(\alpha) k(\alpha, \beta) &=g(\alpha) h(\alpha, \beta) \min \left(1, \frac{g(\b
 
 Once our Markov Chain has been defined, we can simulate a random sequence of states (randomly initialised) and keep some of them chosen such as to obtain samples that, both, follow the targeted distribution and are independent.
 
-First, in order to have samples that (almost) follow the targeted distribution, we need to only consider states far enough from the beginning of the generated sequence to have almost reach the steady state of the Markov Chain (the steady state being, in theory, only asymptotically reached). Thus, the first simulated states are not usable as samples and we call this phase required to reach stationarity the burn-in time. Notice that, in practice it is pretty difficult to know how long this burn-in time has to be.
+First, in order to have samples that (almost) follow the targeted distribution, \textbf{we need to only consider states far enough from the beginning of the generated sequence to have almost reach the steady state of the Markov Chain} (the steady state being, in theory, only asymptotically reached). Thus, the first simulated states are not usable as samples and we call this phase required to reach stationarity the \textbf{burn-in time}. Notice that, in practice it is pretty difficult to know how long this burn-in time has to be.
 
-Second, in order to have (almost) independent samples, we can't keep all the successive states of the sequence after the burn-in time. Indeed, the Markov Chain definition implies a strong correlation between two successive states and we then need to keep as samples only states that are far enough from each other to be considered as almost independent. In practice, the lag required between two states to be considered as almost independent can be estimated through the analysis of the autocorrelation function (only for numeric values).
+Second, in order to have (almost) independent samples, \textbf{we can't keep all the successive states of the sequence after the burn-in time}. Indeed, the Markov Chain definition implies a strong correlation between two successive states and we then need to keep as samples only states that are far enough from each other to be considered as almost independent. In practice, the \textbf{lag} required between two states to be considered as almost independent can be estimated through the analysis of the autocorrelation function (only for numeric values).
 
-So, in order to get our independent samples that follow the targeted distribution, we keep states from the generated sequence that are separated from each other by a lag L and that come after the burn-in time B. Thus, if the successive states of the Markov Chain are denoted
+So, in order to get our independent samples that follow the targeted distribution, \textbf{we keep states from the generated sequence that are separated from each other by a lag L and that come after the burn-in time B}. Thus, if the successive states of the Markov Chain are denoted
 \begin{equation}\left(X_{n}\right)_{n \geq 0}=X_{0}, X_{1}, X_{2}, \dots\end{equation}
 we only keep as our samples the states
 \begin{equation}X_{B}, X_{B+L}, X_{B+2 L}, X_{B+3 L}, \dots\end{equation}
@@ -225,11 +225,11 @@ we only keep as our samples the states
 
 \section{Variational Inference (VI)}
 
-Another possible way to overcome computational difficulties related to inference problem is to use Variational Inference methods that consist in finding the best approximation of a distribution among a parametrised family. In order to find this best approximation, we follow an optimisation process (over the family parameters) that only require the targeted distribution to be defined up to a factor.
+Another possible way to overcome computational difficulties related to inference problem is to use \textbf{Variational Inference methods that consist in finding the best approximation of a distribution among a parametrised family}. In order to find this best approximation, we follow an optimisation process (over the family parameters) that only require the targeted distribution to be defined up to a factor.
 
 \subsection{The approximation approach}
 
-VI methods consist in searching for the best approximation of some complex target probability distribution among a given family. More specifically, the idea is to define a parametrised family of distributions and to optimise over the parameters to obtain the closest element to the target with respect to a well defined error measure.
+VI methods consist in searching for the best approximation of some complex target probability distribution among a given family. More specifically, the idea is to define a parametrised family of distributions and to optimise over the parameters to obtain \textbf{the closest element to the target with respect to a well defined error measure}.
 
 Let's still consider our probability distribution $\pi$ defined up to a normalisation factor $C$:
 \begin{equation}\pi(.)=C \times g(.) \propto g(.)\end{equation}
@@ -237,9 +237,9 @@ Then, in more mathematical terms, if we denote the parametrised family of distri
 \begin{equation}\mathcal{F}_{\Omega}=\left\{f_{\omega} ; \omega \in \Omega\right\} \quad \Omega \equiv \text { set of possible parameters }\end{equation}
 and we consider the error measure $E(p,q)$ between two distributions $p$ and $q$, we search for the best parameter such that
 \begin{equation}\omega^{*}=\underset{\omega \in \Omega}{\arg \min } E\left(f_{\omega}, \pi\right)\end{equation}
-If we can solve this minimisation problem without having to explicitly normalise $\pi$, we can use $f_{\omega*}$ as an approximation to estimate various quantities instead of dealing with intractable computations. The optimisation problem implied by variational inference approaches is, indeed, supposed to be much simpler to handle than issues coming from direct computations (normalisation, combinatorics, $\ldots$).
+If we can solve this minimisation problem without having to explicitly normalise $\pi$, we can use $f_{\omega^*}$ as an approximation to estimate various quantities instead of dealing with intractable computations. The optimisation problem implied by variational inference approaches is, indeed, supposed to be much simpler to handle than issues coming from direct computations (normalisation, combinatorics, $\ldots$).
 
-Contrarily to sampling approaches, a model is assumed (the parametrised family), implying a bias but also a lower variance. In general VI methods are less accurate that MCMC ones but produce results much faster: these methods are better adapted to big scale, very statistical, problems.
+Contrarily to sampling approaches, \textbf{a model is assumed (the parametrised family), implying a bias but also a lower variance}. In general VI methods are less accurate that MCMC ones but produce results much faster: these methods are better adapted to big scale, very statistical, problems.
 
 
 \begin{figure*}[h]
@@ -253,9 +253,9 @@ Contrarily to sampling approaches, a model is assumed (the parametrised family),
 
 The first thing we need to set up is the parametrised family of distributions that defines the space in which we search for our best approximation.
 
-The choice of the family defines a model that control both the bias and the complexity of the method. If we assume a pretty restrictive model (simple family) then we have a high bias but the optimisation process is simple. On the contrary, if we assume a pretty free model (complex family) the bias is much lower but the optimisation is harder (if not intractable). Thus, we have to find the right balance between a family that is complex enough to ensure a good quality of the final approximation and a family that is simple enough to make the optimisation process tractable. We should keep in mind that if no distribution in the family is close to the target distribution, then even the best approximation can give poor results.
+\textbf{The choice of the family defines a model that control both the bias and the complexity of the method. }If we assume a pretty restrictive model (simple family) then we have a high bias but the optimisation process is simple. On the contrary, if we assume a pretty free model (complex family) the bias is much lower but the optimisation is harder (if not intractable). Thus, we have to find the right balance between a family that is complex enough to ensure a good quality of the final approximation and a family that is simple enough to make the optimisation process tractable. We should keep in mind that if no distribution in the family is close to the target distribution, then even the best approximation can give poor results.
 
-The mean-field variational family is a family of probability distributions where all the components of the considered random vector are independent. Distributions from this family have product densities such that each independent component is governed by a distinct factor of the product. Thus, a distribution that belongs to the mean-field variational family has a density that can be written
+The \textbf{mean-field variational family} is a family of probability distributions where all the components of the considered random vector are independent. Distributions from this family have product densities such that each independent component is governed by a distinct factor of the product. Thus, a distribution that belongs to the mean-field variational family has a density that can be written
 \begin{equation}f(z)=\prod_{j=1}^{m} f_{j}\left(z_{j}\right)\end{equation}
 where we have assumed a $m$-dimensional random variable $z$. Notice that, even if it has been omitted in the notation, all the densities $f_j$ are parametrised. So, for example, if each density $f_j$ is a Gaussian with both mean and variance parameters, the global density $f$ is then defined by a set of parameters coming from all the independent factors and the optimisation is done over this entire set of parameters.
 
@@ -269,12 +269,17 @@ where we have assumed a $m$-dimensional random variable $z$. Notice that, even i
 
 \subsection{Kullback-Leibler divergence}
 
-Once the family has been defined, one major question remains: how to find, among this family, the best approximation of a given probability distribution (explicitly defined up to its normalisation factor)? Even if the best approximation obviously depends on the nature of the error measure we consider, it seems pretty natural to assume that the minimisation problem should not be sensitive to normalisation factors as we want to compare masses distributions more than masses themselves (that have to be unitary for probability distributions).
+Once the family has been defined, one major question remains: how to find, among this family, the best approximation of a given probability distribution (explicitly defined up to its normalisation factor)? Even if the best approximation obviously depends on the nature of the error measure we consider, it seems pretty natural to assume that \textbf{the minimisation problem should not be sensitive to normalisation factors as we want to compare masses distributions more than masses themselves} (that have to be unitary for probability distributions).
 
-So, let's now define the Kullback-Leibler (KL) divergence and see that this measure makes the problem insensitive to normalisation factors. If $p$ and $q$ are two distributions, the KL divergence is defined as follows
+So, let's now define the \textbf{Kullback-Leibler (KL)} divergence and see that this measure makes the problem insensitive to normalisation factors. If $p$ and $q$ are two distributions, the KL divergence is defined as follows
 \begin{equation}K L(p, q)=\mathbb{E}_{z \sim p}[\log p(z)]-\mathbb{E}_{z \sim p}[\log q(z)]\end{equation}
 From that definition, we can pretty easily see that we have
-\begin{equation}K L\left(f_{\omega}, C g\right)=\mathbb{E}_{z \sim f_{\omega}}\left[\log f_{\omega}(z)\right]-\mathbb{E}_{z \sim f_{\omega}}[\log (C g(z))]=\mathbb{E}_{z \sim f_{\omega}}\left[\log f_{\omega}(z)\right]-\mathbb{E}_{z \sim f_{\omega}}[\log g(z)]-\log C\end{equation}
+\begin{eqnarray}
+K L\left(f_{\omega}, C g\right)
+&=&\mathbb{E}_{z \sim f_{\omega}}\left[\log f_{\omega}(z)\right]-\mathbb{E}_{z \sim f_{\omega}}[\log (C g(z))]\nonumber\\
+&=&\mathbb{E}_{z \sim f_{\omega}}\left[\log f_{\omega}(z)\right]-\mathbb{E}_{z \sim f_{\omega}}[\log g(z)]-\log C
+\nonumber
+\end{eqnarray}
 which implies the following equality for our minimisation problem
 \begin{equation}\omega^{*}=\underset{\omega \in \Omega}{\arg \min } K L\left(f_{\omega}, \pi\right)=\underset{\omega \in \Omega}{\arg \min } K L\left(f_{\omega}, C g\right)=\underset{\omega \in \Omega}{\arg \min } K L\left(f_{\omega}, g\right)\end{equation}
 Thus, when choosing KL divergence as our error measure, the optimisation process is not sensitive to multiplicative coefficients and we can search for the best approximation among our parametrised family of distributions without having to compute the painful normalisation factor of the targeted distribution, as it was expected.
@@ -283,7 +288,7 @@ Finally, as a side fact, we can conclude this subsection by noticing for the int
 
 \subsection{Optimisation process and intuition}
 
-Once both the parametrised family and the error measure have been defined, we can initialise the parameters (randomly or according to a well defined strategy) and proceed to the optimisation. Several classical optimisation techniques can be used such as gradient descent or coordinate descent that will lead, in practice, to a local optimum.
+Once both the parametrised family and the error measure have been defined, we can initialise the parameters (randomly or according to a well defined strategy) and proceed to the optimisation. Several classical optimisation techniques can be used such as \textbf{gradient descent or coordinate descent} that will lead, in practice, to a local optimum.
 
 In order to better understand this optimisation process, let's take an example and go back to the specific case of the Bayesian inference problem where we assume a posterior such that
 \begin{equation}p(z | x) \propto p(x | z) p(z)=p(x, z)\end{equation}
@@ -295,7 +300,7 @@ In this case, if we want to get an approximation of this posterior using variati
 &=\underset{\omega \in \Omega}{\arg \max }\left(\mathbb{E}_{z \sim f_{\omega}}[\log p(z)]+\mathbb{E}_{z \sim f_{\omega}}[\log p(x | z)]-\mathbb{E}_{z \sim f_{\omega}}\left[\log f_{\omega}(z)\right]\right) \\
 &=\underset{\omega \in \Omega}{\arg \max }\left(\mathbb{E}_{z \sim f_{\omega}}[\log p(x | z)]-K L\left(f_{\omega}, p(z)\right)\right)
 \end{aligned}\end{equation}
-The last equality helps us to better understand how the approximation is encouraged to distribute its mass. The first term is the expected log-likelihood that tends to adjust parameters so that to place the mass of the approximation on values of the latent variables $z$ that explain the best the observed data. The second term is the negative KL divergence between the approximation and the prior that tends to adjust the parameters in order to make the approximation be close to the prior distribution. Thus, this objective function expresses pretty well the usual prior/likelihood balance.
+The last equality helps us to better understand how the approximation is encouraged to distribute its mass. \textbf{The first term is the expected log-likelihood} that tends to adjust parameters so that to place the mass of the approximation on values of the latent variables $z$ that explain the best the observed data. \textbf{The second term is the negative KL divergence between the approximation and the prior} that tends to adjust the parameters in order to make the approximation be close to the prior distribution. Thus, this objective function expresses pretty well the usual prior/likelihood balance.
 
 \begin{figure*}[h]
     \centering
