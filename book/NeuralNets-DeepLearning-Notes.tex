@@ -3,6 +3,7 @@
 \documentclass[a4,nobib]{tufte-book} 
 \usepackage[utf8]{inputenc}
 \usepackage[T1]{fontenc}
+\usepackage{amsmath}
 
 \hypersetup{colorlinks}% uncomment this line if you prefer colored hyperlinks (e.g., for onscreen viewing)
 
@@ -224,12 +225,12 @@
 ,p02c01,p02c02,p02c03,p02c04,p02c05,p02c06,p02c07
 ,p03c01,p03c02,p03c03,p03c04
 ,p04c01,p04c02,p04c03
-,p05c01,p05c02,p05c03,p05c04,p05c05
+,p05c01,p05c02,p05c03,p05c04,p05c05,p05c06,p05c07
 ,cbib}
 
 %\includeonly{c14}
 %\includeonly{p05c01,p05c02,cbib}
-%\includeonly{p05c05,cbib}
+\includeonly{p05c07,cbib}
 
 
 \begin{document}
@@ -273,6 +274,8 @@
 \include{p05c03} % Estimating Probabilities with Bayesian Modeling in Python Koehrsen
 \include{p05c04} % Linear regression
 \include{p05c05} % Introduction to Probability and Computational Bayesian Statistics
+\include{p05c06} % Markov chainnse
+\include{p05c07} % Bayesian inference, MCMC and variational inference
 
 %\part{Reference}
 \include{cbib} %[[Done]] bibliography   
