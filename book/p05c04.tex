@@ -10,16 +10,16 @@ A simple application of Probabilistic Programming with PyMC3 in Python
 
 Will Koehrsen, Nov 28, 2018.
 
-It started, as the best projects always do, with a few tweets shown in Figure~\ref{fig:p05c02-snip01}.
+It started, as the best projects always do, with a few tweets shown in Figure~\ref{fig:p05c04-snip01}.
 
 % \begin{marginfigure}
 %     \includegraphics{504192}
 %     \end{marginfigure}
 
 \begin{figure*}[h]
-    \includegraphics[width=0.56\textwidth]{p05c02-snip01}
+    \includegraphics[width=0.56\textwidth]{p05c04-snip01}
     \caption{Allen Downey tweets}
-    \label{fig:p05c02-snip01}
+    \label{fig:p05c04-snip01}
     \end{figure*}
 
 
@@ -35,9 +35,9 @@ basic probabilistic programming \cite{CameronDavidsonPilonGitHub2019} \cite{Came
 with PyMC3 \cite{PyMC3API2019}. The complete code is available as a Jupyter Notebook on GitHub \cite{KoehrsenEstiBayesGithub2018}.
 
     \begin{figure*}[h]
-        \includegraphics[width=0.56\textwidth]{p05c02-snip02}
+        \includegraphics[width=0.56\textwidth]{p05c04-snip02}
         \caption{PDF and trace values from PyMC3}
-        \label{fig:p05c02-snip02}
+        \label{fig:p05c04-snip02}
         \end{figure*}
     
 \section{Background Concepts}
@@ -65,7 +65,7 @@ The overall system, where we have 3 \textbf{discrete} choices (species) each wit
 A probability mass function \cite{WikipeadiaProbabilitymassfunction2019} of a multinomial with 3 discrete outcomes is shown in the figure.
 
 \begin{marginfigure}
-    \includegraphics{p05c02-snip03}
+    \includegraphics{p05c04-snip03}
     \caption{Probability Mass Function (PMF) of a multinomial with 3 outcomes}
     \end{marginfigure}
 
@@ -83,7 +83,7 @@ Conversely, if we expected to see more bears, we could use a hyperparameter vect
 A Dirichlet distribution with 3 outcomes is shown below \cite{FrancisTsengBayesianLearning2019} with different values of the hyperparameter vector. Color indicates the concentration weighting.
 
     \begin{figure*}[h]
-        \includegraphics[width=0.8\textwidth]{p05c02-snip04}
+        \includegraphics[width=0.8\textwidth]{p05c04-snip04}
         \caption{Effect of the hyperparameter vector $\boldsymbol {\alpha }$ on the Dirichlet Distribution}
     \end{figure*}
 
@@ -98,14 +98,14 @@ Our ultimate goal is to estimate the posterior distribution for the probability 
 Our final model, consisting of a multinomial distribution with Dirichlet priors is called a Dirichlet-Multinomial and is visualized below:
 
 \begin{figure*}[h]
-    \includegraphics[width=0.5\textwidth]{p05c02-snip05}
+    \includegraphics[width=0.5\textwidth]{p05c04-snip05}
     \caption{Model of the problem}
 \end{figure*}
 
 A summary of the problem specifics is below:
 
 \begin{figure*}[h]
-    \includegraphics[width=0.5\textwidth]{p05c02-snip06}
+    \includegraphics[width=0.5\textwidth]{p05c04-snip06}
     \caption{Model specifics}
 \end{figure*}
 
@@ -164,7 +164,7 @@ We can adjust our level of confidence in this prior belief by increasing the mag
 
 
 \begin{figure*}[h]
-    \includegraphics[width=0.5\textwidth]{p05c02-snip07}
+    \includegraphics[width=0.5\textwidth]{p05c04-snip07}
     \caption{Expected values for different pseudocounts}
 \end{figure*}
 
@@ -205,28 +205,28 @@ Then, we can sample from the posterior:
 
 This code draws 1000 samples from the posterior in 2 different chains (with 500 samples for tuning that are discarded). We are left with a trace which contains all of the samples drawn during the run. We use this trace to estimate the posterior distribution.
 
-PyMC3 has many methods for inspecting the trace such as \lstinline{pm.traceplot} (Figure~\ref{fig:p05c02-snip02b}).
+PyMC3 has many methods for inspecting the trace such as \lstinline{pm.traceplot} (Figure~\ref{fig:p05c04-snip02b}).
 
 \begin{figure*}[h]
-    \includegraphics[width=0.5\textwidth]{p05c02-snip02}
+    \includegraphics[width=0.5\textwidth]{p05c04-snip02}
     \caption{PDF and trace of samples}
-    \label{fig:p05c02-snip02b}
+    \label{fig:p05c04-snip02b}
 \end{figure*}
 
-On the left we have a kernel density estimate for the sampled parameters --- a PDF of the event probabilities. On the right, we have the complete samples drawn for each free parameter in the model. We can see from the KDE that $p_\textrm{bears}<p_\textrm{tigers}<p_\textrm{lions}$ as expected but there is some uncertainty. A better way to view this uncertainty is through \lstinline{pm.posterior_plot} (Figure~\ref{fig:p05c02-snip09}).
+On the left we have a kernel density estimate for the sampled parameters --- a PDF of the event probabilities. On the right, we have the complete samples drawn for each free parameter in the model. We can see from the KDE that $p_\textrm{bears}<p_\textrm{tigers}<p_\textrm{lions}$ as expected but there is some uncertainty. A better way to view this uncertainty is through \lstinline{pm.posterior_plot} (Figure~\ref{fig:p05c04-snip09}).
 
 \begin{figure*}[h]
-    \includegraphics[width=0.5\textwidth]{p05c02-snip09}
+    \includegraphics[width=0.5\textwidth]{p05c04-snip09}
     \caption{Posterior plots from PyMC3}
-    \label{fig:p05c02-snip09}
+    \label{fig:p05c04-snip09}
 \end{figure*}
 
-Figure~\ref{fig:p05c02-snip09} shows histograms indicating the number of times each probability was sampled from the posterior. We have a point estimate for the probabilities --- the mean --- as well as the Bayesian equivalent of the confidence interval --- the 95\% highest probability density (also known as a credible interval). We see an extreme level of uncertainty in these estimates, as befits the limited data.
+Figure~\ref{fig:p05c04-snip09} shows histograms indicating the number of times each probability was sampled from the posterior. We have a point estimate for the probabilities --- the mean --- as well as the Bayesian equivalent of the confidence interval --- the 95\% highest probability density (also known as a credible interval). We see an extreme level of uncertainty in these estimates, as befits the limited data.
 
 To quantify the level of uncertainty we can get a dataframe of the results:
 
 \begin{figure*}[h]
-    \includegraphics[width=0.5\textwidth]{p05c02-snip10}
+    \includegraphics[width=0.5\textwidth]{p05c04-snip10}
     \caption{Posterior plots from PyMC3}
 \end{figure*}
 
@@ -247,7 +247,7 @@ Once we have the trace, we can draw samples from the posterior to simulate addit
 \end{lstlisting}
 
 \begin{figure*}[h]
-    \includegraphics[width=0.5\textwidth]{p05c02-snip11}
+    \includegraphics[width=0.5\textwidth]{p05c04-snip11}
     \caption{1000 samples drawn from the estimated posterior}
 \end{figure*}
 
@@ -256,7 +256,7 @@ Based on the evidence, there are times when we go to the preserve and see 5 bear
 If we want to see the new Dirichlet distribution after sampling, it looks like:
 
 \begin{figure*}[h]
-    \includegraphics[width=0.3\textwidth]{p05c02-snip12}
+    \includegraphics[width=0.3\textwidth]{p05c04-snip12}
     \caption{Dirichlet distribution after sampling}
 \end{figure*}
 
@@ -285,10 +285,10 @@ What happens when we go 4 times to the preserve and want to incorporate addition
 The uncertainty in the posterior should be reduced with a greater number of observations, and indeed, that is what we see both quantitatively and visually. Intuitively, this again makes sense: as we gather more data, we become more sure of the state of the world. In the case of infinite data, our estimate will converge on the true values and the priors will play no role.
 
 \begin{figure*}[h]
-    \includegraphics[width=0.5\textwidth]{p05c02-snip13}
+    \includegraphics[width=0.5\textwidth]{p05c04-snip13}
 \end{figure*}
 \begin{figure*}[h]
-    \includegraphics[width=0.5\textwidth]{p05c02-snip14}
+    \includegraphics[width=0.5\textwidth]{p05c04-snip14}
     \caption{Posteriors with more data}
 \end{figure*}
 
@@ -298,21 +298,21 @@ The uncertainty in the posterior should be reduced with a greater number of obse
 Earlier we discussed how the hyperparameters can be thought of as pseudocounts that represent our prior belief. If we set all the values of $\bm \alpha$ equal to 1, we get the results we've seen so far. What about if we decrease or increase our confidence in our initial theory that the prevalence is equal? To do so, all we have to do is alter the $\boldsymbol {\alpha }$ vector. Then, we sample from the posterior again (using the original observations) and inspect the results.
 
 \begin{figure*}[h]
-    \includegraphics[width=0.7\textwidth]{p05c02-snip15}
+    \includegraphics[width=0.7\textwidth]{p05c04-snip15}
 \end{figure*}
 
 
 
 The hyperparameters have a large influence on the outcome! A lower value means the data itself has a greater weighting in the posterior, while a higher value results in greater weight placed on the pseudocounts. As the value is increased, the distributions converge on one another. We'd need a lot of data to overcome our strong hyperparameters in the last case.
 
-We can compare the posterior plots with $\bm \alpha$ = 0.1 and $\bm \alpha$ = 15 in Figure~\ref{fig:p05c02-snip16}.
+We can compare the posterior plots with $\bm \alpha$ = 0.1 and $\bm \alpha$ = 15 in Figure~\ref{fig:p05c04-snip16}.
 
 
 \begin{figure*}[h]
-    \includegraphics[width=0.7\textwidth]{p05c02-snip16}\\
-    \includegraphics[width=0.7\textwidth]{p05c02-snip17}
+    \includegraphics[width=0.7\textwidth]{p05c04-snip16}\\
+    \includegraphics[width=0.7\textwidth]{p05c04-snip17}
     \caption{Posterior plots with different $\bm \alpha$ }
-    \label{fig:p05c02-snip16}
+    \label{fig:p05c04-snip16}
 \end{figure*}
 
 

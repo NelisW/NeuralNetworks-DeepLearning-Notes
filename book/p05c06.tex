@@ -184,7 +184,7 @@ To understand this, let's look at the simplest complex example that I could thin
 
 If we assume a data generating process that looks like the following (with no probability distributions specified yet):
 \begin{marginfigure}
-\includegraphics{p05c05-snip01.png}
+\includegraphics{p05c06-snip01.png}
 \end{marginfigure}
 
 We can write out the following probabilistic model (now explicitly specifying probability distributions):
@@ -391,20 +391,20 @@ And voila! If you notice, the key trick here was to \textbf{sample in unbounded 
 \section{Samples from Posterior}
 
 \begin{figure*}[th]
-\includegraphics[width=.3\textwidth]{p05c05-mcmc-trace.png}
-\includegraphics[width=.3\textwidth]{p05c05-mcmc-trace-burn-in.png}
+\includegraphics[width=.3\textwidth]{p05c06-mcmc-trace.png}
+\includegraphics[width=.3\textwidth]{p05c06-mcmc-trace-burn-in.png}
 \caption{MCMC simple run results: full run and after burn-in phase}
-\label{fig:p05c05-mcmc-trace}
+\label{fig:p05c06-mcmc-trace}
 \end{figure*}
 
 %\begin{figure*}[th]
 %\caption{MCMC simple run results after burn-in}
-%\label{fig:p05c05-mcmc-trace-burn-in}
+%\label{fig:p05c06-mcmc-trace-burn-in}
 %\end{figure*}
 
 If we simulate 1000 data points from a Normal(3,1) distribution, and pass them into the model log probability function defined above, then after running the sampler, we get a chain of values that the sampler has picked out as maximizing the joint likelihood of the data and the model. This, by the way, is essentially the simplest version of Markov Chain Monte Carlo sampling that exists in modern computational Bayesian statistics.
 
-Examine the trace from one run in the left graph of Figure~\ref{fig:p05c05-mcmc-trace}. Notice how it takes about 200 steps before the trace becomes \textbf{stationary}, that is it becomes a flat trend-line. If we prune the trace to just the values after the 200th iteration, we get the trace on the right in Figure~\ref{fig:p05c05-mcmc-trace}.
+Examine the trace from one run in the left graph of Figure~\ref{fig:p05c06-mcmc-trace}. Notice how it takes about 200 steps before the trace becomes \textbf{stationary}, that is it becomes a flat trend-line. If we prune the trace to just the values after the 200th iteration, we get the trace on the right in Figure~\ref{fig:p05c06-mcmc-trace}.
 The samples drawn are an approximation to the expected values of $\mu$
 and $\sigma$ given the data and priors specified.
 \marginnote{Random Variables and Sampling: 
@@ -433,4 +433,4 @@ In fact, based on the exercise above, any ``sampler'' is only concerned with the
 
 Finally, I hope the ``simplest complex example'' of estimating $\mu$ and $\sigma$ of a normal distribution helps further your understanding of the math behind Bayesian statistics.
 
-All in all, I hope this essay helps your learning, as writing it did for me!
+All in all, I hope this essay helps your learning, as writing it did for me! 

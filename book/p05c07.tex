@@ -29,13 +29,13 @@ Before introducing Markov chains, let's start with a quick reminder of some basi
 
 First, in non-mathematical terms, a \textbf{random variable} $X$ is a variable whose value is defined as the outcome of a random phenomenon. This outcome can be a number (or "number-like", including vectors) or not. For example we can define a random variable as the outcome of rolling a dice (number) as well as the output of flipping a coin (not a number, unless you assign, for example, 0 to head and 1 to tail). Notice also that the space of possible outcomes of a random variable can be discrete or continuous: for example, a normal random variable is continuous whereas a poisson random variable is discrete.
 
-We can then define a \textbf{random process} (also called stochastic process) as a collection of random variables indexed by a set $T$ that often represent different instants of time (we will assume that in the following). The two most common cases are: either $T$ is the set of natural numbers (discrete time random process) or $T$ is the set of real numbers (continuous time random process). For example, flipping a coin every day defines a discrete time random process whereas the price of a stock market option varying continuously defines a continuous time random process. The random variables at different instant of time can be independent to each other (coin flipping example) or dependent in some way (stock price example) as well as they can have continuous or discrete state space (space of possible outcomes at each instant of time), see Figure~\ref{fig:p05c06-snip01}.
+We can then define a \textbf{random process} (also called stochastic process) as a collection of random variables indexed by a set $T$ that often represent different instants of time (we will assume that in the following). The two most common cases are: either $T$ is the set of natural numbers (discrete time random process) or $T$ is the set of real numbers (continuous time random process). For example, flipping a coin every day defines a discrete time random process whereas the price of a stock market option varying continuously defines a continuous time random process. The random variables at different instant of time can be independent to each other (coin flipping example) or dependent in some way (stock price example) as well as they can have continuous or discrete state space (space of possible outcomes at each instant of time), see Figure~\ref{fig:p05c07-snip01}.
 
 \begin{figure*}[h]
     \centering
-\includegraphics[width=\textwidth]{pic/p05c06-snip01.png}
+\includegraphics[width=\textwidth]{pic/p05c07-snip01.png}
     \caption{Different kind of random processes (discrete/continuous in space/time)}
-    \label{fig:p05c06-snip01}
+    \label{fig:p05c07-snip01}
 \end{figure*}
 
 
@@ -49,9 +49,9 @@ One property that makes the study of a random process much easier is the "Markov
 
 \begin{figure}[h]
     \centering
-\includegraphics[width=\textwidth]{pic/p05c06-snip02.png}
+\includegraphics[width=\textwidth]{pic/p05c07-snip02.png}
     \caption[The Markov does not learn about the future by gathering information about the past]{The Markov property expresses the fact that at a given time step and knowing the current state, we won't get any additional information about the future by gathering information about the past}
-    \label{fig:p05c06-snip02}
+    \label{fig:p05c07-snip02}
 \end{figure}
 
 
@@ -121,9 +121,9 @@ q_{n+1}=q_{n} p \quad q_{n+2}=q_{n+1} p=\left(q_{n} p\right) p=q_{n} p^{2} \quad
 
 \begin{figure*}[h]
     \centering
-\includegraphics[width=\textwidth]{pic/p05c06-snip03.png}
+\includegraphics[width=\textwidth]{pic/p05c07-snip03.png}
     \caption[Obtain the probability distribution for the next time step]{When right multiplying a row vector representing probability distribution at a given time step by the transition probability matrix, we obtain the probability distribution at the next time step}
-    \label{fig:p05c06-snip03}
+    \label{fig:p05c07-snip03}
 \end{figure*}
 
 So, we see here that evolving the probability distribution from a given step to the following one is as easy as right multiplying the row probability vector of the initial step by the matrix $p$. This also implies that we have
@@ -166,9 +166,9 @@ Finally, the probabilistic dynamic of this Markov chain can be graphically repre
 
 \begin{figure*}[h]
     \centering
-\includegraphics[width=\textwidth]{pic/p05c06-snip04.png}
+\includegraphics[width=\textwidth]{pic/p05c07-snip04.png}
     \caption{Graph representation of the Markov chain modelling our fictive TDS reader behaviour}
-    \label{fig:p05c06-snip04}
+    \label{fig:p05c07-snip04}
 \end{figure*}
 
 .
@@ -184,9 +184,9 @@ First, we say that a Markov chain is \textbf{irreducible} if it is possible to r
 
 \begin{figure*}[h]
     \centering
-\includegraphics[width=\textwidth]{pic/p05c06-snip05.png}
+\includegraphics[width=\textwidth]{pic/p05c07-snip05.png}
     \caption[Illustration of the irreducibility property]{Illustration of the irreducibility property. The chain on the left is not irreducible: from 3 or 4 we can't reach 1 or 2. The chain on the right (one edge has been added) is irreducible: each state can be reached from any other state}
-    \label{fig:p05c06-snip05}
+    \label{fig:p05c07-snip05}
 \end{figure*}
 
 
@@ -196,9 +196,9 @@ A state has period $k$ if, when leaving it, any return to that state requires a 
 
 \begin{figure*}[h]
     \centering
-\includegraphics[width=\textwidth]{pic/p05c06-snip06.png}
+\includegraphics[width=\textwidth]{pic/p05c07-snip06.png}
     \caption[Illustration of the periodicity property]{Illustration of the periodicity property. The chain on the left is 2-periodic: when leaving any state, it always takes a multiple of 2 steps to come back to it. The chain on the right is 3-periodic}
-    \label{fig:p05c06-snip06}
+    \label{fig:p05c07-snip06}
 \end{figure*}
 
 A state is \textbf{transient} if, when we leave this state, there is a non-zero probability that we will never return to it. Conversely, a state is \textbf{recurrent} if we know that we will return to that state, in the future, with probability 1 after leaving it (if it is not transient).
@@ -207,9 +207,9 @@ A state is \textbf{transient} if, when we leave this state, there is a non-zero 
 
 \begin{figure*}[h]
     \centering
-\includegraphics[width=\textwidth]{pic/p05c06-snip07.png}
+\includegraphics[width=\textwidth]{pic/p05c07-snip07.png}
     \caption[Illustration of the recurrence/transience property.]{Illustration of the recurrence/transience property. The chain of the left is such that: 1, 2 and 3 are transient (when leaving these points we can't be absolutely sure that we will come back to them) and 3-periodic whereas 4 and 5 are recurrent (when leaving these points we are absolutely sure that we will come back to them at some time) and 2-periodic. The chain on the right has one more edge that makes the full chain recurrent and aperiodic}
-    \label{fig:p05c06-snip07}
+    \label{fig:p05c07-snip07}
 \end{figure*}
 
 For a recurrent state, we can compute the mean recurrence time that is the \textbf{expected return time} when leaving the state. Notice that even if the probability of return is equal to 1, it doesn't mean that the expected return time is finite. So, among the recurrent states, we can make a difference between \textbf{positive recurrent} state (finite expected return time) and \textbf{null recurrent } state (infinite expected return time).
@@ -286,9 +286,9 @@ So, we have to find the left eigenvector of $p$ associated to the eigenvalue 1. 
 
 \begin{figure*}[h]
     \centering
-\includegraphics[width=\textwidth]{pic/p05c06-snip08.png}
+\includegraphics[width=\textwidth]{pic/p05c07-snip08.png}
     \caption{Stationary distribution of our "TDS reader" example}
-    \label{fig:p05c06-snip08}
+    \label{fig:p05c07-snip08}
 \end{figure*}
 
 
@@ -301,9 +301,9 @@ As the chain is irreducible and aperiodic, it means that, in the long run, the p
 
 \begin{figure*}[h]
     \centering
-\includegraphics[width=\textwidth]{pic/p05c06-snip09.png}
+\includegraphics[width=\textwidth]{pic/p05c07-snip09.png}
     \caption[Visualisation of convergence of probability distributions]{Visualisation of the convergence of 3 differently initialised probability distributions (blue, orange and green) towards the stationary distribution (red)}
-    \label{fig:p05c06-snip09}
+    \label{fig:p05c07-snip09}
 \end{figure*}
 
 
@@ -325,28 +325,28 @@ The hypothesis behind PageRank is that the most probable pages in the stationary
 
 \subsection{A toy example}
 
-In order to make all this much clearer, let's consider a toy example. Assume that we have a tiny website with 7 pages labeled from 1 to 7 and with links between the pages as represented in the graph in Figure~\ref{fig:p05c06-snip10}.
+In order to make all this much clearer, let's consider a toy example. Assume that we have a tiny website with 7 pages labeled from 1 to 7 and with links between the pages as represented in the graph in Figure~\ref{fig:p05c07-snip10}.
 
 
 \begin{figure*}[h]
     \centering
-\includegraphics[width=.3\textwidth]{pic/p05c06-snip10-00.png}
-\includegraphics[width=.3\textwidth]{pic/p05c06-snip10-01.png}
-\includegraphics[width=.3\textwidth]{pic/p05c06-snip10-02.png}\\\ \\
-\includegraphics[width=.3\textwidth]{pic/p05c06-snip10-03.png}
-\includegraphics[width=.3\textwidth]{pic/p05c06-snip10-04.png}
-\includegraphics[width=.3\textwidth]{pic/p05c06-snip10-05.png}\\\ \\
-\includegraphics[width=.3\textwidth]{pic/p05c06-snip10-06.png}
-\includegraphics[width=.3\textwidth]{pic/p05c06-snip10-07.png}
-\includegraphics[width=.3\textwidth]{pic/p05c06-snip10-08.png}\\\ \\
-\includegraphics[width=.3\textwidth]{pic/p05c06-snip10-09.png}
-\includegraphics[width=.3\textwidth]{pic/p05c06-snip10-10.png}
-\includegraphics[width=.3\textwidth]{pic/p05c06-snip10-11.png}\\\ \\
-\includegraphics[width=.3\textwidth]{pic/p05c06-snip10-12.png}
-\includegraphics[width=.3\textwidth]{pic/p05c06-snip10-13.png}
-\includegraphics[width=.3\textwidth]{pic/p05c06-snip10-14.png}
+\includegraphics[width=.3\textwidth]{pic/p05c07-snip10-00.png}
+\includegraphics[width=.3\textwidth]{pic/p05c07-snip10-01.png}
+\includegraphics[width=.3\textwidth]{pic/p05c07-snip10-02.png}\\\ \\
+\includegraphics[width=.3\textwidth]{pic/p05c07-snip10-03.png}
+\includegraphics[width=.3\textwidth]{pic/p05c07-snip10-04.png}
+\includegraphics[width=.3\textwidth]{pic/p05c07-snip10-05.png}\\\ \\
+\includegraphics[width=.3\textwidth]{pic/p05c07-snip10-06.png}
+\includegraphics[width=.3\textwidth]{pic/p05c07-snip10-07.png}
+\includegraphics[width=.3\textwidth]{pic/p05c07-snip10-08.png}\\\ \\
+\includegraphics[width=.3\textwidth]{pic/p05c07-snip10-09.png}
+\includegraphics[width=.3\textwidth]{pic/p05c07-snip10-10.png}
+\includegraphics[width=.3\textwidth]{pic/p05c07-snip10-11.png}\\\ \\
+\includegraphics[width=.3\textwidth]{pic/p05c07-snip10-12.png}
+\includegraphics[width=.3\textwidth]{pic/p05c07-snip10-13.png}
+\includegraphics[width=.3\textwidth]{pic/p05c07-snip10-14.png}
     \caption{Markov chain trajectory}
-    \label{fig:p05c06-snip10}
+    \label{fig:p05c07-snip10}
 \end{figure*}
 
 \FloatBarrier
@@ -369,15 +369,15 @@ where 0.0 values have been replaced by '.' for readability. Before any further c
 \pi_{1} & \pi_{2} & \pi_{3} & \pi_{4} & \pi_{5} & \pi_{6} & \pi_{7}
 \end{array}\right)
 \end{aligned}\end{equation}
-Doing so we obtain the following values of PageRank (values of the stationary distribution) for each page is shown in Figure~\ref{fig:p05c06-snip11}.
+Doing so we obtain the following values of PageRank (values of the stationary distribution) for each page is shown in Figure~\ref{fig:p05c07-snip11}.
 The PageRank ranking of this tiny web site is therefore\\
 1 > 7 > 4 > 2 > 5 = 6 > 3.
 
 \begin{figure*}[h]
     \centering
-\includegraphics[width=\textwidth]{pic/p05c06-snip11.png}
+\includegraphics[width=\textwidth]{pic/p05c07-snip11.png}
     \caption{PageRank values computed on our toy example that contains 7 pages}
-    \label{fig:p05c06-snip11}
+    \label{fig:p05c07-snip11}
 \end{figure*}
 
 

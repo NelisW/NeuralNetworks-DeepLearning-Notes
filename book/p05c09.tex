@@ -76,9 +76,9 @@ That is, we would like to find the most likely distribution of $\theta$, the par
 
 \begin{figure}[h]
     \centering
-\includegraphics[width=.3\textwidth]{pic/p05c08-snip01}
+\includegraphics[width=.3\textwidth]{pic/p05c09-snip01}
     \caption{A supposed portrait of Thomas Bayes, an English statistician, philosopher, and theologian}
-    \label{fig:p05c08-snip01}
+    \label{fig:p05c09-snip01}
 \end{figure}
 
 Computing some of these probabilities can be tedious, especially the evidence $P(D)$. Also, other problems can arise such as those of ensuring conjugacy which I will not dive into in this article. Luckily, some techniques, namely MCMC, allow us to sample from the posterior, and a draw distributions over our parameters without having to worry about computing the evidence, nor about conjugacy.
@@ -165,9 +165,9 @@ mu_obs
 
 \begin{figure}[h]
     \centering
-\includegraphics[width=.6\textwidth]{pic/p05c08-snip02}
+\includegraphics[width=.6\textwidth]{pic/p05c09-snip02}
     \caption{Samples from normal distribution}
-    \label{fig:p05c08-snip02}
+    \label{fig:p05c09-snip02}
 \end{figure}
 
 
@@ -179,7 +179,7 @@ We would like to find a distribution for $\sigma_\textrm{observed}$ using the 10
 Why do we want to sample and whatnot? Well, this is just a dummy data example, the real problem is in part 3, where it's hard to compute the parameters directly. Plus here, we are not trying to find a value for $\sigma$, but rather, we are trying to compute a probability distribution for $\sigma$.
 
 \subsection{Step 3: Define the PDF and the transition model}
-From Figure~\ref{fig:p05c08-snip02}, we can see that the data is normally distributed. The mean can be easily computed by taking the average of the values of the 1000 samples. By doing that, we get that  $\mu_\textrm{observed}$ = 9.8 (although on a side note, we could have also assumed  $\mu$ to be unknown and sampled for it just like we are doing for $\sigma$. However, I want to make this starting example simple.)
+From Figure~\ref{fig:p05c09-snip02}, we can see that the data is normally distributed. The mean can be easily computed by taking the average of the values of the 1000 samples. By doing that, we get that  $\mu_\textrm{observed}$ = 9.8 (although on a side note, we could have also assumed  $\mu$ to be unknown and sampled for it just like we are doing for $\sigma$. However, I want to make this starting example simple.)
 
 \textbf{For the transition model/ proposal distribution}
 
@@ -325,9 +325,9 @@ Let's see how the algorithm worked its way to these values:
 
 \begin{figure}[h]
     \centering
-\includegraphics[width=.6\textwidth]{pic/p05c08-snip03}
+\includegraphics[width=.6\textwidth]{pic/p05c09-snip03}
     \caption{Run results}
-    \label{fig:p05c08-snip03}
+    \label{fig:p05c09-snip03}
 \end{figure}
 
 So, starting from an initial $\sigma$ of 0.1, the algorithm converged pretty quickly to the expected value of 3. That said, it's only sampling in a 1D space. so it's not very surprising.
@@ -338,9 +338,9 @@ Still, we will consider the initial 25\% of the values of $\sigma$ to be "burn-i
 
 \begin{figure}[h]
     \centering
-\includegraphics[width=.6\textwidth]{pic/p05c08-snip04}
+\includegraphics[width=.6\textwidth]{pic/p05c09-snip04}
     \caption{The trace and histogram}
-    \label{fig:p05c08-snip04}
+    \label{fig:p05c09-snip04}
 \end{figure}
 
 
@@ -352,18 +352,18 @@ First, we average the last 75\% of accepted samples of $\sigma$, and we generate
 
 \begin{figure}[h]
     \centering
-\includegraphics[width=.6\textwidth]{pic/p05c08-snip05}
+\includegraphics[width=.6\textwidth]{pic/p05c09-snip05}
     \caption{The histogram for 30,000 samples}
-    \label{fig:p05c08-snip05}
+    \label{fig:p05c09-snip05}
 \end{figure}
 
 \section{Part 3: A real world example}
 
 \begin{figure}[h]
     \centering
-\includegraphics[width=.6\textwidth]{pic/p05c08-snip06}
+\includegraphics[width=.6\textwidth]{pic/p05c09-snip06}
     \caption{Sun spots}
-    \label{fig:p05c08-snip06}
+    \label{fig:p05c09-snip06}
 \end{figure}
 
 A sunspot is a region on the Sun's surface (photo-sphere) that is marked by a lower temperature than its environment. These reduced temperatures are caused by concentrations of magnetic field flux that inhibit convection by an effect similar to eddy current brakes. Sunspots usually appear in pairs of opposite magnetic polarity. Their number varies according to the approximately 11-year solar cycle.
@@ -374,10 +374,10 @@ The data we will be working on is the "Monthly mean total sunspot number", for e
 
 \begin{figure*}[h]
     \centering
-\includegraphics[width=.48\textwidth]{pic/p05c08-snip07}
-\includegraphics[width=.48\textwidth]{pic/p05c08-snip08}
+\includegraphics[width=.48\textwidth]{pic/p05c09-snip07}
+\includegraphics[width=.48\textwidth]{pic/p05c09-snip08}
     \caption{Sun spot cycles}
-    \label{fig:p05c08-snip07}
+    \label{fig:p05c09-snip07}
 \end{figure*}
 
 \FloatBarrier
@@ -388,18 +388,18 @@ A gamma distribution  $\Gamma$ is a two-parameter family of continuous probabili
 
 \begin{figure}[h]
     \centering
-\includegraphics[width=.6\textwidth]{pic/p05c08-snip09}
+\includegraphics[width=.6\textwidth]{pic/p05c09-snip09}
     \caption{Gamma function with different parameters}
-    \label{fig:p05c08-snip09}
+    \label{fig:p05c09-snip09}
 \end{figure}
 
 For example, in the first cycle, the sunspot counts start from their highest at about 300 at the end of 1749, and fall to their lowest 6 years after, during 1755. Then the number rises up again to it's maximum during 1761 and 1762 before falling again during 1766 and so on.
 
 \begin{figure}[h]
     \centering
-\includegraphics[width=.6\textwidth]{pic/p05c08-snip10}
+\includegraphics[width=.6\textwidth]{pic/p05c09-snip10}
     \caption{Histogram of sunspot counts}
-    \label{fig:p05c08-snip10}
+    \label{fig:p05c09-snip10}
 \end{figure}
 
 \FloatBarrier
@@ -439,9 +439,9 @@ As with the dummy data example, let's see how the algorithm worked its way to th
 
 \begin{figure}[h]
     \centering
-\includegraphics[width=.8\textwidth]{pic/p05c08-snip11}
+\includegraphics[width=.8\textwidth]{pic/p05c09-snip11}
     \caption{MCMC solution for $a$ and $b$}
-    \label{fig:p05c08-snip11}
+    \label{fig:p05c09-snip11}
 \end{figure}
 
 As we can see from the figures, the algorithm converges quickly to the [$a$=1,$b$=85] zone.
@@ -455,11 +455,11 @@ We consider the initial 50\% of the values of a and b to be "burn-in", so we dro
 
 \begin{figure}[h]
     \centering
-\includegraphics[width=.8\textwidth]{pic/p05c08-snip12}
-\includegraphics[width=.8\textwidth]{pic/p05c08-snip13}
-\includegraphics[width=.8\textwidth]{pic/p05c08-snip14}
+\includegraphics[width=.8\textwidth]{pic/p05c09-snip12}
+\includegraphics[width=.8\textwidth]{pic/p05c09-snip13}
+\includegraphics[width=.8\textwidth]{pic/p05c09-snip14}
     \caption{Trace histogram}
-    \label{fig:p05c08-snip12}
+    \label{fig:p05c09-snip12}
 \end{figure}
 
 
@@ -469,9 +469,9 @@ And the predictions:
 
 \begin{figure}[h]
     \centering
-\includegraphics[width=.8\textwidth]{pic/p05c08-snip15}
+\includegraphics[width=.8\textwidth]{pic/p05c09-snip15}
     \caption{Predictions}
-    \label{fig:p05c08-snip15}
+    \label{fig:p05c09-snip15}
 \end{figure}
 
 \FloatBarrier
@@ -486,9 +486,9 @@ The lag $k$, is  the range ahead of sample  $Y_i$ in which we would like to meas
 The plots below show the auto-correlation for $a$, $b$ for $k$ going from 1 to 100. A lag of $k$=0 means that we are measuring the correlation of a sample with itself, so we expect it to be equal to 1. The higher $k$ goes, the lower that correlation ought to be.
 \begin{figure}[h]
     \centering
-\includegraphics[width=.8\textwidth]{pic/p05c08-snip16}
+\includegraphics[width=.8\textwidth]{pic/p05c09-snip16}
     \caption{Auto-correlation of $a$ and $b$}
-    \label{fig:p05c08-snip16}
+    \label{fig:p05c09-snip16}
 \end{figure}
 In our case, we are lucky to have a low enough correlation. In general, we might want to setup the parameters of the proposal distribution, $Q$, automatically. A common method is to keep adjusting the proposal parameters so that more than 50\% proposals are rejected. Alternatively, one could use an enhanced version of MCMC called Hamiltonian Monte Carlo, which reduces the correlation between successive sampled states and reaches the stationary distribution quicker.
 
