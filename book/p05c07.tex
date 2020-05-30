@@ -1,328 +1,406 @@
 % -*- TeX -*- -*- UK -*- -*- Soft -*-
 
-\chapter{Bayesian Inference Problem, MCMC and Variational Inference}
-\label{chap:BayesianInferenceIroblemMCMCandVariationalInference}
+\chapter{Introduction to Markov Chains}
+\label{chap:IntroductiontoMarkovChains}
 
-This chapter is a verbatim copy of a blog \cite{JosephRoccaBayes2019} by Joseph Rocca.
+This chapter is a verbatim copy of a blog \cite{JosephRoccaMarkovChains2019} by Joseph Rocca.
 
-\textit{Overview of the Bayesian inference problem in statistics.}
+
+\textit{Definitions, properties and PageRank example.}
 
 \section{Introduction}
 
-Bayesian inference is a major problem in statistics that is also encountered in many machine learning methods. For example, Gaussian mixture models, for classification, or Latent Dirichlet Allocation, for topic modelling, are both graphical models requiring to solve such a problem when fitting the data.
+In 1998, Lawrence Page, Sergey Brin, Rajeev Motwani and Terry Winograd published "The PageRank Citation Ranking: Bringing Order to the Web", an article in which they introduced the now famous PageRank algorithm at the origin of Google. A little bit more than two decades later, Google has became a giant and, even if the algorithm has evolved a lot, the PageRank is still a "symbol" of the Google ranking algorithm (even if few people can really say the weight it still occupies in the algorithm).
 
-Meanwhile, it can be noticed that Bayesian inference problems can sometimes be very difficult to solve depending on the model settings (assumptions, dimensionality, $\ldots$). In large problems, exact solutions require, indeed, heavy computations that often become intractable and some approximation techniques have to be used to overcome this issue and build fast and scalable systems.
-
-In this post we will discuss the two main methods that can be used to tackle the Bayesian inference problem: Markov Chain Monte Carlo (MCMC), that is a sampling based approach, and Variational Inference (VI), that is an approximation based approach.
+From a theoretical point of view, it is interesting to notice that one common interpretation of the PageRank algorithm relies on the simple but fundamental mathematical notion of Markov chains. We will see in this article that Markov chains are powerful tools for stochastic modelling that can be useful to any data scientist. More especially, we will answer basic questions such as: what are Markov chains, what good properties do they have and what can be done with them?
 
 \section{Outline}
+In the first section we will give the basic definitions required to understand what Markov chains are. In the second section, we will discuss the special case of finite state space Markov chains. Then, in the third section we will discuss some elementary properties of Markov chains and will illustrate these properties with many little examples. Finally, in the fourth section we will make the link with the PageRank algorithm and see on a toy example how Markov chains can be used for ranking nodes of a graph.
 
-In the first section we will discuss the Bayesian inference problem and see some examples of classical machine learning applications in which this problem naturally appears. Then in the second section we will present globally MCMC technique to solve this problem and give some details about two MCMC algorithms: Metropolis-Hasting and Gibbs Sampling. Finally in the third section we will introduce Variational Inference and see how an approximate solution can be obtained following an optimisation process over a parametrised family of distributions.
+Note. Basics of probability and linear algebra are required in this post. In particular, the following notions will be used: 
+\href{https://en.wikipedia.org/wiki/Conditional_probability}{conditional probability}, 
+\href{https://en.wikipedia.org/wiki/Eigenvalues_and_eigenvectors}{eigenvector}, and 
+\href{https://en.wikipedia.org/wiki/Law_of_total_probability}{law of total probability}.
 
-Notice  that in this post $p(.)$ is used to denote either probability, probability density or probability distribution depending on the context.
+\section{What are Markov chains?}
+\subsection{Random variables and random processes}
 
-\section{The Bayesian inference problem}
+Before introducing Markov chains, let's start with a quick reminder of some basic but important notions of probability theory.
 
-In this section we present the Bayesian inference problem and discuss some computational difficulties before giving the example of Latent Dirichlet Allocation, a concrete machine learning technique of topic modelling in which this problem is encountered.
+First, in non-mathematical terms, a \textbf{random variable} $X$ is a variable whose value is defined as the outcome of a random phenomenon. This outcome can be a number (or "number-like", including vectors) or not. For example we can define a random variable as the outcome of rolling a dice (number) as well as the output of flipping a coin (not a number, unless you assign, for example, 0 to head and 1 to tail). Notice also that the space of possible outcomes of a random variable can be discrete or continuous: for example, a normal random variable is continuous whereas a poisson random variable is discrete.
 
-\subsection{What is inference?}
-
-Statistical inference consists in \textbf{learning about what we do not observe based on what we observe}. In other words, it is the process of drawing conclusions such as punctual estimations, confidence intervals or distribution estimations about some latent variables (often causes) in a population, based on some observed variables (often effects) in this population or in a sample of this population.
-
-In particular, \textbf{Bayesian inference} is the process of producing statistical inference taking a Bayesian point of view. In short, the Bayesian paradigm is a statistical/probabilistic paradigm in which a prior knowledge, modelled by a probability distribution, is updated each time a new observation, whose uncertainty is modelled by another probability distribution, is recorded. The whole idea that rules the Bayesian paradigm is embed in the so called Bayes theorem that expresses the relation between the updated knowledge (the "posterior"), the prior knowledge (the "prior") and the knowledge coming from the observation (the "likelihood").
-
-A classical example is the \textbf{Bayesian inference of parameters}. Let's assume a model where data $x$ are generated from a probability distribution depending on an unknown parameter $\theta$. Let's also assume that we have a prior knowledge about the parameter $\theta$ that can be expressed as a probability distribution $p(\theta)$. Then, when data $x$ are observed, we can update the prior knowledge about this parameter using the Bayes theorem as follows
-
+We can then define a \textbf{random process} (also called stochastic process) as a collection of random variables indexed by a set $T$ that often represent different instants of time (we will assume that in the following). The two most common cases are: either $T$ is the set of natural numbers (discrete time random process) or $T$ is the set of real numbers (continuous time random process). For example, flipping a coin every day defines a discrete time random process whereas the price of a stock market option varying continuously defines a continuous time random process. The random variables at different instant of time can be independent to each other (coin flipping example) or dependent in some way (stock price example) as well as they can have continuous or discrete state space (space of possible outcomes at each instant of time), see Figure~\ref{fig:p05c06-snip01}.
 
 \begin{figure*}[h]
     \centering
-\includegraphics[width=0.8\textwidth]{pic/p05c07-snip01.png}
-    \caption{Illustration of the Bayes theorem applied to the inference of a parameter given observed data}
-    \label{fig:p05c07-snip01}
+\includegraphics[width=\textwidth]{pic/p05c06-snip01.png}
+    \caption{Different kind of random processes (discrete/continuous in space/time)}
+    \label{fig:p05c06-snip01}
 \end{figure*}
 
 
-\subsection{Computational difficulties}
+\subsection{Markov property and Markov chain}
 
-The Bayes theorem tells us that the computation of the posterior requires three terms: a prior, a likelihood and an evidence. The first two can be expressed easily as they are part of the assumed model (in many situation, the prior and the likelihood are explicitly known). However, the third term, that is a normalisation factor, requires to be computed such that
+There exists some well known families of random processes: gaussian processes, poisson processes, autoregressive models, moving-average models, Markov chains and others. These particular cases have, each, specific properties that allow us to better study and understand them.
 
-\begin{equation}p(x)=\int_{\theta} p(x | \theta) p(\theta) d \theta\end{equation}
-
-Although in low dimension this integral can be computed without too much difficulties, \textbf{it can become intractable in higher dimensions}. In this last case, the exact computation of the posterior distribution is practically infeasible and some approximation techniques have to be used to get solutions to problems that require to know this posterior (such as mean computation, for example).
-
-We can notice that some other computational difficulties can arise from Bayesian inference problem such as, for example, combinatorics problems when some variables are discrete. Among the approaches that are the most used to overcome these difficulties we find \textbf{Markov Chain Monte Carlo} and \textbf{Variational Inference} methods. Later in this post, we will describe these two approaches focusing especially on the "normalisation factor problem" but one should keep in mind that these methods can also be precious when facing other computational difficulties related to Bayesian inference.
-
-In order to make things a lit bit more general for the upcoming sections, we can observe that, as $x$ is supposed to be given and can, so, be treated as a parameter, we face a situation where we have a probability distribution on $\theta$ defined up to a normalisation factor
-
-\begin{equation}\pi_{x}(\theta) \equiv p(\theta | x) \propto p(x | \theta) p(\theta) \equiv g_{x}(\theta)\end{equation}
-
-Before describing MCMC and VI in the next two sections, let's give a concrete example of Bayesian inference problem in machine learning with Latent Dirichlet Allocation.
-
-\subsection{Example}
-
-Bayesian inference problem naturally appears, for example, in machine learning methods that assume a probabilistic graphical model and where, given some observations, we want to recover latent variables of the model. In topic modelling, the \textbf{Latent Dirichlet Allocation (LDA)} method defines such a model for the description of texts in a corpus. Thus, given the full corpus vocabulary of size $V$ and a given number of topics $T$, the model assumes:
-
-\begin{itemize}
-    \item     there exists, for each topic, a "topic-word" probability distribution over the vocabulary (with a Dirichlet prior assumed)
-    \item     there exists, for each document, a "document-topic" probability distribution over the topics (with another Dirichlet prior assumed)
-    \item     each word in a document have been sampled such that, first, we have sampled a topic from the "document-topic" distribution of the document and, second, we have sampled a word from the "topic-word" distribution attached to the sampled topic
-\end{itemize}
+One property that makes the study of a random process much easier is the "Markov property". In a very informal way, the Markov property says, for a random process, that if we know the value taken by the process at a given time, we won't get any additional information about the future behaviour of the process by gathering more knowledge about the past. Stated in slightly more mathematical terms, for any given time, the conditional distribution of future states of the process given present and past states depends only on the present state and not at all on the past states (\textbf{memoryless property}). A random process with the Markov property is called \textbf{Markov process}.
 
 
-The purpose of the method, whose name comes from the Dirichlet priors assumed in the model, is then to infer the latent topics in the observed corpus as well as the topic decomposition of each documents. Even if we won't dive into details of LDA, we can say very roughly, denoting $w$ the vector of words in the corpus and $z$ the vector of topics associated to these words, that we want to infer $z$ based on the observed $w$ in a Bayesian way:
 
-\begin{equation}p(z | w)=\frac{p(w | z) p(z)}{p(w)}=\frac{p(w | z) p(z)}{\int_{z} p(w | z) p(z) d z}\end{equation}
-
-Here, beyond the fact that the normalisation factor is absolutely intractable due to a huge dimensionality, we face a combinatoric challenge (as some variables of the problem are discrete) that require to use either MCMC or VI to get an approximate solution. The reader interested by topic modelling and its specific underlying Bayesian inference problem can take a look at this reference paper \cite{Blei2003a}  on LDA.
-
-
-\begin{figure*}[h]
+\begin{figure}[h]
     \centering
-\includegraphics[width=\textwidth]{pic/p05c07-snip02.png}
-    \caption{Illustration of the Latent Dirichlet Allocation method}
-    \label{fig:p05c07-snip02}
-\end{figure*}
+\includegraphics[width=\textwidth]{pic/p05c06-snip02.png}
+    \caption[The Markov does not learn about the future by gathering information about the past]{The Markov property expresses the fact that at a given time step and knowing the current state, we won't get any additional information about the future by gathering information about the past}
+    \label{fig:p05c06-snip02}
+\end{figure}
 
 
-\section{Markov Chains Monte Carlo (MCMC)}
-
-As we mentioned before, one of the main difficulty faced when dealing with a Bayesian inference problem comes from the normalisation factor. In this section we describe \textbf{MCMC sampling methods} that constitute a possible solution to overcome this issue as well as some others computational difficulties related to Bayesian inference.
-
-\subsection{The sampling approach}
-
-The idea of sampling methods is the following. Let's assume first that we have a way (MCMC) to \textbf{draw samples from a probability distribution defined up to a factor}. Then, instead of trying to deal with intractable computations involving the posterior, we can get samples from this distribution (using only the not normalised part definition) and use these samples to compute various punctual statistics such as mean and variance or even to approximate the distribution by Kernel Density Estimation.
-
-Contrarily to VI methods described in the next section, \textbf{MCMC approaches assume no model} for the studied probability distribution (the posterior in the Bayesian inference case). As a consequence, these methods have a low bias but a high variance and it implies that results are most of the time more costly to obtain but also more accurate than the one we can get from VI.
-
-To conclude this subsection, we outline once more the fact that this sampling process we just described is not constrained to the Bayesian inference of posterior distribution and can also, more generally, be used in any situation where a probability distribution is defined up to its normalisation factor.
 
 
-\begin{figure*}[h]
-    \centering
-\includegraphics[width=\textwidth]{pic/p05c07-snip03.png}
-    \caption{Illustration of the sampling approach (MCMC)}
-    \label{fig:p05c07-snip03}
-\end{figure*}
+Based on the previous definition, we can now define "homogenous discrete time Markov chains" (that will be denoted "Markov chains" for simplicity in the following). A \textbf{Markov chain} is a Markov process with discrete time and discrete state space. So, a Markov chain is a discrete sequence of states, each drawn from a discrete state space (finite or not), and that follows the Markov property.
 
-
-\subsection{The idea of MCMC}
-
-In statistics, \textbf{Markov Chain Monte Carlo algorithms are aimed at generating samples from a given probability distribution}. The "Monte Carlo" part of the method's name is due to the sampling purpose whereas the "Markov Chain" part comes from the way we obtain these samples (we refer the reader to our introductory post on Markov Chains \cite{JosephRoccaMarkovChains2019}), see Chapter~\ref{chap:IntroductiontoMarkovChains}.
-
-
-In order to produce samples, the idea is to set up a Markov Chain whose stationary distribution is the one we want to sample from. Then, we can simulate a random sequence of states from that Markov Chain that is long enough to (almost) reach the steady state and then keep some generated states as our samples.
-
-Among the random variables generation techniques, MCMC is a pretty advanced kind of methods (we already discussed an other method in our post about GANs) that makes possible to \textbf{get samples from a very difficult probability distribution potentially defined only up to a multiplicative constant}. The counter-intuitive fact that we can obtain, with MCMC, samples from a distribution not well normalised comes from the specific way we define the Markov Chain that is not sensitive to these normalisation factor.
-
-
-\begin{figure*}[h]
-    \centering
-\includegraphics[width=\textwidth]{pic/p05c07-snip04.png}
-    \caption[The Markov Chain Monte Carlo approach is aimed at generating samples]{The Markov Chain Monte Carlo approach is aimed at generating samples from a difficult probability distribution that can be defined up to a factor}
-    \label{fig:p05c07-snip04}
-\end{figure*}
-
-
-\subsection{Definition of the Markov Chain}
-
-The whole MCMC approach is based on the ability to \textbf{build a Markov Chain whose stationary distribution is the one we want to sample from}. In order to do so, Metropolis-Hasting and Gibbs Sampling algorithms both use a particular property of Markov Chains: reversibility.
-
-A Markov Chain over a state space E with transition probabilities denoted by
-\begin{equation}k(\alpha, \beta) \equiv p\left(X_{n+1}=\beta | X_{n}=\alpha\right)\end{equation}
-is said to be reversible if there exists a probability distribution $\gamma$ such that
-\begin{equation}k(\alpha, \beta) \gamma(\alpha)=k(\beta, \alpha) \gamma(\beta) \quad \forall \alpha, \beta \in E\end{equation}
-For such Markov Chain, we can easily verify that we have
-\begin{equation}\int_{\beta \in E} k(\beta, \alpha) \gamma(\beta) d \beta=\int_{\beta \in E} k(\alpha, \beta) \gamma(\alpha) d \beta=\gamma(\alpha)\end{equation}
-and, then, $\gamma$ is a stationary distribution (the only one if the Markov Chain is irreducible).
-
-Let's now assume that the probability distribution $\pi$ we want to sample from is only defined up to a factor
-\begin{equation}\pi(.)=C \times g(.) \propto g(.)\end{equation}
-(where $C$ is the unknown multiplicative constant). We can notice that the following equivalence holds
-\begin{equation}\begin{aligned}
-& k(\alpha, \beta) \pi(\alpha) &=k(\beta, \alpha) \pi(\beta) & & \forall \alpha, \beta \in E \\
-\Longleftrightarrow & k(\alpha, \beta) g(\alpha) &=k(\beta, \alpha) g(\beta) & & \forall \alpha, \beta \in E
-\end{aligned}\end{equation}
-and, then, a Markov Chain with transition probabilities $k(.,.)$ defined to verify the last equality will have, as expected, $\pi$ as stationary distribution. Thus, we can define a Markov Chain that have for stationary distribution a probability distribution $\pi$ that can't be explicitly computed.
-
-\subsection{The Gibbs Sampling transitions}
-
-Let's assume that the Markov Chain we want to define is $D$-dimensional, such that
-\begin{equation}X_{n}=\left(X_{n, 1}, X_{n, 2}, \dots, X_{n, D}\right)\end{equation}
-The \textbf{Gibbs Sampling method} is based on the assumption that, even if the joint probability is intractable, the conditional distribution of a single dimension given the others can be computed. Based on this idea, transitions are defined such that, at iteration $n+1$, the next state to be visited is given by the following process.
-
-First we randomly choose an integer d among the $D$ dimensions of $X_n$. Then we sample a new value for that dimension according to the corresponding conditional probability given that all the other dimensions are kept fixed:
-\begin{eqnarray}
-d 
-&\sim& \text {Uniform}(\{1,2, \ldots, D\}) \quad, \nonumber \\
-&&\quad X_{(n+1), j}=X_{n, j} \quad \forall j \neq d \quad \text { and } \nonumber \\
-&&\quad X_{(n+1), d} \sim \pi_{d}\left(\cdot | X_{n, \neg d}\right)\nonumber
-\end{eqnarray}
-where
-\begin{eqnarray}
-\pi_{d}\left(\cdot | X_{n, \neg d}\right)
-&=&\frac{\pi\left(X_{n, 1}, \ldots, X_{n,(d-1)}, \cdot, X_{n,(d+1)}, \ldots, X_{n, D}\right)}{\int_{u} \pi\left(X_{n, 1}, \ldots, X_{n,(d-1)}, u, X_{n,(d+1)}, \ldots, X_{n, D}\right) d u}\nonumber \\
-&=&\frac{g\left(X_{n, 1}, \dots, X_{n,(d-1)}, \cdot, X_{n,(d+1)}, \dots, X_{n, D}\right)}{\int_{u} g\left(X_{n, 1}, \dots, X_{n,(d-1)}, u, X_{n,(d+1)}, \dots, X_{n, D}\right) d \imath}\nonumber
-\end{eqnarray}
-is the conditional distribution of the d-th dimension given all the other dimensions.
-
-Formally, if we denote
-%\begin{equation}\alpha \underset{d}^{\beta} \Longleftrightarrow \alpha_{i}=\beta_{i} \quad \forall i \neq d\end{equation}
+Mathematically, we can denote a Markov chain by
+\begin{equation}X=\left(X_{n}\right)_{n \in \mathrm{N}}=\left(X_{0}, X_{1}, X_{2}, \ldots\right)\end{equation}
+where at each instant of time the process takes its values in a discrete set $E$ such that
+\begin{equation}X_{n} \in E \quad \forall n \in \mathbb{N}\end{equation}
+Then, the Markov property implies that we have
 \begin{equation}
-\alpha \underset{d}{\sim}{\beta} \Longleftrightarrow 
-\alpha_{i}=\beta_{i} 
-\quad \forall i \neq d
+\mathbb{P}\left(X_{n+1}=s_{n+1} | X_{n}=s_{n}, X_{n-1}=s_{n-1}, X_{n-2}=s_{n-2}, \ldots\right)=\mathbb{P}\left(X_{n+1}=s_{n+1} | X_{n}=s_{n}\right)
 \end{equation}
-the transition probabilities can then be written
-\begin{equation}k(\alpha, \beta)=\left\{\begin{array}{ll}
-\frac{1}{D} \frac{g(\beta)}{\int_{\gamma \underset{d}{\sim}\alpha} g(\gamma) d \gamma} & \text { if } \beta \underset{d}{\sim} \alpha \\
-0 & \text { otherwise }
-\end{array} \quad \forall \beta \neq \alpha\right.\end{equation}
-and, so, the local balance is verified as expected with, for the only non-trivial case,
-\begin{equation}g(\alpha) k(\alpha, \beta)
-=\frac{1}{D} \frac{g(\alpha) g(\beta)}{\int_{\gamma \underset{d}{\sim}\alpha} g(\gamma) d \gamma}
-=\frac{1}{D} \frac{g(\beta) g(\alpha)}{\int_{\gamma \underset{d}{\sim}\beta} g(\gamma) d \gamma}=g(\beta) k(\beta, \alpha)\end{equation}
 
-\subsection{The Metropolis-Hasting transitions}
+Notice once again that this last formula expresses the fact that for a given historic (where I am now and where I was before), the probability distribution for the next state (where I go next) only depends on the current state and not on the past states.
 
-Sometimes even conditional distributions involved in Gibbs methods are far too complex to be obtained. In such cases, \textbf{Metropolis-Hasting} can then be used. For this, we start by defining a side transition probability $h(.,.)$ that will serve at suggesting transitions. Then, at iteration $n+1$, the next state to be visited by the Markov Chain is defined by the following process. We first draw a "suggested transition" $x$ from $h$ and compute a related probability $r$ to accept it:
+Note. We have decided to describe only basic homogenous discrete time Markov chains in this introductory post. However, there also exists inhomogenous (time dependent) and/or time continuous Markov chains. We won't discuss these variants of the model in the following. Notice also that the definition of the Markov property given above is extremely simplified: the true mathematical definition involves the notion of filtration that is far beyond the scope of this modest introduction.
+
+\subsection{Characterising the random dynamic of a Markov chain}
+
+We have introduced in the previous subsection a general framework matched by any Markov chain. Let's now see what we do need in order to define a specific "instance" of such a random process.
+
+Notice first that the full characterisation of a discrete time random process that doesn't verify the Markov property can be painful: the probability distribution at a given time can depend on one or multiple instants of time in the past and/or the future. All these possible time dependences make any proper description of the process potentially difficult.
+
+However, thanks to the Markov property, the dynamic of a Markov chain is pretty easy to define. Indeed, we only need to specify two things: an \textbf{initial probability distribution} (that is a probability distribution for the instant of time $n=0$) denoted
+\begin{equation}\mathbb{P}\left(X_{0}=s\right)=q_{0}(s) \quad \forall s \in E\end{equation}
+and a \textbf{transition probability kernel} (that gives the probabilities that a state, at time $n+1$, succeeds to another, at time n, for any pair of states) denoted
+\begin{equation}\mathbb{P}\left(X_{n+1}=s_{n+1} | X_{n}=s_{n}\right)=p\left(s_{n}, s_{n+1}\right) \quad \forall\left(s_{n+1}, s_{n}\right) \in E \times E\end{equation}
+With the previous two objects known, the full (probabilistic) dynamic of the process is well defined. Indeed, the probability of any realisation of the process can then be computed in a recurrent way.
+
+Assume for example that we want to know the probability for the first 3 states of the process to be $(s0, s1, s2)$. So, we want to compute the probability
+\begin{equation}\mathbb{P}\left(X_{0}=s_{0}, X_{1}=s_{1}, X_{2}=s_{2}\right)\end{equation}
+Here, we use the law of total probability stating that the probability of having $(s0, s1, s2)$ is equal to the probability of having first $s0$, multiplied by the probability of having $s1$ given we had $s0$ before, multiplied by the probability of having finally $s2$ given that we had, in order, $s0$ and $s1$ before. Mathematically, it can be written
+\begin{equation}\mathbb{P}\left(X_{0}=s_{0}, X_{1}=s_{1}, X_{2}=s_{2}\right)=\mathbb{P}\left(X_{0}=s_{0}\right) \mathbb{P}\left(X_{1}=s_{1} | X_{0}=s_{0}\right) \mathbb{P}\left(X_{2}=s_{2} | X_{0}=s_{0}, X_{1}=s_{1}\right)\end{equation}
+Then appears the simplification given by the Markov assumption. Indeed, for long chains we would obtain for the last states heavily conditional probabilities. However, in a Markov case we can simplify this expression using that
+\begin{equation}\mathbb{P}\left(X_{2}=s_{2} | X_{0}=s_{0}, X_{1}=s_{1}\right)=\mathbb{P}\left(X_{2}=s_{2} | X_{1}=s_{1}\right)\end{equation}
+such that we have
 \begin{equation}\begin{aligned}
-&x \sim h\left(X_{n}, .\right)\\
-&\text { and } \quad r=\min \left(1, \frac{g(x) h\left(x, X_{n}\right)}{g\left(X_{n}\right) h\left(X_{n}, x\right)}\right)
+\mathbb{P}\left(X_{0}=s_{0}, X_{1}=s_{1}, X_{2}=s_{2}\right) &=\mathbb{P}\left(X_{0}=s_{0}\right) \mathbb{P}\left(X_{1}=s_{1} | X_{0}=s_{0}\right) \mathbb{P}\left(X_{2}=s_{2} | X_{1}=s_{1}\right) \\
+&=q_{0}\left(s_{0}\right) p\left(s_{0}, s_{1}\right) p\left(s_{1}, s_{2}\right)
 \end{aligned}\end{equation}
-Then the effective transition is chosen such that
-\begin{equation}X_{n+1}=\left\{\begin{array}{ll}
-x & \text { with probability } r \\
-X_{n} & \text { with probability } 1-r
-\end{array}\right.\end{equation}
-Formally, the transition probabilities can then be written
-\begin{equation}k(\alpha, \beta)=h(\alpha, \beta) \min \left(1, \frac{g(\beta) h(\beta, \alpha)}{g(\alpha) h(\alpha, \beta)}\right) \quad \forall \beta \neq \alpha\end{equation}
-and, so, the local balance is verified as expected
+As they fully characterise the probabilistic dynamic of the process, many other more complex events can then be computed only based on both the initial probability distribution $q0$ and the transition probability kernel $p$. One last basic relation that deserves to be given is the expression of the probability distribution at time $n+1$ expressed relatively to the probability distribution at time $n$
+\begin{equation}q_{n+1}\left(s_{n+1}\right) \stackrel{\text { def }}{=} \mathbb{P}\left(X_{n+1}=s_{n+1}\right)=\sum_{s \in E} \mathbb{P}\left(X_{n}=s\right) \mathbb{P}\left(X_{n+1}=s_{n+1} | X_{n}=s\right)=\sum_{s \in E} q_{n}(s) p\left(s, s_{n+1}\right)\end{equation}
+
+\section{Finite state space Markov chains}
+\subsection{Matrix and graph representation}
+
+We assume here that we have a finite number $N$ of possible states in $E$:
+\begin{equation}E=\left\{e_{1}, e_{2}, \dots, e_{N}\right\}\end{equation}
+Then, the initial probability distribution can be described by a \textbf{row vector} $q0$ of size $N$ and the transition probabilities can be described by a matrix $p$ of size $N$ by $N$ such that
+
+$\left(q_{0}\right)_{i}=q_{0}\left(e_{i}\right)=\mathbb{P}\left(X_{0}=e_{i}\right)$\\
+$p_{i, j}=p\left(e_{i}, e_{j}\right)=\mathbb{P}\left(X_{n+1}=e_{j} | X_{n}=e_{i}\right)$
+(independent of n)
+
+The advantage of such notation is that if we note denote the probability distribution at step $n$ by a raw vector $q_n$ such that its components are given by
+\begin{equation}
+\left(q_{n}\right)_{i}=q_{n}\left(e_{i}\right)=\mathbb{P}\left(X_{n}=e_{i}\right)
+\end{equation}
+then the simple matrix relations thereafter hold
+\begin{equation}
+q_{n+1}=q_{n} p \quad q_{n+2}=q_{n+1} p=\left(q_{n} p\right) p=q_{n} p^{2} \quad \ldots \quad q_{n+m}=q_{n} p^{m}
+\end{equation}
+(the proof won't be detailed here but can be recovered very easily).
+
+\begin{figure*}[h]
+    \centering
+\includegraphics[width=\textwidth]{pic/p05c06-snip03.png}
+    \caption[Obtain the probability distribution for the next time step]{When right multiplying a row vector representing probability distribution at a given time step by the transition probability matrix, we obtain the probability distribution at the next time step}
+    \label{fig:p05c06-snip03}
+\end{figure*}
+
+So, we see here that evolving the probability distribution from a given step to the following one is as easy as right multiplying the row probability vector of the initial step by the matrix $p$. This also implies that we have
+
+$p_{i, j}=\mathbb{P}\left(X_{n+1}=e_{j} | X_{n}=e_{i}\right) \equiv$ probability of going from $e_{i}$ to $e_{j}$ in 1 step \\
+$\left(p^{2}\right)_{i, j}=\mathbb{P}\left(X_{n+2}=e_{j} | X_{n}=e_{i}\right) \equiv$ probability of going from $e_{i}$ to $e_{j}$ in 2 steps\\
+$\left(p^{m}\right)_{i, j}=\mathbb{P}\left(X_{n+m}=e_{j} | X_{n}=e_{i}\right) \equiv$ probability of going from $e_{i}$ to $e_{j}$ in $\mathrm{m}$ steps
+
+The random dynamic of a finite state space Markov chain can easily be represented as a valuated oriented graph such that each node in the graph is a state and, for all pairs of states $(e_i, e_j)$, there exists an edge going from $e_i$ to $e_j$ if $p(e_i,e_j)>0$. The value of the edge is then this same probability $p(e_i,e_j)$.
+
+\subsection{Example: the Towards Data Science reader}
+
+Let's take a simple example to illustrate all this. Consider the daily behaviour of a fictive Towards Data Science reader. For each day, there are 3 possible states: the reader doesn't visit TDS this day ($N$), the reader visits TDS but doesn't read a full post ($V$) and the reader visits TDS and read at least one full post ($R$). So, we have the following state space
+\begin{equation}E=\{N, V, R\}\end{equation}
+Assume that at the first day this reader has 50\% chance to only visit TDS and 50\% chance to visit TDS and read at least one article. The vector describing the initial probability distribution ($n=0$) is then
+\begin{equation}q_{0}=(0.0,0.5,0.5)\end{equation}
+Imagine also that the following probabilities have been observed:
+\begin{enumerate}
+\item when the reader doesn't visit TDS a day, he has 25\% chance of still not visiting the next day, 50\% chance to only visit and 25\% to visit and read
+
+\item when the reader visits TDS without reading a day, he has 50\% chance to visit again without reading the next day and 50\% to visit and read
+
+\item when the reader visits and read a day, he has 33\% chance of not visiting the next day (\textit{hope that this post won't have this kind of effect!}), 33\% chance to only visit and 34\% to visit and read again
+\end{enumerate}
+
+
+Then, we have the following transition matrix
+\begin{equation}p=\left(\begin{array}{lll}
+0.25 & 0.50 & 0.25 \\
+0.00 & 0.50 & 0.50 \\
+0.33 & 0.33 & 0.34
+\end{array}\right)\end{equation}
+Based on the previous subsection, we know how to compute, for this reader, the probability of each state for the second day ($n=1$)
+\begin{equation}q_{1}=q_{0} p=(0.0,0.5,0.5)\left(\begin{array}{ccc}
+0.25 & 0.50 & 0.25 \\
+0.00 & 0.50 & 0.50 \\
+0.33 & 0.33 & 0.34
+\end{array}\right)=(0.165,0.415,0.420)\end{equation}
+Finally, the probabilistic dynamic of this Markov chain can be graphically represented as follows
+
+\begin{figure*}[h]
+    \centering
+\includegraphics[width=\textwidth]{pic/p05c06-snip04.png}
+    \caption{Graph representation of the Markov chain modelling our fictive TDS reader behaviour}
+    \label{fig:p05c06-snip04}
+\end{figure*}
+
+.
+
+\section{Markov Chains properties}
+
+In this section, we will only give some basic Markov chains properties or characterisations. The idea is not to go deeply into mathematical details but more to give an overview of what are the points of interest that need to be studied when using Markov chains. As we have seen that in the finite state space case we can picture a Markov chain as a graph, notice that we will use graphical representation to illustrate some of the properties bellow. However, one should keep in mind that these properties are not necessarily limited to the finite state space case.
+
+\subsection{Reducibility, periodicity, transience and recurrence}
+Let's start, in this subsection, with some classical ways to characterise a state or an entire Markov chain.
+
+First, we say that a Markov chain is \textbf{irreducible} if it is possible to reach any state from any other state (not necessarily in a single time step). If the state space is finite and the chain can be represented by a graph, then we can say that the graph of an irreducible Markov chain is strongly connected (graph theory).
+
+\begin{figure*}[h]
+    \centering
+\includegraphics[width=\textwidth]{pic/p05c06-snip05.png}
+    \caption[Illustration of the irreducibility property]{Illustration of the irreducibility property. The chain on the left is not irreducible: from 3 or 4 we can't reach 1 or 2. The chain on the right (one edge has been added) is irreducible: each state can be reached from any other state}
+    \label{fig:p05c06-snip05}
+\end{figure*}
+
+
+A state has period $k$ if, when leaving it, any return to that state requires a multiple of $k$ time steps ($k$ is the greatest common divisor of all the possible return path length). If $k = 1$, then the state is said to be aperiodic and a whole Markov chain is \textbf{aperiodic} if all its states are aperiodic. For an irreducible Markov chain, we can also mention the fact that if one state is aperiodic then all states are aperiodic.
+
+
+
+\begin{figure*}[h]
+    \centering
+\includegraphics[width=\textwidth]{pic/p05c06-snip06.png}
+    \caption[Illustration of the periodicity property]{Illustration of the periodicity property. The chain on the left is 2-periodic: when leaving any state, it always takes a multiple of 2 steps to come back to it. The chain on the right is 3-periodic}
+    \label{fig:p05c06-snip06}
+\end{figure*}
+
+A state is \textbf{transient} if, when we leave this state, there is a non-zero probability that we will never return to it. Conversely, a state is \textbf{recurrent} if we know that we will return to that state, in the future, with probability 1 after leaving it (if it is not transient).
+
+
+
+\begin{figure*}[h]
+    \centering
+\includegraphics[width=\textwidth]{pic/p05c06-snip07.png}
+    \caption[Illustration of the recurrence/transience property.]{Illustration of the recurrence/transience property. The chain of the left is such that: 1, 2 and 3 are transient (when leaving these points we can't be absolutely sure that we will come back to them) and 3-periodic whereas 4 and 5 are recurrent (when leaving these points we are absolutely sure that we will come back to them at some time) and 2-periodic. The chain on the right has one more edge that makes the full chain recurrent and aperiodic}
+    \label{fig:p05c06-snip07}
+\end{figure*}
+
+For a recurrent state, we can compute the mean recurrence time that is the \textbf{expected return time} when leaving the state. Notice that even if the probability of return is equal to 1, it doesn't mean that the expected return time is finite. So, among the recurrent states, we can make a difference between \textbf{positive recurrent} state (finite expected return time) and \textbf{null recurrent } state (infinite expected return time).
+
+\subsection{Stationary distribution, limiting behaviour and ergodicity}
+
+We discuss, in this subsection, properties that characterise some aspects of the (random) dynamic described by a Markov chain.
+
+A probability distribution $\pi$ over the state space $E$ is said to be a \textbf{stationary distribution} if it verifies
+\begin{equation}\pi\left(e^{\prime}\right)=\sum_{e \in E} \pi(e) p\left(e, e^{\prime}\right) \quad \forall e^{\prime} \in E\end{equation}
+As we have\\
+\begin{tabular}{rcl}
+$\pi\left(e^{\prime}\right)$&$=$& probability of being in $e^{\prime}$ at the current step \\
+$\sum_{e \in E} \pi(e) p\left(e, e^{\prime}\right)$&$=$& probability of being in $e^{\prime}$ at the next step
+\end{tabular}
+
+Then a stationary distribution verifies
+
+probability of being in $e^{\prime}$ at the current step
+ $=$ probability of being in $e^{\prime}$ at the next step
+
+By definition, a stationary probability distribution is then such that it doesn't evolve through the time. So if the initial distribution $q$ is a stationary distribution then it will stay the same for all future time steps. If the state space is finite, $p$ can be represented by a matrix and $\pi$ by a raw vector and we then have
+\begin{equation}\pi=\pi p=\pi p^{2}=\dots\end{equation}
+Once more, it expresses the fact that a stationary probability distribution doesn't evolve through the time (as we saw that right multiplying a probability distribution by $p$ allows to compute the probability distribution at the next time step). Notice that an irreducible Markov chain has a stationary probability distribution if and only if all of its states are positive recurrent.
+
+Another interesting property related to stationary probability distribution is the following. If the chain is recurrent positive (so that there exists a stationary distribution) and aperiodic then, no matter what the initial probabilities are, the probability distribution of the chain converges when time steps goes to infinity: the chain is said to have a \textbf{limiting distribution} that is nothing else than the stationary distribution. In the general case it can be written
+\begin{equation}\lim _{n \rightarrow \infty} \mathbb{P}\left(X_{n}=e^{\prime} | X_{0}=e\right)=\lim _{n \rightarrow \infty} p^{n}\left(e, e^{\prime}\right)=\pi\left(e^{\prime}\right) \quad \forall\left(e, e^{\prime}\right) \in E \times E\end{equation}
+Let's emphasise once more the fact that there is no assumption on the initiale probability distribution: the probability distribution of the chain converges to the stationary distribution (equilibrium distribution of the chain) regardless of the initial setting.
+
+Finally, \textbf{ergodicity} is another interesting property related to the behaviour of a Markov chain. If a Markov chain is irreducible then we also say that this chain is "ergodic" as it verifies the following ergodic theorem. Assume that we have an application $f(.)$ that goes from the state space $E$ to the real line (it can be, for example, the cost to be in each state). We can define the mean value that takes this application along a given trajectory (temporal mean). For the $n$-th first terms it is denoted by
+\begin{equation}\frac{1}{n}\left(f\left(X_{0}\right)+f\left(X_{1}\right)+\ldots+f\left(X_{n-1}\right)\right)=\frac{1}{n} \sum_{i=0}^{n-1} f\left(X_{i}\right)\end{equation}
+We can also compute the mean value of application f over the set $E$ weighted by the stationary distribution (spatial mean) that is denoted by
+\begin{equation}\sum_{e \in E} \pi(e) f(e)\end{equation}
+Then ergodic theorem tells us that the temporal mean when trajectory become infinitely long is equal to the spatial mean (weighted by stationary distribution). The ergodic property can be written
+\begin{equation}\lim _{n \rightarrow \infty} \frac{1}{n} \sum_{i=0}^{n-1} f\left(X_{i}\right)=\sum_{e \in E} \pi(e) f(e)\end{equation}
+Stated in another way, it says that, at the limit, the early behaviour of the trajectory becomes negligible and only the long run stationary behaviour really matter when computing the temporal mean.
+
+\subsection{Back to our TDS reader example}
+
+We consider our TDS reader example again. In this simple example, the chain is clearly irreducible, aperiodic and all the states are recurrent positive.
+
+In order to show the kind of interesting results that can be computed with Markov chains, we want to look at the mean recurrence time for the state $R$ (state "visit and read"). In other words, we would like to answer the following question: when our TDS reader visits and reads a given day, how many days do we have to wait in average before he visits and reads again? Let's try to get an intuition of how to compute this value.
+
+First, we denote
+
+$m\left(e, e^{\prime}\right) \equiv$ mean time to go from state $e$ to state $e^{\prime}$
+
+So we want to compute here $m(R,R)$. Reasoning on the first step reached after leaving $R$, we get
+
 \begin{equation}\begin{aligned}
-g(\alpha) k(\alpha, \beta) &=g(\alpha) h(\alpha, \beta) \min \left(1, \frac{g(\beta) h(\beta, \alpha)}{g(\alpha) h(\alpha, \beta)}\right)=\min (g(\alpha) h(\alpha, \beta), g(\beta) h(\beta, \alpha)) \\
-&=g(\beta) h(\beta, \alpha) \min \left(1, \frac{g(\alpha) h(\alpha, \beta)}{g(\beta) h(\beta, \alpha)}\right)=g(\beta) k(\beta, \alpha)
+m(R, R) &=p_{R, N}(1+m(N, R))+p_{R, V}(1+m(V, R))+p_{R, R}(1+0) \\
+&=1+\left[m(N, R) \times p_{R, N}+m(V, R) \times p_{R, V}+0 \times p_{R, R}\right] \\
+&=1+m(N, R) \times p_{R, N}+m(V, R) \times p_{R, V}
 \end{aligned}\end{equation}
 
-\subsection{The sampling process}
-
-Once our Markov Chain has been defined, we can simulate a random sequence of states (randomly initialised) and keep some of them chosen such as to obtain samples that, both, follow the targeted distribution and are independent.
-
-First, in order to have samples that (almost) follow the targeted distribution, \textbf{we need to only consider states far enough from the beginning of the generated sequence to have almost reach the steady state of the Markov Chain} (the steady state being, in theory, only asymptotically reached). Thus, the first simulated states are not usable as samples and we call this phase required to reach stationarity the \textbf{burn-in time}. Notice that, in practice it is pretty difficult to know how long this burn-in time has to be.
-
-Second, in order to have (almost) independent samples, \textbf{we can't keep all the successive states of the sequence after the burn-in time}. Indeed, the Markov Chain definition implies a strong correlation between two successive states and we then need to keep as samples only states that are far enough from each other to be considered as almost independent. In practice, the \textbf{lag} required between two states to be considered as almost independent can be estimated through the analysis of the autocorrelation function (only for numeric values).
-
-So, in order to get our independent samples that follow the targeted distribution, \textbf{we keep states from the generated sequence that are separated from each other by a lag L and that come after the burn-in time B}. Thus, if the successive states of the Markov Chain are denoted
-\begin{equation}\left(X_{n}\right)_{n \geq 0}=X_{0}, X_{1}, X_{2}, \dots\end{equation}
-we only keep as our samples the states
-\begin{equation}X_{B}, X_{B+L}, X_{B+2 L}, X_{B+3 L}, \dots\end{equation}
-
-\begin{figure*}[h]
-    \centering
-\includegraphics[width=\textwidth]{pic/p05c07-snip05.png}
-    \caption{MCMC sampling requires to consider both a burn-in time and a lag}
-    \label{fig:p05c07-snip05}
-\end{figure*}
-
-
-\section{Variational Inference (VI)}
-
-Another possible way to overcome computational difficulties related to inference problem is to use \textbf{Variational Inference methods that consist in finding the best approximation of a distribution among a parametrised family}. In order to find this best approximation, we follow an optimisation process (over the family parameters) that only require the targeted distribution to be defined up to a factor.
-
-\subsection{The approximation approach}
-
-VI methods consist in searching for the best approximation of some complex target probability distribution among a given family. More specifically, the idea is to define a parametrised family of distributions and to optimise over the parameters to obtain \textbf{the closest element to the target with respect to a well defined error measure}.
-
-Let's still consider our probability distribution $\pi$ defined up to a normalisation factor $C$:
-\begin{equation}\pi(.)=C \times g(.) \propto g(.)\end{equation}
-Then, in more mathematical terms, if we denote the parametrised family of distributions
-\begin{equation}\mathcal{F}_{\Omega}=\left\{f_{\omega} ; \omega \in \Omega\right\} \quad \Omega \equiv \text { set of possible parameters }\end{equation}
-and we consider the error measure $E(p,q)$ between two distributions $p$ and $q$, we search for the best parameter such that
-\begin{equation}\omega^{*}=\underset{\omega \in \Omega}{\arg \min } E\left(f_{\omega}, \pi\right)\end{equation}
-If we can solve this minimisation problem without having to explicitly normalise $\pi$, we can use $f_{\omega^*}$ as an approximation to estimate various quantities instead of dealing with intractable computations. The optimisation problem implied by variational inference approaches is, indeed, supposed to be much simpler to handle than issues coming from direct computations (normalisation, combinatorics, $\ldots$).
-
-Contrarily to sampling approaches, \textbf{a model is assumed (the parametrised family), implying a bias but also a lower variance}. In general VI methods are less accurate that MCMC ones but produce results much faster: these methods are better adapted to big scale, very statistical, problems.
-
-
-\begin{figure*}[h]
-    \centering
-\includegraphics[width=\textwidth]{pic/p05c07-snip06.png}
-    \caption{Illustration of the approximation approach (Variational Inference)}
-    \label{fig:p05c07-snip06}
-\end{figure*}
-
-\subsection{Family of distribution}
-
-The first thing we need to set up is the parametrised family of distributions that defines the space in which we search for our best approximation.
-
-\textbf{The choice of the family defines a model that control both the bias and the complexity of the method. }If we assume a pretty restrictive model (simple family) then we have a high bias but the optimisation process is simple. On the contrary, if we assume a pretty free model (complex family) the bias is much lower but the optimisation is harder (if not intractable). Thus, we have to find the right balance between a family that is complex enough to ensure a good quality of the final approximation and a family that is simple enough to make the optimisation process tractable. We should keep in mind that if no distribution in the family is close to the target distribution, then even the best approximation can give poor results.
-
-The \textbf{mean-field variational family} is a family of probability distributions where all the components of the considered random vector are independent. Distributions from this family have product densities such that each independent component is governed by a distinct factor of the product. Thus, a distribution that belongs to the mean-field variational family has a density that can be written
-\begin{equation}f(z)=\prod_{j=1}^{m} f_{j}\left(z_{j}\right)\end{equation}
-where we have assumed a $m$-dimensional random variable $z$. Notice that, even if it has been omitted in the notation, all the densities $f_j$ are parametrised. So, for example, if each density $f_j$ is a Gaussian with both mean and variance parameters, the global density $f$ is then defined by a set of parameters coming from all the independent factors and the optimisation is done over this entire set of parameters.
-
-
-\begin{figure*}[h]
-    \centering
-\includegraphics[width=\textwidth]{pic/p05c07-snip07.png}
-    \caption[The choice of the family in variational inference sets]{The choice of the family in variational inference sets both the difficulty of the optimisation process and the quality of the final approximation}
-    \label{fig:p05c07-snip07}
-\end{figure*}
-
-\subsection{Kullback-Leibler divergence}
-
-Once the family has been defined, one major question remains: how to find, among this family, the best approximation of a given probability distribution (explicitly defined up to its normalisation factor)? Even if the best approximation obviously depends on the nature of the error measure we consider, it seems pretty natural to assume that \textbf{the minimisation problem should not be sensitive to normalisation factors as we want to compare masses distributions more than masses themselves} (that have to be unitary for probability distributions).
-
-So, let's now define the \textbf{Kullback-Leibler (KL)} divergence and see that this measure makes the problem insensitive to normalisation factors. If $p$ and $q$ are two distributions, the KL divergence is defined as follows
-\begin{equation}K L(p, q)=\mathbb{E}_{z \sim p}[\log p(z)]-\mathbb{E}_{z \sim p}[\log q(z)]\end{equation}
-From that definition, we can pretty easily see that we have
-\begin{eqnarray}
-K L\left(f_{\omega}, C g\right)
-&=&\mathbb{E}_{z \sim f_{\omega}}\left[\log f_{\omega}(z)\right]-\mathbb{E}_{z \sim f_{\omega}}[\log (C g(z))]\nonumber\\
-&=&\mathbb{E}_{z \sim f_{\omega}}\left[\log f_{\omega}(z)\right]-\mathbb{E}_{z \sim f_{\omega}}[\log g(z)]-\log C
-\nonumber
-\end{eqnarray}
-which implies the following equality for our minimisation problem
-\begin{equation}\omega^{*}=\underset{\omega \in \Omega}{\arg \min } K L\left(f_{\omega}, \pi\right)=\underset{\omega \in \Omega}{\arg \min } K L\left(f_{\omega}, C g\right)=\underset{\omega \in \Omega}{\arg \min } K L\left(f_{\omega}, g\right)\end{equation}
-Thus, when choosing KL divergence as our error measure, the optimisation process is not sensitive to multiplicative coefficients and we can search for the best approximation among our parametrised family of distributions without having to compute the painful normalisation factor of the targeted distribution, as it was expected.
-
-Finally, as a side fact, we can conclude this subsection by noticing for the interested readers that the KL divergence is the cross-entropy minus the entropy and has a nice interpretation in information theory.
-
-\subsection{Optimisation process and intuition}
-
-Once both the parametrised family and the error measure have been defined, we can initialise the parameters (randomly or according to a well defined strategy) and proceed to the optimisation. Several classical optimisation techniques can be used such as \textbf{gradient descent or coordinate descent} that will lead, in practice, to a local optimum.
-
-In order to better understand this optimisation process, let's take an example and go back to the specific case of the Bayesian inference problem where we assume a posterior such that
-\begin{equation}p(z | x) \propto p(x | z) p(z)=p(x, z)\end{equation}
-In this case, if we want to get an approximation of this posterior using variational inference, we have to solve the following optimisation process (assuming the parametrised family defined and KL divergence as error measure)
+This expression, however, requires to know $m(N,R)$ and $m(V,R)$ to compute $m(R,R)$. These two quantities can be expressed the same way
 \begin{equation}\begin{aligned}
-\omega^{*} &=\underset{\omega \in \Omega}{\arg \min } K L\left(f_{\omega}(z), p(z | x)\right) \\
-&=\underset{\omega \in \Omega}{\arg \min } K L\left(f_{\omega}(z), p(x, z)\right) \\
-&=\underset{\omega \in \Omega}{\arg \max }\left(-K L\left(f_{\omega}(z), p(x, z)\right)\right) \\
-&=\underset{\omega \in \Omega}{\arg \max }\left(\mathbb{E}_{z \sim f_{\omega}}[\log p(z)]+\mathbb{E}_{z \sim f_{\omega}}[\log p(x | z)]-\mathbb{E}_{z \sim f_{\omega}}\left[\log f_{\omega}(z)\right]\right) \\
-&=\underset{\omega \in \Omega}{\arg \max }\left(\mathbb{E}_{z \sim f_{\omega}}[\log p(x | z)]-K L\left(f_{\omega}, p(z)\right)\right)
+m(N, R) &=1+m(N, R) \times p_{N, N}+m(V, R) \times p_{N, V} \\
+m(V, R) &=1+m(N, R) \times p_{V, N}+m(V, R) \times p_{V, V}
 \end{aligned}\end{equation}
-The last equality helps us to better understand how the approximation is encouraged to distribute its mass. \textbf{The first term is the expected log-likelihood} that tends to adjust parameters so that to place the mass of the approximation on values of the latent variables $z$ that explain the best the observed data. \textbf{The second term is the negative KL divergence between the approximation and the prior} that tends to adjust the parameters in order to make the approximation be close to the prior distribution. Thus, this objective function expresses pretty well the usual prior/likelihood balance.
+So, we have 3 equations with 3 unknowns and, when we solve this system, we obtain $m(N,R)$ = 2.67, $m(V,R)$ = 2.00 and $m(R,R)$ = 2.54. The value of the mean recurrence time of state $R$ is then 2.54. So, we see that, with a few linear algebra, we managed to compute the mean recurrence time for the state $R$ (as well as the mean time to go from $N$ to $R$ and the mean time to go from $V$ to $R$).
+
+To conclude this example, let's see what the stationary distribution of this Markov chain is. To determine the stationary distribution, we have to solve the following linear algebra equation
+\begin{equation}\pi=\pi p \Longleftrightarrow\left(\pi_{N} \quad \pi_{V} \quad \pi_{R}\right)=\left(\begin{array}{ccc}
+\pi_{N} & \pi_{V} & \pi_{R}
+\end{array}\right)\left(\begin{array}{ccc}
+0.25 & 0.50 & 0.25 \\
+0.00 & 0.50 & 0.50 \\
+0.33 & 0.33 & 0.34
+\end{array}\right)\end{equation}
+So, we have to find the left eigenvector of $p$ associated to the eigenvalue 1. Solving this problem we obtain the following stationary distribution
+
+
 
 \begin{figure*}[h]
     \centering
-\includegraphics[width=\textwidth]{pic/p05c07-snip08.png}
-    \caption{Optimisation process of the Variational Inference approach}
-    \label{fig:p05c07-snip08}
+\includegraphics[width=\textwidth]{pic/p05c06-snip08.png}
+    \caption{Stationary distribution of our "TDS reader" example}
+    \label{fig:p05c06-snip08}
 \end{figure*}
 
 
-\section{Takeaways}
+.
 
-The main takeways of this article are:
-\begin{itemize}
-    \item Bayesian inference is a pretty classical problem in statistics and machine learning that relies on the well known Bayes theorem and whose main drawback lies, most of the time, in some very heavy computations
-    \item Markov Chain Monte Carlo (MCMC) methods are aimed at simulating samples from densities that can be very complex and/or defined up to a factor
-    \item MCMC can be used in Bayesian inference in order to generate, directly from the "not normalised part" of the posterior, samples to work with instead of dealing with intractable computations
-    \item Variational Inference (VI) is a method for approximating distributions that uses an optimisation process over parameters to find the best approximation among a given family
-    \item VI optimisation process is not sensitive to multiplicative constant in the target distribution and, so, the method can be used to approximate a posterior only defined up to a normalisation factor
-\end{itemize}
-    
+We can also notice the fact that $\pi(R) = 1/m(R,R)$, that is a pretty logical identity when thinking a little bit about it (but we won't give any more detail in this post).
 
-As already mentioned, MCMC and VI methods have different properties that imply different typical use cases. In one hand, the sampling process of MCMC approaches is pretty heavy but has no bias and, so, these methods are preferred when accurate results are expected, without regards to the time it takes. In the other hand, although the choice of the family in VI methods can clearly introduce a bias, it comes along with a reasonable optimisation process that makes these methods particularly adapted to very large scale inference problem requiring fast computations.
+As the chain is irreducible and aperiodic, it means that, in the long run, the probability distribution will converge to the stationary distribution (for any initialisation). Stated in another way, no matter what the initial state of our TDS reader is, if we wait long enough and pick a day randomly then we have a probability $\pi(N)$ that the reader doesn't visit for this day, a probability $\pi(V)$ that the reader visits but doesn't read and a probability $\pi(R)$ that the reader visits and reads. To better grasp that convergence property, let's take a look at the following graphic that shows the evolution of probability distributions beginning at different starting point and the (quick) convergence to the stationary distribution.
 
-Additional comparisons between MCMC and VI can be found in the excellent Variational Inference: A Review For Statisticians \cite{BleiVariational2017}, that we also highly recommend for readers interested in VI only. For further readings about MCMC, we recommend this general introduction \cite{BrooksHBMonteCarlo2011} as well as this machine learning oriented introduction \cite{Andrieu2003}. The reader interested to learn more about Gibbs Sampling applied to LDA can refer to this Tutorial \cite{Darling2011ATA} on Topic Modelling and Gibbs Sampling (combined with these lecture note \cite{Mukherjee2014} on LDA Gibbs Sampler for cautious derivation).
+
+\begin{figure*}[h]
+    \centering
+\includegraphics[width=\textwidth]{pic/p05c06-snip09.png}
+    \caption[Visualisation of convergence of probability distributions]{Visualisation of the convergence of 3 differently initialised probability distributions (blue, orange and green) towards the stationary distribution (red)}
+    \label{fig:p05c06-snip09}
+\end{figure*}
+
+
+
+
+\section{A classical example: the PageRank algorithm}
+
+It's now time to come back to PageRank! Before going any further, let's mention the fact that the interpretation that we are going to give for the PageRank is not the only one possible and that authors of the original paper had not necessarily in mind Markov chains when designing the method. However, the following interpretation has the big advantage to be very well understandable.
+
+\subsection{The random web surfer}
+
+The problem PageRank tries to solve is the following: how can we rank pages of a given a set (we can assume that this set has already been filtered, for example on some query) by using the existing links between them?
+
+To solve this problem and be able to rank the pages, PageRank proceed roughly as follows. We consider that a random web surfer is on one of the pages at initial time. Then, this surfer starts to navigate randomly by clicking, for each page, on one of the links that lead to another page of the considered set (assume that links to pages out of this set are disallowed). For a given page, all the allowed links have then equal chance to be clicked.
+
+We have here a the setting of a Markov chain: pages are the different possible states, transition probabilities are defined by the links from page to page (weighted such that on each page all the linked pages have equal chances to be chosen) and the memoryless properties is clearly verified by the behaviour of the surfer. If we assume also that the defined chain is recurrent positive and aperiodic (some minor tricks are used to ensure we meet this setting), then after a long time the "current page" probability distribution converges to the stationary distribution. So, no matter the starting page, after a long time each page has a probability (almost fixed) to be the current page if we pick a random time step.
+
+The hypothesis behind PageRank is that the most probable pages in the stationary distribution must also be the most important (we visit these pages often because they receive links from pages that are also visited a lot in the process). The stationary probability distribution defines then for each state the value of the PageRank.
+
+\subsection{A toy example}
+
+In order to make all this much clearer, let's consider a toy example. Assume that we have a tiny website with 7 pages labeled from 1 to 7 and with links between the pages as represented in the graph in Figure~\ref{fig:p05c06-snip10}.
+
+
+\begin{figure*}[h]
+    \centering
+\includegraphics[width=.3\textwidth]{pic/p05c06-snip10-00.png}
+\includegraphics[width=.3\textwidth]{pic/p05c06-snip10-01.png}
+\includegraphics[width=.3\textwidth]{pic/p05c06-snip10-02.png}\\\ \\
+\includegraphics[width=.3\textwidth]{pic/p05c06-snip10-03.png}
+\includegraphics[width=.3\textwidth]{pic/p05c06-snip10-04.png}
+\includegraphics[width=.3\textwidth]{pic/p05c06-snip10-05.png}\\\ \\
+\includegraphics[width=.3\textwidth]{pic/p05c06-snip10-06.png}
+\includegraphics[width=.3\textwidth]{pic/p05c06-snip10-07.png}
+\includegraphics[width=.3\textwidth]{pic/p05c06-snip10-08.png}\\\ \\
+\includegraphics[width=.3\textwidth]{pic/p05c06-snip10-09.png}
+\includegraphics[width=.3\textwidth]{pic/p05c06-snip10-10.png}
+\includegraphics[width=.3\textwidth]{pic/p05c06-snip10-11.png}\\\ \\
+\includegraphics[width=.3\textwidth]{pic/p05c06-snip10-12.png}
+\includegraphics[width=.3\textwidth]{pic/p05c06-snip10-13.png}
+\includegraphics[width=.3\textwidth]{pic/p05c06-snip10-14.png}
+    \caption{Markov chain trajectory}
+    \label{fig:p05c06-snip10}
+\end{figure*}
+
+\FloatBarrier
+
+
+For clarity the probabilities of each transition have not been displayed in the previous representation. However, as the "navigation" is supposed to be purely random (we also talk about "random walk"), the values can be easily recovered using the simple following rule: for a node with $K$ outlinks (a page with $K$ links to other pages), the probability of each outlink is equal to $1/K$. So, the probability transition matrix is given by
+\begin{equation}p=\left(\begin{array}{ccccccc}
+. & 0.25 & . & . & 0.25 & 0.25 & 0.25 \\
+. & . & 0.5 & 0.5 & . & . & . \\
+. & 0.5 & . & 0.5 & . & . & . \\
+0.5 & . & . & . & . & . & 0.5 \\
+1.0 & . & . & . & . & . & . \\
+. & . & . & . & . & . & 1.0 \\
+0.5 & . & . & 0.5 & . & . & .
+\end{array}\right)\end{equation}
+where 0.0 values have been replaced by '.' for readability. Before any further computation, we can notice that this Markov chain is irreducible as well as aperiodic and, so, after a long run the system converges to a stationary distribution. As we already saw, we can compute this stationary distribution by solving the following left eigenvector problem
+\begin{equation}\begin{aligned}
+&\pi=\pi_p\\
+&\text { with } \quad \pi=\left(\begin{array}{lllllll}
+\pi_{1} & \pi_{2} & \pi_{3} & \pi_{4} & \pi_{5} & \pi_{6} & \pi_{7}
+\end{array}\right)
+\end{aligned}\end{equation}
+Doing so we obtain the following values of PageRank (values of the stationary distribution) for each page is shown in Figure~\ref{fig:p05c06-snip11}.
+The PageRank ranking of this tiny web site is therefore\\
+1 > 7 > 4 > 2 > 5 = 6 > 3.
+
+\begin{figure*}[h]
+    \centering
+\includegraphics[width=\textwidth]{pic/p05c06-snip11.png}
+    \caption{PageRank values computed on our toy example that contains 7 pages}
+    \label{fig:p05c06-snip11}
+\end{figure*}
+
+
+
+
+
+\subsection{Takeaways}
+
+The main takeaways of this article are the following:
+\begin{enumerate}
+
+\item random processes are collections of random variables, often indexed over time (indices often represent discrete or continuous time)
+
+\item for a random process, the Markov property says that, given the present, the probability of the future is independent of the past (this property is also called "memoryless property")
+
+\item discrete time Markov chain are random processes with discrete time indices and that verify the Markov property
+
+\item the Markov property of Markov chains makes the study of these processes much more tractable and allows to derive some interesting explicit results (mean recurrence time, stationary distribution…)
+
+\item one possible interpretation of the PageRank (not the only one) consists in imagining a web surfer that randomly navigates from page to page and in taking the induced stationary distribution over pages as a factor of ranking (roughly, the most visited pages in steady-state must be the one linked by other very visited pages and then must be the most relevant)
+\end{enumerate}
+
+To conclude, let's emphasise once more how powerful Markov chains are for problems modelling when dealing with random dynamics. Due to their good properties, they are used in various fields such as queueing theory \cite{willig1999} (optimising the performance of telecommunications networks, where messages must often compete for limited resources and are queued when all resources are already allocated), statistics (the well known "Markov Chain Monte Carlo" \cite{JosephRoccaBayes2019} random variables generation technique is based on Markov chains), biology (modelling of biological populations evolution), computer science (hidden Markov models \cite{Rabiner1986,Rabiner1989,stamp2018} are important tools in information theory and speech recognition) and others.
+
+Obviously, the huge possibilities offered by Markov chains in terms of modelling as well as in terms of computation go far behind what have been presented in this modest introduction and, so, we encourage the interested reader to read more about these tools that entirely have there place in the (data) scientist toolbox.
 

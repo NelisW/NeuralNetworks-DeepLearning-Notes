@@ -1,406 +1,436 @@
 % -*- TeX -*- -*- UK -*- -*- Soft -*-
 
-\chapter{Introduction to Markov Chains}
-\label{chap:IntroductiontoMarkovChains}
+\chapter{Introduction to Probability and Computational Bayesian Statistics}
+\label{chap:IntroductiontoProbabilityandComputationalBayesianStatistics}
 
-This chapter is a verbatim copy of a blog \cite{JosephRoccaMarkovChains2019} by Joseph Rocca.
-
-
-\textit{Definitions, properties and PageRank example.}
-
-\section{Introduction}
-
-In 1998, Lawrence Page, Sergey Brin, Rajeev Motwani and Terry Winograd published "The PageRank Citation Ranking: Bringing Order to the Web", an article in which they introduced the now famous PageRank algorithm at the origin of Google. A little bit more than two decades later, Google has became a giant and, even if the algorithm has evolved a lot, the PageRank is still a "symbol" of the Google ranking algorithm (even if few people can really say the weight it still occupies in the algorithm).
-
-From a theoretical point of view, it is interesting to notice that one common interpretation of the PageRank algorithm relies on the simple but fundamental mathematical notion of Markov chains. We will see in this article that Markov chains are powerful tools for stochastic modelling that can be useful to any data scientist. More especially, we will answer basic questions such as: what are Markov chains, what good properties do they have and what can be done with them?
-
-\section{Outline}
-In the first section we will give the basic definitions required to understand what Markov chains are. In the second section, we will discuss the special case of finite state space Markov chains. Then, in the third section we will discuss some elementary properties of Markov chains and will illustrate these properties with many little examples. Finally, in the fourth section we will make the link with the PageRank algorithm and see on a toy example how Markov chains can be used for ranking nodes of a graph.
-
-Note. Basics of probability and linear algebra are required in this post. In particular, the following notions will be used: 
-\href{https://en.wikipedia.org/wiki/Conditional_probability}{conditional probability}, 
-\href{https://en.wikipedia.org/wiki/Eigenvalues_and_eigenvectors}{eigenvector}, and 
-\href{https://en.wikipedia.org/wiki/Law_of_total_probability}{law of total probability}.
-
-\section{What are Markov chains?}
-\subsection{Random variables and random processes}
-
-Before introducing Markov chains, let's start with a quick reminder of some basic but important notions of probability theory.
-
-First, in non-mathematical terms, a \textbf{random variable} $X$ is a variable whose value is defined as the outcome of a random phenomenon. This outcome can be a number (or "number-like", including vectors) or not. For example we can define a random variable as the outcome of rolling a dice (number) as well as the output of flipping a coin (not a number, unless you assign, for example, 0 to head and 1 to tail). Notice also that the space of possible outcomes of a random variable can be discrete or continuous: for example, a normal random variable is continuous whereas a poisson random variable is discrete.
-
-We can then define a \textbf{random process} (also called stochastic process) as a collection of random variables indexed by a set $T$ that often represent different instants of time (we will assume that in the following). The two most common cases are: either $T$ is the set of natural numbers (discrete time random process) or $T$ is the set of real numbers (continuous time random process). For example, flipping a coin every day defines a discrete time random process whereas the price of a stock market option varying continuously defines a continuous time random process. The random variables at different instant of time can be independent to each other (coin flipping example) or dependent in some way (stock price example) as well as they can have continuous or discrete state space (space of possible outcomes at each instant of time), see Figure~\ref{fig:p05c06-snip01}.
-
-\begin{figure*}[h]
-    \centering
-\includegraphics[width=\textwidth]{pic/p05c06-snip01.png}
-    \caption{Different kind of random processes (discrete/continuous in space/time)}
-    \label{fig:p05c06-snip01}
-\end{figure*}
+This chapter is a verbatim copy of a blog \cite{EricMaIntroBayes2019} by Eric Ma.
 
 
-\subsection{Markov property and Markov chain}
+In Bayesian statistics, we often say that we are ``sampling'' from a posterior distribution to estimate what parameters could be, given a model structure and data. What exactly is happening here?
 
-There exists some well known families of random processes: gaussian processes, poisson processes, autoregressive models, moving-average models, Markov chains and others. These particular cases have, each, specific properties that allow us to better study and understand them.
+Examples that I have seen on ``how sampling happens'' tends to focus on an overly-simple example of sampling from a single distribution with known parameters. I was wondering if I could challenge myself to come up with a ``simplest complex example'' that would illuminate ideas that were obscure to me before. In this essay, I would like to share that knowledge with you, and hopefully build up your intuition behind what is happening in computational Bayesian inference.
 
-One property that makes the study of a random process much easier is the "Markov property". In a very informal way, the Markov property says, for a random process, that if we know the value taken by the process at a given time, we won't get any additional information about the future behaviour of the process by gathering more knowledge about the past. Stated in slightly more mathematical terms, for any given time, the conditional distribution of future states of the process given present and past states depends only on the present state and not at all on the past states (\textbf{memoryless property}). A random process with the Markov property is called \textbf{Markov process}.
+\section{Probability Distributions}
 
+We do need to have a working understanding of what a probability distribution is before we can go on. Without going down deep technical and philosophical rabbit holes (I hear they are deep), I'll start by proposing that ``a probability distribution is a Python object that has a math function that allocates credibility points onto the number line''.
 
+Because we'll be using the normal distribution extensively in this essay, we'll start off by examining that definition in the context of the standard normal distribution.
 
-\begin{figure}[h]
-    \centering
-\includegraphics[width=\textwidth]{pic/p05c06-snip02.png}
-    \caption[The Markov does not learn about the future by gathering information about the past]{The Markov property expresses the fact that at a given time step and knowing the current state, we won't get any additional information about the future by gathering information about the past}
-    \label{fig:p05c06-snip02}
-\end{figure}
+\section{Base Object Implementation}
 
+Since the normal distribution is an object, I'm implying here that it can hold state. What might that state be? Well, we know from math that probability distributions have parameters, and that the normal distribution has the ``mean'' and ``variance'' parameters defined. In Python code, we might write it as:
 
+\begin{lstlisting}
+class Normal:
+    def __init__(self, mu, sigma):
+        self.mu = mu
+        self.sigma = sigma
+\end{lstlisting}
 
+\section{Probability Density Function}
 
-Based on the previous definition, we can now define "homogenous discrete time Markov chains" (that will be denoted "Markov chains" for simplicity in the following). A \textbf{Markov chain} is a Markov process with discrete time and discrete state space. So, a Markov chain is a discrete sequence of states, each drawn from a discrete state space (finite or not), and that follows the Markov property.
+Now, I also stated that the normal distribution has a math function that we can use to allocate credibility points to the number line. This function also has a name, called a ``probability distribution function, or the ``PDF''. Using this, we may then extend extend this object with a method called \lstinline{.pdf(x)}, that returns a number giving the number of credibility points assigned to the value of \lstinline{x} passed in.
 
-Mathematically, we can denote a Markov chain by
-\begin{equation}X=\left(X_{n}\right)_{n \in \mathrm{N}}=\left(X_{0}, X_{1}, X_{2}, \ldots\right)\end{equation}
-where at each instant of time the process takes its values in a discrete set $E$ such that
-\begin{equation}X_{n} \in E \quad \forall n \in \mathbb{N}\end{equation}
-Then, the Markov property implies that we have
+\begin{lstlisting}
+import numpy as np
+
+class Normal:
+    def __init__(self, mu, sigma):
+        self.mu = mu
+        self.sigma = sigma
+
+    def pdf(self, x):
+        return (
+            1 / np.sqrt(2 * self.sigma ** 2 * np.pi)
+            * np.exp(
+                - (x - self.mu) ** 2
+                / 2 * self.sigma ** 2
+            )
+\end{lstlisting}
+If we pass in a number \lstinline{x} from the number line, we will get back another number that tells us the number of credibility points given to that value \lstinline{x}, under the state of the normal distribution instantiated. We'll call this $P(x)$.
+
+To simplify the implementation used here, we are going to borrow some machinery already available to us in the Python scientific computing ecosystem, particularly from the SciPy stats module, which gives us reference implementations of probability distributions.
+
+\begin{lstlisting}
+import numpy as np
+
+class Normal:
+    def __init__(self, mu, sigma):
+        self.mu = mu
+        self.sigma = sigma
+
+        # We instantiate the distribution object here.
+        self.dist = norm(loc=mu, scale=sigma)
+
+    def pdf(self, x):
+        # Now, our PDF class method is simplified to be just a wrapper.
+        return self.dist.pdf(x)
+\end{lstlisting}
+
+\section{Log Probability}
+
+A common task in Bayesian inference is computing the likelihood of data. Let's assume that the data $X_1,X_2,\ldots X_i$ generated are independent and identically distributed, (the famous i.i.d. term comes from this). This means, then, that the joint probability of the data that was generated is equivalent to the product of the individual probabilities of each datum:
 \begin{equation}
-\mathbb{P}\left(X_{n+1}=s_{n+1} | X_{n}=s_{n}, X_{n-1}=s_{n-1}, X_{n-2}=s_{n-2}, \ldots\right)=\mathbb{P}\left(X_{n+1}=s_{n+1} | X_{n}=s_{n}\right)
+P(X_1,X_2,\ldots X_i)=P(X_1)P(X_2)\ldots P(X_i)
+\end{equation}
+(We have to know the rules of probability to know this result; it is a topic for a different essay.)
+
+If you remember the notation above, each $P(X_i)$ is an evaluation of $X_i$ 
+on the distribution's probability density function. It being a probability value means it is bound between 0 and 1. However, multiplying many probabilities together usually will result in issues with underflow computationally, so in evaluating likelihoods, we usually stick with log-likelihoods instead. By the usual rules of math, then:
+\begin{equation}
+\log P(X_1,X_2,\ldots ,X_i)=\sum_{j=1}{i}\log P(X_i)
+\end{equation}
+To our normal distribution class, we can now add in another class method that computes the sum of log likelihoods evaluated at a bunch of i.i.d. data points.
+
+\begin{lstlisting}
+import numpy as np
+
+class Normal:
+    def __init__(self, mu, sigma):
+        self.mu = mu
+        self.sigma = sigma
+
+        # We instantiate the distribution object here.
+        self.dist = norm(loc=mu, scale=sigma)
+
+    def pdf(self, x):
+        # Now, our PDF class method is simplified to be just a wrapper.
+        return self.dist.pdf(x)
+
+    def logpdf(self, x):
+        return self.dist.logpdf(x)
+\end{lstlisting}
+
+\section{Random Variables}
+\subsection{Definition}
+
+Informally, a ``random variable'' is nothing more than a variable whose quantity is non-deterministic (hence random) but whose probability of taking on a certain value can be described by a probability distribution.
+
+According to the Wikipedia definition of a random variable:
+``A random variable has a probability distribution, which specifies the probability of its values.''
+
+As such, it may be tempting to conceive of a random variable as an object that has a probability distribution attribute attached to it.
+
+\subsection{Realizations of a Random Variable}
+
+On the other hand, it can also be convenient to invert that relationship, and claim that a probability distribution can generate realizations of a random variable. The latter is exactly how SciPy distributions are implemented:
+\marginnote{Realizations of a Random Variable: A ``realization'' of a random variable is nothing more than generating a random number whose probability of being generated is defined by the random variable's probability density function.
+}
+\begin{lstlisting}
+from scipy.stats import norm
+
+# Normal distribution can generate realizations of an RV
+# The following returns a NumPy array of 10 draws
+# from a standard normal distribution.
+norm(loc=0, scale=1).rvs(10)
+\end{lstlisting}
+Because the generation of realizations of a random variable is equivalent to sampling from a probability distribution, we can extend our probability distribution definition to include a \lstinline{.sample(n)} method:
+
+\begin{lstlisting}
+import numpy as np
+
+class Normal:
+    def __init__(self, mu, sigma):
+        self.mu = mu
+        self.sigma = sigma
+
+        # We instantiate the distribution object here.
+        self.dist = norm(loc=mu, scale=sigma)
+
+    # ...
+
+    def sample(self, n):
+        return self.dist.rvs(n)
+\end{lstlisting}
+
+Now, if we draw 10 realizations of a normally distributed random variable, and the drawing of each realization has no dependence of any kind on the previous draw, then we can claim that each draw is \textbf{independent} and \textbf{identically distributed}. This is where the fabled ``iid'' term in undergraduate statistics classes comes from.
+
+\section{Data Generating Process}
+
+Now that we have covered what probability distributions are, we can now move on to other concepts that are important in Bayesian statistical modelling.
+
+Realizations of a random variable, or draws from its probability distribution, are how a Bayesian assumes data are generated. Describing how data are generated using probability distributions, or in other words, writing down the ``data generating process'', is a core activity in Bayesian statistical modelling.
+
+Viewed this way, data values generated by a random process depend on the underlying random variable's probability distribution. In other words, the random variable realizations are known, given the probability distribution used to model it. Keep this idea in mind: it is going to be important shortly.
+
+\section{Bayes' Rule}
+
+Now that we've covered probability distributions, we can move on to Bayes' rule. You probably have seen the following equation:
+
+\begin{equation}
+P(B|A)=\frac{P(A|B)P(B)}{P(A)}
 \end{equation}
 
-Notice once again that this last formula expresses the fact that for a given historic (where I am now and where I was before), the probability distribution for the next state (where I go next) only depends on the current state and not on the past states.
+Bayes' rule states nothing more than the fact that the conditional probability of B given A is equal to the conditional probability of A given B times the probability of B divided by the probability of A.
 
-Note. We have decided to describe only basic homogenous discrete time Markov chains in this introductory post. However, there also exists inhomogenous (time dependent) and/or time continuous Markov chains. We won't discuss these variants of the model in the following. Notice also that the definition of the Markov property given above is extremely simplified: the true mathematical definition involves the notion of filtration that is far beyond the scope of this modest introduction.
+When doing Bayesian statistical inference, we commonly take a related but distinct interpretation:
+\marginnote{Data are random variables? Notes from a chat with Colin gave me a lot to chew on, as usual: ``The answer is in how you define 'event' as 'an element of a sigma algebra'. Intuitively, an 'event' is just an abstraction, so one event might be 'the coin is heads', or in another context the event might be 'the parameters are [0.2, 0.1, 0.2]'. And so analogously, 'the data were configured as [0, 5, 2, 3]'. Notice also that the events are different if the data being ordered vs unordered are different!''  This was a logical leap that I had been asked about before, but did not previously have the knowledge to respond to. Thanks to Colin, I now do.
+}
 
-\subsection{Characterising the random dynamic of a Markov chain}
-
-We have introduced in the previous subsection a general framework matched by any Markov chain. Let's now see what we do need in order to define a specific "instance" of such a random process.
-
-Notice first that the full characterisation of a discrete time random process that doesn't verify the Markov property can be painful: the probability distribution at a given time can depend on one or multiple instants of time in the past and/or the future. All these possible time dependences make any proper description of the process potentially difficult.
-
-However, thanks to the Markov property, the dynamic of a Markov chain is pretty easy to define. Indeed, we only need to specify two things: an \textbf{initial probability distribution} (that is a probability distribution for the instant of time $n=0$) denoted
-\begin{equation}\mathbb{P}\left(X_{0}=s\right)=q_{0}(s) \quad \forall s \in E\end{equation}
-and a \textbf{transition probability kernel} (that gives the probabilities that a state, at time $n+1$, succeeds to another, at time n, for any pair of states) denoted
-\begin{equation}\mathbb{P}\left(X_{n+1}=s_{n+1} | X_{n}=s_{n}\right)=p\left(s_{n}, s_{n+1}\right) \quad \forall\left(s_{n+1}, s_{n}\right) \in E \times E\end{equation}
-With the previous two objects known, the full (probabilistic) dynamic of the process is well defined. Indeed, the probability of any realisation of the process can then be computed in a recurrent way.
-
-Assume for example that we want to know the probability for the first 3 states of the process to be $(s0, s1, s2)$. So, we want to compute the probability
-\begin{equation}\mathbb{P}\left(X_{0}=s_{0}, X_{1}=s_{1}, X_{2}=s_{2}\right)\end{equation}
-Here, we use the law of total probability stating that the probability of having $(s0, s1, s2)$ is equal to the probability of having first $s0$, multiplied by the probability of having $s1$ given we had $s0$ before, multiplied by the probability of having finally $s2$ given that we had, in order, $s0$ and $s1$ before. Mathematically, it can be written
-\begin{equation}\mathbb{P}\left(X_{0}=s_{0}, X_{1}=s_{1}, X_{2}=s_{2}\right)=\mathbb{P}\left(X_{0}=s_{0}\right) \mathbb{P}\left(X_{1}=s_{1} | X_{0}=s_{0}\right) \mathbb{P}\left(X_{2}=s_{2} | X_{0}=s_{0}, X_{1}=s_{1}\right)\end{equation}
-Then appears the simplification given by the Markov assumption. Indeed, for long chains we would obtain for the last states heavily conditional probabilities. However, in a Markov case we can simplify this expression using that
-\begin{equation}\mathbb{P}\left(X_{2}=s_{2} | X_{0}=s_{0}, X_{1}=s_{1}\right)=\mathbb{P}\left(X_{2}=s_{2} | X_{1}=s_{1}\right)\end{equation}
-such that we have
-\begin{equation}\begin{aligned}
-\mathbb{P}\left(X_{0}=s_{0}, X_{1}=s_{1}, X_{2}=s_{2}\right) &=\mathbb{P}\left(X_{0}=s_{0}\right) \mathbb{P}\left(X_{1}=s_{1} | X_{0}=s_{0}\right) \mathbb{P}\left(X_{2}=s_{2} | X_{1}=s_{1}\right) \\
-&=q_{0}\left(s_{0}\right) p\left(s_{0}, s_{1}\right) p\left(s_{1}, s_{2}\right)
-\end{aligned}\end{equation}
-As they fully characterise the probabilistic dynamic of the process, many other more complex events can then be computed only based on both the initial probability distribution $q0$ and the transition probability kernel $p$. One last basic relation that deserves to be given is the expression of the probability distribution at time $n+1$ expressed relatively to the probability distribution at time $n$
-\begin{equation}q_{n+1}\left(s_{n+1}\right) \stackrel{\text { def }}{=} \mathbb{P}\left(X_{n+1}=s_{n+1}\right)=\sum_{s \in E} \mathbb{P}\left(X_{n}=s\right) \mathbb{P}\left(X_{n+1}=s_{n+1} | X_{n}=s\right)=\sum_{s \in E} q_{n}(s) p\left(s, s_{n+1}\right)\end{equation}
-
-\section{Finite state space Markov chains}
-\subsection{Matrix and graph representation}
-
-We assume here that we have a finite number $N$ of possible states in $E$:
-\begin{equation}E=\left\{e_{1}, e_{2}, \dots, e_{N}\right\}\end{equation}
-Then, the initial probability distribution can be described by a \textbf{row vector} $q0$ of size $N$ and the transition probabilities can be described by a matrix $p$ of size $N$ by $N$ such that
-
-$\left(q_{0}\right)_{i}=q_{0}\left(e_{i}\right)=\mathbb{P}\left(X_{0}=e_{i}\right)$\\
-$p_{i, j}=p\left(e_{i}, e_{j}\right)=\mathbb{P}\left(X_{n+1}=e_{j} | X_{n}=e_{i}\right)$
-(independent of n)
-
-The advantage of such notation is that if we note denote the probability distribution at step $n$ by a raw vector $q_n$ such that its components are given by
 \begin{equation}
-\left(q_{n}\right)_{i}=q_{n}\left(e_{i}\right)=\mathbb{P}\left(X_{n}=e_{i}\right)
+P(H|D)=\frac{P(D|H)P(H)}{P(D)}
 \end{equation}
-then the simple matrix relations thereafter hold
+It may look weird, but didn't we say before that data are realizations from a random variable? Why are we now treating data as a random variable? Here, we are doing not-so-intuitive but technically correct step of treating the data $D$
+as being part of this probabilistic model (hence it ``looks'' like a random variable), alongside our model parameters $H$. There's a lot of measure theory that goes into this interpretation, which at this point I have not yet mastered, and so will wave my hands in great arcs and propose that this interpretation be accepted for now and move on.
+
+
+With the data + hypothesis interpretation of Bayes' rule in hand, the next question arises: What math happens when we calculate posterior densities?
+
+\section{Translating Bayes' Math to Python}
+\subsection{Defining Posterior Log-Likelihood}
+
+To understand this, let's look at the simplest complex example that I could think of: Estimating the $\mu$ and $\sigma$ parameters of a normal distribution conditioned on observing data points $y$.
+
+
+If we assume a data generating process that looks like the following (with no probability distributions specified yet):
+\begin{marginfigure}
+\includegraphics{p05c05-snip01.png}
+\end{marginfigure}
+
+We can write out the following probabilistic model (now explicitly specifying probability distributions):
+
+$\mu\sim$Normal(0,10)\\
+$\sigma\sim$Exponential(1)\\
+$y\sim$Normal($\mu$,$\sigma$)
+
+Let's now map the symbols onto Bayes' rule.
+\begin{itemize}
+\item $H$ are the parameters, which are $\mu$ and $\sigma$ here.
+\item $D$ is the data that I will observe
+\item $P(H|D)$  is the posterior, which we would like to compute.
+\item $P(D|H)$ is the likelihood, and is given by $y$'s probability distribution Normal($\mu$,$\sigma$), or in probability notation, $P(y|\mu,\sigma)$.
+\item $P(H)$ is the prior, and is given by$P(y|\mu,\sigma)$.
+\item $P(D)$ is a hard quantity to calculate, so we sort of cheat and don't use it, and merely claim that the posterior is proportional to likelihood times prior.
+\end{itemize}
+
+If we look at the probability symbols again, we should notice that $P(y|\mu,\sigma)$ is the joint distribution between $\mu$ and $\sigma$. However, from observing the graphical diagram, we'll notice that $\mu$ and $\sigma$ have no bearing on one another: we do not need to know $\mu$ to know the value of $\sigma$, and vice versa. Hence, they are independent of one another, and so by the rules of probability,
 \begin{equation}
-q_{n+1}=q_{n} p \quad q_{n+2}=q_{n+1} p=\left(q_{n} p\right) p=q_{n} p^{2} \quad \ldots \quad q_{n+m}=q_{n} p^{m}
+P(\mu ,\sigma )=P(\mu |\sigma )P(\sigma )=P(\mu )P(\sigma )=P(H)
 \end{equation}
-(the proof won't be detailed here but can be recovered very easily).
 
-\begin{figure*}[h]
-    \centering
-\includegraphics[width=\textwidth]{pic/p05c06-snip03.png}
-    \caption[Obtain the probability distribution for the next time step]{When right multiplying a row vector representing probability distribution at a given time step by the transition probability matrix, we obtain the probability distribution at the next time step}
-    \label{fig:p05c06-snip03}
-\end{figure*}
+Now, by simply moving symbols around:
+\begin{eqnarray}
+P(H|D)&=&P(D|H)P(H)\\
+&=&P(y|\mu ,\sigma )P(\mu ,\sigma )\\
+&=&P(y|\mu ,\sigma )P(\mu )P(\sigma )
+\end{eqnarray}
+This translates directly into Python code!
+\begin{lstlisting}
+def model_prob(mu, sigma, y):
+    # Probability of mu under prior.
+    normal_prior = Normal(0, 10)
+    mu_prob = normal_prior.pdf(mu)
 
-So, we see here that evolving the probability distribution from a given step to the following one is as easy as right multiplying the row probability vector of the initial step by the matrix $p$. This also implies that we have
+    # Probability of sigma under prior.
+    sigma_prior = Exponential(1)
+    sigma_prob = sigma_prior.pdf(mu)
 
-$p_{i, j}=\mathbb{P}\left(X_{n+1}=e_{j} | X_{n}=e_{i}\right) \equiv$ probability of going from $e_{i}$ to $e_{j}$ in 1 step \\
-$\left(p^{2}\right)_{i, j}=\mathbb{P}\left(X_{n+2}=e_{j} | X_{n}=e_{i}\right) \equiv$ probability of going from $e_{i}$ to $e_{j}$ in 2 steps\\
-$\left(p^{m}\right)_{i, j}=\mathbb{P}\left(X_{n+m}=e_{j} | X_{n}=e_{i}\right) \equiv$ probability of going from $e_{i}$ to $e_{j}$ in $\mathrm{m}$ steps
+    # Likelihood of data given mu and sigma
+    likelihood = Normal(mu, sigma)
+    likelihood_prob = likelihood.pdf(y)
 
-The random dynamic of a finite state space Markov chain can easily be represented as a valuated oriented graph such that each node in the graph is a state and, for all pairs of states $(e_i, e_j)$, there exists an edge going from $e_i$ to $e_j$ if $p(e_i,e_j)>0$. The value of the edge is then this same probability $p(e_i,e_j)$.
+    # Joint likelihood
+    return mu_prob * sigma_prob * likelihood_prob
+\end{lstlisting}
 
-\subsection{Example: the Towards Data Science reader}
+If you remember, multiplying so many probability distributions together can give us underflow issues when computing, so it is common to take the log of both sides.
+\begin{equation}
+\log(P(H|D))=\log(P(y|\mu ,\sigma ))+\log(P(\mu ))+\log(P(\sigma ))
+\end{equation}
 
-Let's take a simple example to illustrate all this. Consider the daily behaviour of a fictive Towards Data Science reader. For each day, there are 3 possible states: the reader doesn't visit TDS this day ($N$), the reader visits TDS but doesn't read a full post ($V$) and the reader visits TDS and read at least one full post ($R$). So, we have the following state space
-\begin{equation}E=\{N, V, R\}\end{equation}
-Assume that at the first day this reader has 50\% chance to only visit TDS and 50\% chance to visit TDS and read at least one article. The vector describing the initial probability distribution ($n=0$) is then
-\begin{equation}q_{0}=(0.0,0.5,0.5)\end{equation}
-Imagine also that the following probabilities have been observed:
+This also translates directly into Python code!
+
+\begin{lstlisting}
+def model_log_prob(mu, sigma, y):
+    # log-probability of mu under prior.
+    normal_prior = Normal(0, 10)
+    mu_log_prob = normal_prior.logpdf(mu)
+
+    # log-probability of sigma under prior.
+    sigma_prior = Exponential(1)
+    sigma_log_prob = sigma_prior.logpdf(mu)
+
+    # log-likelihood given priors and data
+    likelihood = Normal(mu, sigma)
+    likelihood_log_prob = likelihood.logpdf(y)
+
+    # Joint log-likelihood
+    return mu_log_prob + sigma_log_prob + likelihood_log_prob
+\end{lstlisting}
+
+\section{Computing the Posterior with Sampling}
+
+To identify what the values of $\mu$ and $\sigma$ should take on given the data and priors, we can turn to sampling to help us. I am intentionally skipping over integrals which are used to compute expectations, which is what sampling is replacing.
+
+\subsection{Metropolis-Hastings Sampling}
+
+An easy-to-understand sampler that we can start with is the Metropolis-Hastings sampler. I first learned it in a grad-level computational biology class, but I expect most statistics undergrads should have a good working knowledge of the algorithm.
+
+For the rest of us, check out the note below on how the algorithm works.
+
+The Metropolis-Hastings Algorithm, shamelessly copied (and modified) from the Wikipedia article \cite{WikiPediaHMetropolisHastingsalgorithm2019}:
+
 \begin{enumerate}
-\item when the reader doesn't visit TDS a day, he has 25\% chance of still not visiting the next day, 50\% chance to only visit and 25\% to visit and read
+\item For each parameter $p$, do the following.
 
-\item when the reader visits TDS without reading a day, he has 50\% chance to visit again without reading the next day and 50\% to visit and read
+\item Initialize an arbitrary point for the parameter (this is $p_t$, or $p$ at step $t$).
 
-\item when the reader visits and read a day, he has 33\% chance of not visiting the next day (\textit{hope that this post won't have this kind of effect!}), 33\% chance to only visit and 34\% to visit and read again
-\end{enumerate}
+\item Define a probability density $P(p_t)$, for which we will draw new values of the parameters. Here, we will use $P(p)=\textrm{Normal}(p_{t-1},1)$.
 
-
-Then, we have the following transition matrix
-\begin{equation}p=\left(\begin{array}{lll}
-0.25 & 0.50 & 0.25 \\
-0.00 & 0.50 & 0.50 \\
-0.33 & 0.33 & 0.34
-\end{array}\right)\end{equation}
-Based on the previous subsection, we know how to compute, for this reader, the probability of each state for the second day ($n=1$)
-\begin{equation}q_{1}=q_{0} p=(0.0,0.5,0.5)\left(\begin{array}{ccc}
-0.25 & 0.50 & 0.25 \\
-0.00 & 0.50 & 0.50 \\
-0.33 & 0.33 & 0.34
-\end{array}\right)=(0.165,0.415,0.420)\end{equation}
-Finally, the probabilistic dynamic of this Markov chain can be graphically represented as follows
-
-\begin{figure*}[h]
-    \centering
-\includegraphics[width=\textwidth]{pic/p05c06-snip04.png}
-    \caption{Graph representation of the Markov chain modelling our fictive TDS reader behaviour}
-    \label{fig:p05c06-snip04}
-\end{figure*}
-
-.
-
-\section{Markov Chains properties}
-
-In this section, we will only give some basic Markov chains properties or characterisations. The idea is not to go deeply into mathematical details but more to give an overview of what are the points of interest that need to be studied when using Markov chains. As we have seen that in the finite state space case we can picture a Markov chain as a graph, notice that we will use graphical representation to illustrate some of the properties bellow. However, one should keep in mind that these properties are not necessarily limited to the finite state space case.
-
-\subsection{Reducibility, periodicity, transience and recurrence}
-Let's start, in this subsection, with some classical ways to characterise a state or an entire Markov chain.
-
-First, we say that a Markov chain is \textbf{irreducible} if it is possible to reach any state from any other state (not necessarily in a single time step). If the state space is finite and the chain can be represented by a graph, then we can say that the graph of an irreducible Markov chain is strongly connected (graph theory).
-
-\begin{figure*}[h]
-    \centering
-\includegraphics[width=\textwidth]{pic/p05c06-snip05.png}
-    \caption[Illustration of the irreducibility property]{Illustration of the irreducibility property. The chain on the left is not irreducible: from 3 or 4 we can't reach 1 or 2. The chain on the right (one edge has been added) is irreducible: each state can be reached from any other state}
-    \label{fig:p05c06-snip05}
-\end{figure*}
-
-
-A state has period $k$ if, when leaving it, any return to that state requires a multiple of $k$ time steps ($k$ is the greatest common divisor of all the possible return path length). If $k = 1$, then the state is said to be aperiodic and a whole Markov chain is \textbf{aperiodic} if all its states are aperiodic. For an irreducible Markov chain, we can also mention the fact that if one state is aperiodic then all states are aperiodic.
-
-
-
-\begin{figure*}[h]
-    \centering
-\includegraphics[width=\textwidth]{pic/p05c06-snip06.png}
-    \caption[Illustration of the periodicity property]{Illustration of the periodicity property. The chain on the left is 2-periodic: when leaving any state, it always takes a multiple of 2 steps to come back to it. The chain on the right is 3-periodic}
-    \label{fig:p05c06-snip06}
-\end{figure*}
-
-A state is \textbf{transient} if, when we leave this state, there is a non-zero probability that we will never return to it. Conversely, a state is \textbf{recurrent} if we know that we will return to that state, in the future, with probability 1 after leaving it (if it is not transient).
-
-
-
-\begin{figure*}[h]
-    \centering
-\includegraphics[width=\textwidth]{pic/p05c06-snip07.png}
-    \caption[Illustration of the recurrence/transience property.]{Illustration of the recurrence/transience property. The chain of the left is such that: 1, 2 and 3 are transient (when leaving these points we can't be absolutely sure that we will come back to them) and 3-periodic whereas 4 and 5 are recurrent (when leaving these points we are absolutely sure that we will come back to them at some time) and 2-periodic. The chain on the right has one more edge that makes the full chain recurrent and aperiodic}
-    \label{fig:p05c06-snip07}
-\end{figure*}
-
-For a recurrent state, we can compute the mean recurrence time that is the \textbf{expected return time} when leaving the state. Notice that even if the probability of return is equal to 1, it doesn't mean that the expected return time is finite. So, among the recurrent states, we can make a difference between \textbf{positive recurrent} state (finite expected return time) and \textbf{null recurrent } state (infinite expected return time).
-
-\subsection{Stationary distribution, limiting behaviour and ergodicity}
-
-We discuss, in this subsection, properties that characterise some aspects of the (random) dynamic described by a Markov chain.
-
-A probability distribution $\pi$ over the state space $E$ is said to be a \textbf{stationary distribution} if it verifies
-\begin{equation}\pi\left(e^{\prime}\right)=\sum_{e \in E} \pi(e) p\left(e, e^{\prime}\right) \quad \forall e^{\prime} \in E\end{equation}
-As we have\\
-\begin{tabular}{rcl}
-$\pi\left(e^{\prime}\right)$&$=$& probability of being in $e^{\prime}$ at the current step \\
-$\sum_{e \in E} \pi(e) p\left(e, e^{\prime}\right)$&$=$& probability of being in $e^{\prime}$ at the next step
-\end{tabular}
-
-Then a stationary distribution verifies
-
-probability of being in $e^{\prime}$ at the current step
- $=$ probability of being in $e^{\prime}$ at the next step
-
-By definition, a stationary probability distribution is then such that it doesn't evolve through the time. So if the initial distribution $q$ is a stationary distribution then it will stay the same for all future time steps. If the state space is finite, $p$ can be represented by a matrix and $\pi$ by a raw vector and we then have
-\begin{equation}\pi=\pi p=\pi p^{2}=\dots\end{equation}
-Once more, it expresses the fact that a stationary probability distribution doesn't evolve through the time (as we saw that right multiplying a probability distribution by $p$ allows to compute the probability distribution at the next time step). Notice that an irreducible Markov chain has a stationary probability distribution if and only if all of its states are positive recurrent.
-
-Another interesting property related to stationary probability distribution is the following. If the chain is recurrent positive (so that there exists a stationary distribution) and aperiodic then, no matter what the initial probabilities are, the probability distribution of the chain converges when time steps goes to infinity: the chain is said to have a \textbf{limiting distribution} that is nothing else than the stationary distribution. In the general case it can be written
-\begin{equation}\lim _{n \rightarrow \infty} \mathbb{P}\left(X_{n}=e^{\prime} | X_{0}=e\right)=\lim _{n \rightarrow \infty} p^{n}\left(e, e^{\prime}\right)=\pi\left(e^{\prime}\right) \quad \forall\left(e, e^{\prime}\right) \in E \times E\end{equation}
-Let's emphasise once more the fact that there is no assumption on the initiale probability distribution: the probability distribution of the chain converges to the stationary distribution (equilibrium distribution of the chain) regardless of the initial setting.
-
-Finally, \textbf{ergodicity} is another interesting property related to the behaviour of a Markov chain. If a Markov chain is irreducible then we also say that this chain is "ergodic" as it verifies the following ergodic theorem. Assume that we have an application $f(.)$ that goes from the state space $E$ to the real line (it can be, for example, the cost to be in each state). We can define the mean value that takes this application along a given trajectory (temporal mean). For the $n$-th first terms it is denoted by
-\begin{equation}\frac{1}{n}\left(f\left(X_{0}\right)+f\left(X_{1}\right)+\ldots+f\left(X_{n-1}\right)\right)=\frac{1}{n} \sum_{i=0}^{n-1} f\left(X_{i}\right)\end{equation}
-We can also compute the mean value of application f over the set $E$ weighted by the stationary distribution (spatial mean) that is denoted by
-\begin{equation}\sum_{e \in E} \pi(e) f(e)\end{equation}
-Then ergodic theorem tells us that the temporal mean when trajectory become infinitely long is equal to the spatial mean (weighted by stationary distribution). The ergodic property can be written
-\begin{equation}\lim _{n \rightarrow \infty} \frac{1}{n} \sum_{i=0}^{n-1} f\left(X_{i}\right)=\sum_{e \in E} \pi(e) f(e)\end{equation}
-Stated in another way, it says that, at the limit, the early behaviour of the trajectory becomes negligible and only the long run stationary behaviour really matter when computing the temporal mean.
-
-\subsection{Back to our TDS reader example}
-
-We consider our TDS reader example again. In this simple example, the chain is clearly irreducible, aperiodic and all the states are recurrent positive.
-
-In order to show the kind of interesting results that can be computed with Markov chains, we want to look at the mean recurrence time for the state $R$ (state "visit and read"). In other words, we would like to answer the following question: when our TDS reader visits and reads a given day, how many days do we have to wait in average before he visits and reads again? Let's try to get an intuition of how to compute this value.
-
-First, we denote
-
-$m\left(e, e^{\prime}\right) \equiv$ mean time to go from state $e$ to state $e^{\prime}$
-
-So we want to compute here $m(R,R)$. Reasoning on the first step reached after leaving $R$, we get
-
-\begin{equation}\begin{aligned}
-m(R, R) &=p_{R, N}(1+m(N, R))+p_{R, V}(1+m(V, R))+p_{R, R}(1+0) \\
-&=1+\left[m(N, R) \times p_{R, N}+m(V, R) \times p_{R, V}+0 \times p_{R, R}\right] \\
-&=1+m(N, R) \times p_{R, N}+m(V, R) \times p_{R, V}
-\end{aligned}\end{equation}
-
-This expression, however, requires to know $m(N,R)$ and $m(V,R)$ to compute $m(R,R)$. These two quantities can be expressed the same way
-\begin{equation}\begin{aligned}
-m(N, R) &=1+m(N, R) \times p_{N, N}+m(V, R) \times p_{N, V} \\
-m(V, R) &=1+m(N, R) \times p_{V, N}+m(V, R) \times p_{V, V}
-\end{aligned}\end{equation}
-So, we have 3 equations with 3 unknowns and, when we solve this system, we obtain $m(N,R)$ = 2.67, $m(V,R)$ = 2.00 and $m(R,R)$ = 2.54. The value of the mean recurrence time of state $R$ is then 2.54. So, we see that, with a few linear algebra, we managed to compute the mean recurrence time for the state $R$ (as well as the mean time to go from $N$ to $R$ and the mean time to go from $V$ to $R$).
-
-To conclude this example, let's see what the stationary distribution of this Markov chain is. To determine the stationary distribution, we have to solve the following linear algebra equation
-\begin{equation}\pi=\pi p \Longleftrightarrow\left(\pi_{N} \quad \pi_{V} \quad \pi_{R}\right)=\left(\begin{array}{ccc}
-\pi_{N} & \pi_{V} & \pi_{R}
-\end{array}\right)\left(\begin{array}{ccc}
-0.25 & 0.50 & 0.25 \\
-0.00 & 0.50 & 0.50 \\
-0.33 & 0.33 & 0.34
-\end{array}\right)\end{equation}
-So, we have to find the left eigenvector of $p$ associated to the eigenvalue 1. Solving this problem we obtain the following stationary distribution
-
-
-
-\begin{figure*}[h]
-    \centering
-\includegraphics[width=\textwidth]{pic/p05c06-snip08.png}
-    \caption{Stationary distribution of our "TDS reader" example}
-    \label{fig:p05c06-snip08}
-\end{figure*}
-
-
-.
-
-We can also notice the fact that $\pi(R) = 1/m(R,R)$, that is a pretty logical identity when thinking a little bit about it (but we won't give any more detail in this post).
-
-As the chain is irreducible and aperiodic, it means that, in the long run, the probability distribution will converge to the stationary distribution (for any initialisation). Stated in another way, no matter what the initial state of our TDS reader is, if we wait long enough and pick a day randomly then we have a probability $\pi(N)$ that the reader doesn't visit for this day, a probability $\pi(V)$ that the reader visits but doesn't read and a probability $\pi(R)$ that the reader visits and reads. To better grasp that convergence property, let's take a look at the following graphic that shows the evolution of probability distributions beginning at different starting point and the (quick) convergence to the stationary distribution.
-
-
-\begin{figure*}[h]
-    \centering
-\includegraphics[width=\textwidth]{pic/p05c06-snip09.png}
-    \caption[Visualisation of convergence of probability distributions]{Visualisation of the convergence of 3 differently initialised probability distributions (blue, orange and green) towards the stationary distribution (red)}
-    \label{fig:p05c06-snip09}
-\end{figure*}
-
-
-
-
-\section{A classical example: the PageRank algorithm}
-
-It's now time to come back to PageRank! Before going any further, let's mention the fact that the interpretation that we are going to give for the PageRank is not the only one possible and that authors of the original paper had not necessarily in mind Markov chains when designing the method. However, the following interpretation has the big advantage to be very well understandable.
-
-\subsection{The random web surfer}
-
-The problem PageRank tries to solve is the following: how can we rank pages of a given a set (we can assume that this set has already been filtered, for example on some query) by using the existing links between them?
-
-To solve this problem and be able to rank the pages, PageRank proceed roughly as follows. We consider that a random web surfer is on one of the pages at initial time. Then, this surfer starts to navigate randomly by clicking, for each page, on one of the links that lead to another page of the considered set (assume that links to pages out of this set are disallowed). For a given page, all the allowed links have then equal chance to be clicked.
-
-We have here a the setting of a Markov chain: pages are the different possible states, transition probabilities are defined by the links from page to page (weighted such that on each page all the linked pages have equal chances to be chosen) and the memoryless properties is clearly verified by the behaviour of the surfer. If we assume also that the defined chain is recurrent positive and aperiodic (some minor tricks are used to ensure we meet this setting), then after a long time the "current page" probability distribution converges to the stationary distribution. So, no matter the starting page, after a long time each page has a probability (almost fixed) to be the current page if we pick a random time step.
-
-The hypothesis behind PageRank is that the most probable pages in the stationary distribution must also be the most important (we visit these pages often because they receive links from pages that are also visited a lot in the process). The stationary probability distribution defines then for each state the value of the PageRank.
-
-\subsection{A toy example}
-
-In order to make all this much clearer, let's consider a toy example. Assume that we have a tiny website with 7 pages labeled from 1 to 7 and with links between the pages as represented in the graph in Figure~\ref{fig:p05c06-snip10}.
-
-
-\begin{figure*}[h]
-    \centering
-\includegraphics[width=.3\textwidth]{pic/p05c06-snip10-00.png}
-\includegraphics[width=.3\textwidth]{pic/p05c06-snip10-01.png}
-\includegraphics[width=.3\textwidth]{pic/p05c06-snip10-02.png}\\\ \\
-\includegraphics[width=.3\textwidth]{pic/p05c06-snip10-03.png}
-\includegraphics[width=.3\textwidth]{pic/p05c06-snip10-04.png}
-\includegraphics[width=.3\textwidth]{pic/p05c06-snip10-05.png}\\\ \\
-\includegraphics[width=.3\textwidth]{pic/p05c06-snip10-06.png}
-\includegraphics[width=.3\textwidth]{pic/p05c06-snip10-07.png}
-\includegraphics[width=.3\textwidth]{pic/p05c06-snip10-08.png}\\\ \\
-\includegraphics[width=.3\textwidth]{pic/p05c06-snip10-09.png}
-\includegraphics[width=.3\textwidth]{pic/p05c06-snip10-10.png}
-\includegraphics[width=.3\textwidth]{pic/p05c06-snip10-11.png}\\\ \\
-\includegraphics[width=.3\textwidth]{pic/p05c06-snip10-12.png}
-\includegraphics[width=.3\textwidth]{pic/p05c06-snip10-13.png}
-\includegraphics[width=.3\textwidth]{pic/p05c06-snip10-14.png}
-    \caption{Markov chain trajectory}
-    \label{fig:p05c06-snip10}
-\end{figure*}
-
-\FloatBarrier
-
-
-For clarity the probabilities of each transition have not been displayed in the previous representation. However, as the "navigation" is supposed to be purely random (we also talk about "random walk"), the values can be easily recovered using the simple following rule: for a node with $K$ outlinks (a page with $K$ links to other pages), the probability of each outlink is equal to $1/K$. So, the probability transition matrix is given by
-\begin{equation}p=\left(\begin{array}{ccccccc}
-. & 0.25 & . & . & 0.25 & 0.25 & 0.25 \\
-. & . & 0.5 & 0.5 & . & . & . \\
-. & 0.5 & . & 0.5 & . & . & . \\
-0.5 & . & . & . & . & . & 0.5 \\
-1.0 & . & . & . & . & . & . \\
-. & . & . & . & . & . & 1.0 \\
-0.5 & . & . & 0.5 & . & . & .
-\end{array}\right)\end{equation}
-where 0.0 values have been replaced by '.' for readability. Before any further computation, we can notice that this Markov chain is irreducible as well as aperiodic and, so, after a long run the system converges to a stationary distribution. As we already saw, we can compute this stationary distribution by solving the following left eigenvector problem
-\begin{equation}\begin{aligned}
-&\pi=\pi_p\\
-&\text { with } \quad \pi=\left(\begin{array}{lllllll}
-\pi_{1} & \pi_{2} & \pi_{3} & \pi_{4} & \pi_{5} & \pi_{6} & \pi_{7}
-\end{array}\right)
-\end{aligned}\end{equation}
-Doing so we obtain the following values of PageRank (values of the stationary distribution) for each page is shown in Figure~\ref{fig:p05c06-snip11}.
-The PageRank ranking of this tiny web site is therefore\\
-1 > 7 > 4 > 2 > 5 = 6 > 3.
-
-\begin{figure*}[h]
-    \centering
-\includegraphics[width=\textwidth]{pic/p05c06-snip11.png}
-    \caption{PageRank values computed on our toy example that contains 7 pages}
-    \label{fig:p05c06-snip11}
-\end{figure*}
-
-
-
-
-
-\subsection{Takeaways}
-
-The main takeaways of this article are the following:
+\item For each iteration:
 \begin{enumerate}
 
-\item random processes are collections of random variables, often indexed over time (indices often represent discrete or continuous time)
+\item Generate candidate new candidate $p_t$ drawn from $P(p_t)$.
 
-\item for a random process, the Markov property says that, given the present, the probability of the future is independent of the past (this property is also called "memoryless property")
+\item Calculate the likelihood of the data under the previous parameter value(s) $p_{t-1}: L(p_{t-1})$
 
-\item discrete time Markov chain are random processes with discrete time indices and that verify the Markov property
+\item Calculate the likelihood of the data under the proposed parameter value(s) $p_t: L(p_t)$
 
-\item the Markov property of Markov chains makes the study of these processes much more tractable and allows to derive some interesting explicit results (mean recurrence time, stationary distribution…)
+\item Calculate acceptance ratio $r=\frac{L(p_t)}{L(p_{t-1})}$.
 
-\item one possible interpretation of the PageRank (not the only one) consists in imagining a web surfer that randomly navigates from page to page and in taking the induced stationary distribution over pages as a factor of ranking (roughly, the most visited pages in steady-state must be the one linked by other very visited pages and then must be the most relevant)
+\item Generate a new random number on the unit interval: $s\sim U(0,1)$.
+
+\item Compare $s$ to $r$.
+\begin{itemize}
+\item If $s\leq r$, accept $p_t$.
+
+\item If $s>r$, reject $p_t$ and continue sampling again with $p_{t-1}$.
+\end{itemize}
+\end{enumerate}
 \end{enumerate}
 
-To conclude, let's emphasise once more how powerful Markov chains are for problems modelling when dealing with random dynamics. Due to their good properties, they are used in various fields such as queueing theory \cite{willig1999} (optimising the performance of telecommunications networks, where messages must often compete for limited resources and are queued when all resources are already allocated), statistics (the well known "Markov Chain Monte Carlo" \cite{JosephRoccaBayes2019} random variables generation technique is based on Markov chains), biology (modelling of biological populations evolution), computer science (hidden Markov models \cite{Rabiner1986,Rabiner1989,stamp2018} are important tools in information theory and speech recognition) and others.
+In the algorithm described in the note above, our parameters $p$ are actually $(\mu,\sigma)$. This means that we have to propose two numbers and sample two numbers in each loop of the sampler.
 
-Obviously, the huge possibilities offered by Markov chains in terms of modelling as well as in terms of computation go far behind what have been presented in this modest introduction and, so, we encourage the interested reader to read more about these tools that entirely have there place in the (data) scientist toolbox.
+To make things simple for us, let's use the normal distribution centered on 0
+but with scale 0.1 to propose values for each.
 
+We can implement the algorithm in Python code:
+
+\begin{lstlisting}
+# Metropolis-Hastings Sampling
+mu_prev = np.random.normal()
+sigma_prev = np.random.normal()
+
+# Keep a history of the parameter values and ratio.
+mu_history = dict()
+sigma_history = dict()
+ratio_history = dict()
+
+for i in range(1000):
+    mu_history[i] = mu_prev
+    sigma_history[i] = sigma_prev
+    mu_t = np.random.normal(mu_prev, 0.1)
+    sigma_t = np.random.normal(sigma_prev, 0.1)
+
+    # Compute joint log likelihood
+    LL_t = model_log_prob(mu_t, sigma_t, y)
+    LL_prev = model_log_prob(mu_prev, sigma_prev, y)
+
+    # Calculate the difference in log-likelihoods
+    # (or a.k.a. ratio of likelihoods)
+    diff_log_like = LL_t - LL_prev
+    if diff_log_like > 0:
+        ratio = 1
+    else:
+        # We need to exponentiate to get the correct ratio,
+        # since all of our calculations were in log-space
+        ratio = np.exp(diff_log_like)
+
+    # Defensive programming check
+    if np.isinf(ratio) or np.isnan(ratio):
+        raise ValueError(f"LL_t: {LL_t}, LL_prev: {LL_prev}")
+
+    # Ratio comparison step
+    ratio_history[i] = ratio
+    p = np.random.uniform(0, 1)
+
+    if ratio >= p:
+        mu_prev = mu_t
+        sigma_prev = sigma_t
+\end{lstlisting}
+
+Because of a desire for convenience, we chose to use a single normal distribution to sample all values. However, that distribution choice is going to bite us during sampling, because the values that we could possibly sample for the $\sigma$ parameter can take on negatives, but when a negative $\sigma$ is passed into the normally-distributed likelihood, we are going to get computation errors! This is because the scale parameter of a normal distribution can only be positive, and cannot be negative or zero. (If it were zero, there would be no randomness.)
+
+\subsection{Transformations as a Hack}
+
+The key problem here is that the support of the Exponential distribution is bound to be positive real numbers only. That said, we can get around this problem simply by sampling amongst the unbounded real number space $(-\infty,+\infty)$, and then transforming the number by a math function to be in the bounded space.
+
+One way we can transform numbers from an unbounded space to a positive-bounded space is to use the exponential transform:
+\begin{equation}
+y=e^x
+\end{equation}
+
+For any given value $x,y$ will be guaranteed to be positive.
+
+Knowing this, we can modify our sampling code, specifically, what was before:
+
+\begin{lstlisting}
+# Initialize in unconstrained space
+sigma_prev_unbounded = np.random.normal(0, 1)
+# ...
+for i in range(1000):
+    # ...
+    # Propose in unconstrained space
+    sigma_t_unbounded = np.random.normal(sigma_prev, 0.1)
+
+    # Transform the sampled values to the constrained space
+    sigma_prev = np.exp(sigma_prev_unbounded)
+    sigma_t = np.exp(sigma_t_unbounded)
+
+    # ...
+
+    # Pass the transformed values into the log-likelihood calculation
+    LL_t = model_log_prob(mu_t, sigma_t, y)
+    LL_prev = model_log_prob(mu_prev, sigma_prev, y)
+
+    # ...
+\end{lstlisting}
+
+And voila! If you notice, the key trick here was to \textbf{sample in unbounded space}, but \textbf{evaluate log-likelihood in bounded space}. We call the ``unbounded'' space the \emph{transformed} space, while the ``bounded'' space is the \emph{original} or \emph{untransformed} space. We have implemented the necessary components to compute posterior distributions on parameters!
+
+\section{Samples from Posterior}
+
+\begin{figure*}[th]
+\includegraphics[width=.3\textwidth]{p05c05-mcmc-trace.png}
+\includegraphics[width=.3\textwidth]{p05c05-mcmc-trace-burn-in.png}
+\caption{MCMC simple run results: full run and after burn-in phase}
+\label{fig:p05c05-mcmc-trace}
+\end{figure*}
+
+%\begin{figure*}[th]
+%\caption{MCMC simple run results after burn-in}
+%\label{fig:p05c05-mcmc-trace-burn-in}
+%\end{figure*}
+
+If we simulate 1000 data points from a Normal(3,1) distribution, and pass them into the model log probability function defined above, then after running the sampler, we get a chain of values that the sampler has picked out as maximizing the joint likelihood of the data and the model. This, by the way, is essentially the simplest version of Markov Chain Monte Carlo sampling that exists in modern computational Bayesian statistics.
+
+Examine the trace from one run in the left graph of Figure~\ref{fig:p05c05-mcmc-trace}. Notice how it takes about 200 steps before the trace becomes \textbf{stationary}, that is it becomes a flat trend-line. If we prune the trace to just the values after the 200th iteration, we get the trace on the right in Figure~\ref{fig:p05c05-mcmc-trace}.
+The samples drawn are an approximation to the expected values of $\mu$
+and $\sigma$ given the data and priors specified.
+\marginnote{Random Variables and Sampling: 
+A piece of wisdom directly quoted from my friend Colin Carroll, who is also a PyMC developer: ``Random variables are measures, and measures are only really defined under an integral sign. Sampling is usually defined as the act of generating data according to a certain measure. This is confusing, because we invert this relationship when we do computational statistics: we generate the data, and use that to approximate an integral or expectation.''
+}
+
+\section{Topics We Skipped Over}
+
+We intentionally skipped over a number of topics.
+
+One of them was why we used a normal distribution with scale of 0.1 to propose a different value, rather than a different scale. As it turns out the, scale parameter is a tunable hyperparameter, and in PyMC3 we do perform tuning as well. If you want to learn more about how tuning happens, Colin has a great essay on that too \cite{ColinCarrollParameterAdaptationPyMC32019}.
+
+We also skipped over API design, as that is a topic I will be exploring in a separate essay. It will also serve as a tour through the PyMC3 API as I understand it.
+
+\section{An Anchoring Thought Framework for Learning Computational Bayes}
+
+Having gone through this exercise has been extremely helpful in deciphering what goes on behind-the-scenes in PyMC3 (and the in-development PyMC4, which is built on top of TensorFlow probability).
+
+From digging through everything from scratch, my thought framework to think about Bayesian modelling has been updated (pun intended) to the following.
+
+Firstly, we can view a Bayesian model from the axis of \textbf{prior, likelihood, posterior}. Bayes' rule provides us the equation ``glue'' that links those three components together.
+
+Secondly, when doing \emph{computational Bayesian} statistics, we should be able to modularly separate \textbf{sampling} from \textbf{model definition}. Sampling is computing the posterior distribution of parameters given the model and data. Model definition, by contrast, is all about providing the model structure as well as a function that calculates the joint log likelihood of the model and data.
+
+In fact, based on the exercise above, any ``sampler'' is only concerned with the model log probability (though some also require the local gradient of the log probability w.r.t. the parameters to find where to climb next), and should only be required to accept a \textbf{model log probability} function and a proposed set of initial parameter values, and return a chain of sampled values.
+
+Finally, I hope the ``simplest complex example'' of estimating $\mu$ and $\sigma$ of a normal distribution helps further your understanding of the math behind Bayesian statistics.
+
+All in all, I hope this essay helps your learning, as writing it did for me!
