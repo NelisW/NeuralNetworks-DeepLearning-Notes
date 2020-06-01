@@ -25,7 +25,7 @@ The Likelihood Axiom
 
 Edwards \cite[p 30]{Edwards1992} defines the Likelihood Axiom as a natural combination of the Law of Likelihood and the Likelihood Principle.
 
-The \textbf{Law of Likelihood} states that ''within the framework of a statistical model, a particular set of data supports one statistical hypothesis better than another if the likelihood of the first hypothesis, on the data, exceeds the likelihood of the second hypothesis'' (Emphasis original, \cite[p 30]{Edwards1992}).
+The \textbf{Law of Likelihood} states that ``within the framework of a statistical model, a particular set of data supports one statistical hypothesis better than another if the likelihood of the first hypothesis, on the data, exceeds the likelihood of the second hypothesis'' (Emphasis original, \cite[p 30]{Edwards1992}).
 
 In other words, there is evidence for $H1$ vis-a-vis $H2$ if and only if the probability of the data under $H1$ is greater than the probability of the data under $H2$. That is, $D$ is evidence for $H1$ over $H2$ if $\mathrm{P}(\mathrm{D} | \mathrm{H} 1)>\mathrm{P}(\mathrm{D} | \mathrm{H} 2)$. If these two probabilities are equivalent, then there is no evidence for either hypothesis over the other. Furthermore, the strength of the statistical evidence for $H1$ over $H2$ is quantified by the ratio of their likelihoods, $\mathrm{L}(\mathrm{H} 1 | \mathrm{D}) / \mathrm{L}(\mathrm{H} 2 | \mathrm{D})$ (which again is proportional to $\mathrm{P}(\mathrm{D} | \mathrm{H} 1) / \mathrm{P}(\mathrm{D} | \mathrm{H} 2)$ up to an arbitrary constant that cancels out).
 
@@ -60,7 +60,7 @@ Translation: The data are 1.4 times as probable under a fair coin hypothesis tha
 
 \textsl{Same data. Same constant. Cancel out.}
 
-The first term in the equations above, $\frac{10 !}{6 !(4 !)}$, details \textit{our journey} to obtaining 6 heads out of 10. If we change our journey (i.e., different sampling plan) then this changes the term's value, \textbf{but crucially, since it is the same term in both the numerator and denominator it always cancels itself out}. In other words, the information contained in the way the data are obtained \textit{disappears from the function}. Hence the irrelevance of the stopping rule to the evaluation of statistical evidence, which is something that makes bayesian and likelihood methods valuable and flexible.
+The first term in the equations above, $\frac{10 !}{6 !(4 !)}$, details \textit{our journey} to obtaining 6 heads out of 10. If we change our journey (i.e., different sampling plan) then this changes the term's value, \textbf{but crucially, since it is the same term in both the numerator and denominator it always cancels itself out}. In other words, the information contained in the way the data are obtained \textit{disappears from the function}. Hence the irrelevance of the stopping rule to the evaluation of statistical evidence, which is something that makes Bayesian and likelihood methods valuable and flexible.
 
 If we leave out the first term in the above calculations, our numerator is $L(.5)=0.0009765625$
  and our denominator is $\mathrm{L}(.75) \approx 0.0006952286$. Using these values to form the likelihood ratio we get: $0.0009765625 / 0.0006952286 \approx 1.4$, as we should since the other terms simply cancelled out before.
@@ -73,7 +73,7 @@ Likelihoods may seem overly restrictive at first. We can only compare 2 simple s
 
 In that case we can plot the likelihood function for our data, and this lets us ‘see' the evidence in its entirety. By plotting the entire likelihood function we compare all possible hypotheses simultaneously. The Likelihood Principle tells us that the likelihood function encompasses all statistical evidence that our data can provide, so we should always plot this function along side our reported likelihood ratios.
 
-Following the wisdom of Birnbaum \cite{Birnbaum1962}, ''the ''evidential meaning'' of experimental results is characterized fully by the likelihood function'' (as cited in \cite[p 25]{Royall2000}). So let's look at some examples. The R script at the end of this post can be used to reproduce these plots, or you can use it to make your own plots. Play around with it and see how the functions change for different number of heads, total flips, and hypotheses of interest. See the instructions in the script for details.
+Following the wisdom of Birnbaum \cite{Birnbaum1962}, ``the ``evidential meaning'' of experimental results is characterized fully by the likelihood function'' (as cited in \cite[p 25]{Royall2000}). So let's look at some examples. The R script at the end of this post can be used to reproduce these plots, or you can use it to make your own plots. Play around with it and see how the functions change for different number of heads, total flips, and hypotheses of interest. See the instructions in the script for details.
 
 The graph shows the likelihood function for 6 heads in 10 tosses. I've marked our two hypotheses from before on the likelihood curve with blue dots. Since the likelihood function is meaningful only up to an arbitrary constant, the graph is scaled by convention so that the best supported value (i.e., the maximum) corresponds to a likelihood of 1.
 
@@ -115,7 +115,7 @@ Here is one more curve, for when we obtain 300 heads in 500 coin flips.
 
 Notice that both of our hypotheses look to be very near the minimum of the graph. Yet their likelihood ratio is much stronger than before. For this data the likelihood ratio$\mathrm{L}(.5) / \mathrm{L}(.75)$ is nearly \textbf{24 million!} The inherent relativity of evidence is made clear here: The fair coin was supported when compared to \textit{one particular} trick coin. But this should not be interpreted as absolute evidence for the fair coin, because the likelihood ratio for the maximally supported hypothesis vs the fair coin, $\mathrm{L}(.6) / \mathrm{L}(.5)$, is nearly \textbf{24 thousand!}
 
-We need to be careful not to make blanket statements about absolute support, such as claiming that the maximum is ''strongly supported by the data''. Always ask, ''Compared to what?'' The best supported hypothesis will be only be weakly supported vs any hypothesis just before or just after it on the x-axis. For example, $\mathrm{L}(.6) / \mathrm{L}(.61) \approx 1.1$, which is barely any support one way or the other. It cannot be said enough that evidence for a hypothesis must be evaluated in consideration with a specific alternative.
+We need to be careful not to make blanket statements about absolute support, such as claiming that the maximum is ``strongly supported by the data''. Always ask, ``Compared to what?'' The best supported hypothesis will be only be weakly supported vs any hypothesis just before or just after it on the x-axis. For example, $\mathrm{L}(.6) / \mathrm{L}(.61) \approx 1.1$, which is barely any support one way or the other. It cannot be said enough that evidence for a hypothesis must be evaluated in consideration with a specific alternative.
 
 \subsection{Connecting likelihood ratios to Bayes factors}
 
@@ -145,7 +145,7 @@ LR <- function(h,n,p1=.5,p2=.75){
 }
 \end{lstlisting}
 
-(footnote) Obtaining 60 heads in 100 tosses is equivalent to obtaining 6 heads in 10 tosses 10 separate times. To obtain this new likelihood ratio we can simply multiply our ratios together. That is, raise the first ratio to the power of 10; $1.4^{\wedge} 10 \approx 28.9$, which is just slightly off from the correct value of 29.9 due to rounding.
+Obtaining 60 heads in 100 tosses is equivalent to obtaining 6 heads in 10 tosses 10 separate times. To obtain this new likelihood ratio we can simply multiply our ratios together. That is, raise the first ratio to the power of 10; $1.4^{\wedge} 10 \approx 28.9$, which is just slightly off from the correct value of 29.9 due to rounding.
 
 In the comments to the above blog, someone wrote:
 `` Bayesian statistics is a religion that gives a false promise of certainty to believers in a world of uncertainty.''
@@ -157,7 +157,7 @@ In the comments to the above blog, someone wrote:
 
 Above I outlined the basic idea behind likelihoods and likelihood ratios. Likelihoods are relatively straightforward to understand because they are based on tangible data. Collect your data, and then the likelihood curve shows the relative support that your data lend to various simple hypotheses. Likelihoods are a key component of Bayesian inference because they are the bridge that gets us from prior to posterior.
 
-In this post I explain how to use the likelihood to update a prior into a posterior. The simplest way to illustrate likelihoods as an updating factor is to use \textit{conjugate distribution families} \cite{Raiffa2000}. A prior and likelihood are said to be conjugate when the resulting posterior distribution is the same type of distribution as the prior. This means that if you have binomial data you can use a beta prior to obtain a beta posterior. If you had normal data you could use a normal prior and obtain a normal posterior. Conjugate priors are not required for doing bayesian updating, but they make the calculations a lot easier so they are nice to use if you can.
+In this post I explain how to use the likelihood to update a prior into a posterior. The simplest way to illustrate likelihoods as an updating factor is to use \textit{conjugate distribution families} \cite{Raiffa2000}. A prior and likelihood are said to be conjugate when the resulting posterior distribution is the same type of distribution as the prior. This means that if you have binomial data you can use a beta prior to obtain a beta posterior. If you had normal data you could use a normal prior and obtain a normal posterior. Conjugate priors are not required for doing Bayesian updating, but they make the calculations a lot easier so they are nice to use if you can.
 
 I'll use some data from a recent NCAA 3-point shooting contest to illustrate how different priors can converge into highly similar posteriors.
 
@@ -173,28 +173,28 @@ Round 3: 14/25
 Round 4: 19/25
 Total: 58/100
 \end{lstlisting}
-The likelihood curve below encompasses the entirety of statistical evidence that our 3-point data provide (footnote 1). The hypothesis with the most relative support is .58, and the curve is moderately narrow since there are quite a few data points. I didn't standardize the height of the curve in order to keep it comparable to the other curves I'll be showing.
+The likelihood curve below encompasses the entirety of statistical evidence that our 3-point data provide\footnote{I'm making a major assumption about the data: Any one shot is exchangeable with any other shot. This might not be defensible since the final ball on each rack is worth a bonus point, so maybe those shots differ systematically from regular shots, but it's a toy example so I'll ignore that possibility. There's also the possibility of her going on a hot streak, a.k.a. having a ``hot hand'', but I'm going to ignore that too because I'm the one writing this blog post and I want to keep it simple. There's also the possibility that she gets worse throughout the competition because she gets tired, but then there's also the possibility that she gets better as she warms up with multiple rounds. All of these things are reasonable to consider and I am going to ignore them all.}. The hypothesis with the most relative support is .58, and the curve is moderately narrow since there are quite a few data points. I didn't standardize the height of the curve in order to keep it comparable to the other curves I'll be showing.
 
 
-\begin{figure}[h]
+\begin{figure*}[h]
     \centering
-\includegraphics[width=0.8\textwidth]{pic/p05c03-snip05.png}
-    \caption{Likelihood fpor 3-pt Shots}
+\includegraphics[width=0.4\textwidth]{pic/p05c03-snip05.png}
+    \caption{Likelihood for 3-pt Shots}
     \label{fig:p05c03-snip05}
-\end{figure}
+\end{figure*}
+
+\FloatBarrier
 
 
-The prior
+\subsection{The prior}
 
-Now the part that people often make a fuss about: choosing the prior. There are a few ways to choose a prior. Since I am using a binomial likelihood, I'll be using a conjugate beta prior. A beta prior has two shape parameters that determine what it looks like, and is denoted Beta(α, β). I like to think of priors in terms of what kind of information they represent. The shape parameters α and β can be thought of as prior observations that I've made (or imagined).
+Now the part that people often make a fuss about: choosing the prior. There are a few ways to choose a prior. Since I am using a binomial likelihood, I'll be using a conjugate beta prior. A beta prior has two shape parameters that determine what it looks like, and is denoted Beta($\alpha$, $\beta$). I like to think of priors in terms of what kind of information they represent. The shape parameters $\alpha$ and $\beta$ can be thought of as prior observations that I've made (or imagined).
 
-Imagine my trusted friend caught the end of Brown's warm-up and saw her take two shots, making one and missing the other, and she tells me this information. This would mean I could reasonably use the common Beta(1, 1) prior, which represents a uniform density over [0, 1]. In other words, all possible values for Brown's shooting percentage are given equal weight before taking data into account, because the only thing I know about her ability is that both outcomes are possible (Lee & Wagenmakers, 2005).
+Imagine my trusted friend caught the end of Brown's warm-up and saw her take two shots, making one and missing the other, and she tells me this information. This would mean I could reasonably use the common Beta(1, 1) prior, which represents a uniform density over [0, 1]. In other words, all possible values for Brown's shooting percentage are given equal weight before taking data into account, because the only thing I know about her ability is that both outcomes are possible\cite{LeeWagenmakers2005}.
 
-Another common prior is called Jeffreys's prior, a Beta(1/2, 1/2) which forms a wide bowl shape. This prior would be recommended if you had extremely scarce information about Brown's ability. Is Brown so good that she makes nearly every shot, or is she so bad that she misses nearly every shot? This prior says that Brown's shooting rate is probably near the extremes, which may not necessarily reflect a reasonable belief for someone who is a college basketball player, but it has the benefit of having less influence on the posterior estimates than the uniform prior (since it is equal to 1 prior observation instead of 2). Jeffreys's prior is popular because it has some desirable properties, such as invariance under parameter transformation (Jaynes, 2003). So if instead of asking about Brown's shooting percentage I instead wanted to know her shooting percentage squared or cubed, Jeffreys's prior would remain the same shape while many other priors would drastically change shape.
+Another common prior is called Jeffreys's prior, a Beta(1/2, 1/2) which forms a wide bowl shape. This prior would be recommended if you had extremely scarce information about Brown's ability. Is Brown so good that she makes nearly every shot, or is she so bad that she misses nearly every shot? This prior says that Brown's shooting rate is probably near the extremes, which may not necessarily reflect a reasonable belief for someone who is a college basketball player, but it has the benefit of having less influence on the posterior estimates than the uniform prior (since it is equal to 1 prior observation instead of 2). Jeffreys's prior is popular because it has some desirable properties, such as invariance under parameter transformation \cite{Jaynes2003}. So if instead of asking about Brown's shooting percentage I instead wanted to know her shooting percentage squared or cubed, Jeffreys's prior would remain the same shape while many other priors would drastically change shape.
 
 Or perhaps I had another trusted friend who had arrived earlier and seen Brown take her final 13 shots in warm-up, and she saw 4 makes and 9 misses. Then I could use a Beta(4, 9) prior to characterize this prior information, which looks like a hump over .3 with density falling slowly as it moves outward in either direction. This prior has information equivalent to 13 shots, or roughly an extra 1/2 round of shooting.
-
-These three different priors are shown below.
 
 
 \begin{figure}[h]
@@ -202,46 +202,47 @@ These three different priors are shown below.
 \includegraphics[width=0.3\textwidth]{pic/p05c03-snip06-1.png}
 \includegraphics[width=0.3\textwidth]{pic/p05c03-snip06-2.png}
 \includegraphics[width=0.3\textwidth]{pic/p05c03-snip06-3.png}
-    \caption{Priors}
+    \caption{Three different priors, or different Beta}
     \label{fig:p05c03-snip06}
 \end{figure}
 
+These are but three possible priors one could use. In your analysis you can use any prior you want, but if you want to be taken seriously you'd better give some justification for it. Bayesian inference allows many rules for prior construction.''This is my personal prior'' is a technically a valid reason, but if this is your only justification then your colleagues/reviewers/editors will probably not take your results seriously.
 
-prioruni priorjeff priorinformed
+\FloatBarrier
 
-These are but three possible priors one could use. In your analysis you can use any prior you want, but if you want to be taken seriously you'd better give some justification for it. Bayesian inference allows many rules for prior construction.”This is my personal prior” is a technically a valid reason, but if this is your only justification then your colleagues/reviewers/editors will probably not take your results seriously.
-Updating the prior via the likelihood
+\subsection{Updating the prior via the likelihood}
 
 Now for the easiest part. In order to obtain a posterior, simply use Bayes's rule:
 
-\ Posterior \propto Likelihood \ X \ Prior
+Posterior $\propto$ Likelihood $X$ Prior
 
-The posterior is proportional to the likelihood multiplied by the prior. What's nice about working with conjugate distributions is that Bayesian updating really is as simple as basic algebra. We take the formula for the binomial likelihood, which from a previous post is known to be:
+The posterior is proportional to the likelihood multiplied by the prior. What's nice about working with conjugate distributions is that Bayesian updating really is as simple as basic algebra. We take the formula for the binomial likelihood, which from above is known to be:
 
-\ Likelihood \ = \ p^x \big(1-p \big)^{n-x}  
+Likelihood$=p^{x}(1-p)^{n-x}$
 
-and then multiply it by the formula for the beta prior with α and β shape parameters:
+and then multiply it by the formula for the beta prior with $\alpha$ and $\beta$ shape parameters:
 
-\ Prior \ = \ p^{\alpha-1} \big(1-p \big)^{\beta-1}  
+Prior$=p^{\alpha-1}(1-p)^{\beta-1}$ 
 
 to obtain the following formula for the posterior:
 
-\ Posterior \ = \ p^x \big(1-p \big)^{n-x} p^{\alpha-1} \big(1-p \big)^{\beta-1}  
+Posterior $=p^{x}(1-p)^{n-x} p^{\alpha-1}(1-p)^{\beta-1}$
 
 With a little bit of algebra knowledge, you'll know that multiplying together terms with the same base means the exponents can be added together. So the posterior formula can be rewritten as:
 
-\ Posterior \ = \ p^x p^{\alpha-1}\big(1-p \big)^{n-x} \big(1-p \big)^{\beta-1}
+Posterior $=p^{x} p^{\alpha-1}(1-p)^{n-x}(1-p)^{\beta-1}$
 
 and then by adding the exponents together the formula simplifies to:
 
-\ Posterior \ = \ p^{\alpha-1+x} \big(1-p \big)^{\beta-1+n-x}  
+Posterior $=p^{\alpha-1+x}(1-p)^{\beta-1+n-x}$
 
-and it's that simple! Take the prior, add the successes and failures to the different exponents, and voila. The distributional notation is even simpler. Take the prior, Beta(α, β), and add the successes from the data, x, to α and the failures, n – x, to β, and there's your posterior, Beta(α+x, β+n-x).
+and it's that simple! Take the prior, add the successes and failures to the different exponents, and voila. The distributional notation is even simpler. Take the prior, Beta($\alpha$, $\beta$), and add the successes from the data, $x$, to $\alpha$ and the failures, $n – x$, to $\beta$, and there's your posterior, Beta($\alpha+x$, $\beta+n-x$).
 
-Remember from the previous post that likelihoods don't care about what order the data arrive in, it always results in the same curve. This property of likelihoods is carried over to posterior updating. The formulas above serve as another illustration of this fact. It doesn't matter if you add a string of six single data points, 1+1+1+1+1+1+1 or a batch of +6 data points; the posterior formula in either case ends up with 6 additional points in the exponents.
-Looking at some posteriors
+Remember from the previous that likelihoods don't care about what order the data arrive in, it always results in the same curve. This property of likelihoods is carried over to posterior updating. The formulas above serve as another illustration of this fact. It doesn't matter if you add a string of six single data points, 1+1+1+1+1+1+1 or a batch of +6 data points; the posterior formula in either case ends up with 6 additional points in the exponents.
 
-Back to Brown's shooting data. She had four rounds of shooting so I'll treat each round as a batch of new data. Her results for each round were: 13/25, 12/25, 14/25, 19/25. I'll show how the different priors are updated with each batch of data. A neat thing about bayesian updating is that after batch 1 is added to the initial prior, its posterior is used as the prior for the next batch of data. And as the formulas above indicate, the order or frequency of additions doesn't make a difference on the final posterior. I'll verify this at the end of the post.
+\subsection{Looking at some posteriors}
+
+Back to Brown's shooting data. She had four rounds of shooting so I'll treat each round as a batch of new data. Her results for each round were: 13/25, 12/25, 14/25, 19/25. I'll show how the different priors are updated with each batch of data. A neat thing about Bayesian updating is that after batch 1 is added to the initial prior, its posterior is used as the prior for the next batch of data. And as the formulas above indicate, the order or frequency of additions doesn't make a difference on the final posterior. I'll verify this at the end of the post.
 
 In the following plots, the prior is shown in blue (as above), the likelihood in orange (as above), and the resulting posteriors after Brown's first 13/25 makes in purple.
 
@@ -251,14 +252,15 @@ In the following plots, the prior is shown in blue (as above), the likelihood in
 \includegraphics[width=0.3\textwidth]{pic/p05c03-snip07-1.png}
 \includegraphics[width=0.3\textwidth]{pic/p05c03-snip07-2.png}
 \includegraphics[width=0.3\textwidth]{pic/p05c03-snip07-3.png}
-    \caption{Posteriors}
+    \caption{Priors, likelihood and posteriors}
     \label{fig:p05c03-snip07}
 \end{figure}
 
+\FloatBarrier
 
-In the first and second plot the likelihood is nearly invisible because the posterior sits right on top of it. When the prior has only 1 or 2 data points worth of information, it has essentially no impact on the posterior shape (footnote 2). The third plot shows how the posterior splits the difference between the likelihood and the informed prior based on the relative quantity of information in each.
+In the first and second plot the likelihood is nearly invisible because the posterior sits right on top of it. When the prior has only 1 or 2 data points worth of information, it has essentially no impact on the posterior shape\footnote{There is a tendency to call any priors that have very little impact on the posterior ``non-informative'', but, as I mentioned in the section on determining priors, uniform priors that seem non-informative in one context can become highly informative with parameter transformation \cite{MuZhuLu2004}. Jeffreys's prior was derived precisely with that in mind, so it carries little information no matter what transformation is applied.} . The third plot shows how the posterior splits the difference between the likelihood and the informed prior based on the relative quantity of information in each.
 
-The posteriors obtained from the uniform and Jeffreys's priors suggest the best guess for Brown's shooting percentage is around 50%, whereas the posterior obtained from the informed prior suggests it is around 40%. No surprise here since the informed prior represents another 1/2 round of shots where Brown performed poorly, which shifts the posterior towards lower values. But all three posteriors are still quite broad, and the breadth of the curves can be thought to represent the uncertainty in my estimates. More data -> tighter curves -> less uncertainty.
+The posteriors obtained from the uniform and Jeffreys's priors suggest the best guess for Brown's shooting percentage is around 50\%, whereas the posterior obtained from the informed prior suggests it is around 40\%. No surprise here since the informed prior represents another 1/2 round of shots where Brown performed poorly, which shifts the posterior towards lower values. But all three posteriors are still quite broad, and the breadth of the curves can be thought to represent the uncertainty in my estimates. More data $\rightarrow$ tighter curves $\rightarrow$ less uncertainty.
 
 Now I'll add the second round performance as a new likelihood (12/25 makes), and I'll take the posteriors from the first round of updating as new priors for the second round of updating. So the purple posteriors from the plots above are now blue priors, the likelihood is orange again, and the new posteriors are purple.
 
@@ -268,7 +270,7 @@ Now I'll add the second round performance as a new likelihood (12/25 makes), and
 \includegraphics[width=0.3\textwidth]{pic/p05c03-snip08-1.png}
 \includegraphics[width=0.3\textwidth]{pic/p05c03-snip08-2.png}
 \includegraphics[width=0.3\textwidth]{pic/p05c03-snip08-3.png}
-    \caption{Posteriors}
+    \caption{Priors, likelihood and posteriors}
     \label{fig:p05c03-snip08}
 \end{figure}
 
@@ -277,28 +279,17 @@ The left two plots look nearly identical, which should be no surprise since thei
 
 The last two rounds of updating are shown below, again with posteriors from the previous round taken as priors for the next round. At this point they've all converged to very similar posteriors that are much narrower, translating to less uncertainty in my estimates.
 
+\FloatBarrier
+
 
 \begin{figure}[h]
     \centering
-\includegraphics[width=0.3\textwidth]{pic/p05c03-snip09.png}
-    \caption{Posteriors}
+\includegraphics[width=0.6\textwidth]{pic/p05c03-snip09.png}
+\includegraphics[width=0.6\textwidth]{pic/p05c03-snip10.png}
+\includegraphics[width=0.6\textwidth]{pic/p05c03-snip11.png}
+    \caption{Priors, likelihood and posteriors}
     \label{fig:p05c03-snip09}
 \end{figure}
-
-\begin{figure}[h]
-    \centering
-\includegraphics[width=0.3\textwidth]{pic/p05c03-snip10.png}
-    \caption{Posteriors}
-    \label{fig:p05c03-snip10}
-\end{figure}
-
-\begin{figure}[h]
-    \centering
-\includegraphics[width=0.3\textwidth]{pic/p05c03-snip11.png}
-    \caption{Posteriors}
-    \label{fig:p05c03-snip11}
-\end{figure}
-
 
 These posterior distributions look pretty similar now! Just as an illustration, I'll show what happens when I update the initial priors with all of the data at once.
 
@@ -308,20 +299,17 @@ These posterior distributions look pretty similar now! Just as an illustration, 
 \includegraphics[width=0.3\textwidth]{pic/p05c03-snip12-1.png}
 \includegraphics[width=0.3\textwidth]{pic/p05c03-snip12-2.png}
 \includegraphics[width=0.3\textwidth]{pic/p05c03-snip12-3.png}
-    \caption{Posteriors}
+    \caption{Priors, likelihood and posteriors}
     \label{fig:p05c03-snip12}
 \end{figure}
+
+\FloatBarrier
 
 
 As the formulas predict, the posteriors after one big batch of data are identical to those obtained by repeatedly adding multiple smaller batches of data. It's also a little easier to see the discrepancies between the final posteriors in this illustration because the likelihood curve acts as a visual anchor. The uniform and Jeffreys's priors result in posteriors that essentially fall right on top of the likelihood, whereas the informed prior results in a posterior that is very slightly shifted to the left of the likelihood.
 
 My takeaway from these posteriors is that Cassandra Brown has a pretty damn good 3-point shot! In a future post I'll explain how to use this method of updating to make inferences using Bayes factors. It's called the Savage-Dickey density method, and I think it's incredibly intuitive and easy to use.
 Notes:
-
-Footnote 1: I'm making a major assumption about the data: Any one shot is exchangeable with any other shot. This might not be defensible since the final ball on each rack is worth a bonus point, so maybe those shots differ systematically from regular shots, but it's a toy example so I'll ignore that possibility. There's also the possibility of her going on a hot streak, a.k.a. having a “hot hand”, but I'm going to ignore that too because I'm the one writing this blog post and I want to keep it simple. There's also the possibility that she gets worse throughout the competition because she gets tired, but then there's also the possibility that she gets better as she warms up with multiple rounds. All of these things are reasonable to consider and I am going to ignore them all.
-
-Footnote 2: There is a tendency to call any priors that have very little impact on the posterior “non-informative”, but, as I mentioned in the section on determining priors, uniform priors that seem non-informative in one context can become highly informative with parameter transformation (Zhu & Lu, 2004). Jeffreys's prior was derived precisely with that in mind, so it carries little information no matter what transformation is applied.
-
 
 \begin{lstlisting}
 shotData<- c(1, 0, 0, 0, 1, 0, 1, 0, 1, 0, 0, 0, 1, 1, 1, 0, 1, 0, 1, 1, 1, 0, 0, 1, 1, 0, 0,
