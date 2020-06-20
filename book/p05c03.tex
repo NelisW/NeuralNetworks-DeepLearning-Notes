@@ -10,6 +10,8 @@ All these blog posts have lively discussion, please see the web sites.
 \section{A Look at the Likelihood}
 \label{sec:ALookattheLikelihood}
 
+Taken from \cite{etz2015a}.
+
 Much of the discussion in psychology surrounding Bayesian inference focuses on priors. Should we embrace priors, or should we be skeptical? When are Bayesian methods sensitive to specification of the prior, and when do the data effectively overwhelm it? Should we use context specific prior distributions or should we use general defaults? These are all great questions and great discussions to be having.
 
 One thing that often gets left out of the discussion is the importance of the likelihood. The likelihood is the workhorse of Bayesian inference. In order to understand Bayesian parameter estimation you need to understand the likelihood. In order to understand Bayesian model comparison (Bayes factors) you need to understand the likelihood and likelihood ratios.
@@ -154,6 +156,8 @@ In the comments to the above blog, someone wrote:
 
 \section{Updating priors via the likelihood}
 \label{sec:Updatingpriorsviathelikelihood}
+
+Taken from  \cite{etz2015d}.
 
 Above I outlined the basic idea behind likelihoods and likelihood ratios. Likelihoods are relatively straightforward to understand because they are based on tangible data. Collect your data, and then the likelihood curve shows the relative support that your data lend to various simple hypotheses. Likelihoods are a key component of Bayesian inference because they are the bridge that gets us from prior to posterior.
 
@@ -472,6 +476,8 @@ plot.beta(4,9,58,100,ymax=10,main="Beta(4,9) to Beta(62,51)")
 \section{Visualization of the Bayes Factor}
 \label{sec:VisualizationoftheBayesFactor}
 
+Taken from  \cite{etz2015b}.
+
  In this post I'll explain how using Bayes factors for model comparison can be conceptualized as a simple extension of likelihood ratios.
 There's that coin again
 
@@ -567,7 +573,7 @@ Since this is not a uniform distribution, we need to assign varying weights to e
 The actual Bayes factor is obtained by integrating the likelihood with respect to H1's density distribution and then dividing by the (marginal) likelihood of H0. Essentially what it does is cut $P(\Theta)$ into slices infinitely thin before it calculates the likelihood ratios, re-weighs, and averages. That Bayes factor comes out to 55.7, which is basically the same thing we got through this ghetto visualization demonstration!
 Take home
 
-The take-home message is hopefully pretty clear at this point: When you are comparing a point null hypothesis with a composite hypothesis, the Bayes factor can be thought of as a weighted average of every point hypothesis's likelihood ratio against H0, and the weights are determined by the prior density distribution of H1. Since the Bayes factor is a weighted average based on the prior distribution, it's really important to think hard about the prior distribution you choose for H1. In a previous post, I showed how different priors can converge to the same posterior with enough data. The priors are often said to “wash out” in estimation problems like that. This is not necessarily the case for Bayes factors. The priors you choose matter, so think hard!
+The take-home message is hopefully pretty clear at this point: When you are comparing a point null hypothesis with a composite hypothesis, the Bayes factor can be thought of as a weighted average of every point hypothesis's likelihood ratio against H0, and the weights are determined by the prior density distribution of H1. Since the Bayes factor is a weighted average based on the prior distribution, it's really important to think hard about the prior distribution you choose for H1. In a previous post, I showed how different priors can converge to the same posterior with enough data. The priors are often said to ``wash out'' in estimation problems like that. This is not necessarily the case for Bayes factors. The priors you choose matter, so think hard!
 
 
 \begin{lstlisting}
@@ -623,7 +629,193 @@ l=k/101 #weighted average likelihood ratio (i.e., BF)
 \section{Evidence vs. Conclusions}
 \label{sec:Evidencevs.Conclusions}
 
+Taken from  \cite{etz2015c}.
+
+\subsection{Perspective}
+
+In this installment of Understanding Bayes I want to discuss the nature of Bayesian evidence and conclusions. In a previous post I focused on Bayes factors' mathematical structure and visualization. In this post I hope to give some idea of how Bayes factors should be interpreted \textit{in context}. How do we use the Bayes factor to come to a conclusion?
+
+\subsection{How to calculate a Bayes factor}
+
+I'm going to start with an example to show the nature of the Bayes factor. Imagine I have 2 baskets with black and white balls in them. In basket A there are 5 white balls and 5 black balls. In basket B there are 10 white balls. Other than the color, the balls are completely indistinguishable. Here's my advanced high-tech figure depicting the problem.
+
+\begin{figure}[h]
+\centering
+\includegraphics[width=0.3\textwidth]{pic/p05c03-snip17.png}
+\caption{Bayes factor baskets}
+\label{fig:p05c03-snip17}
+\end{figure}
+
+You choose a basket and bring it to me. The baskets aren't labeled so I can't tell by their appearance which one you brought. You tell me that in order to figure out which basket I have, I am allowed to take a ball out one at a time and then return it and reshuffle the balls around. What outcomes are possible here? In this case it's super simple: I can either draw a white ball or a black ball.
+
+If I draw a black ball I immediately know I have basket A, since this is impossible in basket B. If I draw a white ball I can't rule anything out, but drawing a white ball counts as evidence for basket B over basket A. Since the white ball occurs with probability 1 if I have basket B, and probability .5 if I have basket A, then due to what is known as the Likelihood Axiom, I have evidence for basket B over basket A by a factor of 2.  See this post for a refresher on likelihoods, including the concepts such as the law of likelihood and the likelihood principle. The short version is that observations count as evidence for basket B over basket A if they are more probable given basket B than basket A.
+
+\begin{figure}[h]
+\centering
+\includegraphics[width=0.3\textwidth]{pic/p05c03-snip18.png}
+\caption{Bayes factor baskets}
+\label{fig:p05c03-snip18}
+\end{figure}
+
+I continue to sample, and end up with this set of observations: {W, W, W, W, W, W}. Each white ball that I draw counts as evidence of 2 for basket B over basket A, so my evidence looks like this: {2, 2, 2, 2, 2, 2}. Multiply them all together and my total evidence for B over A is $2^6$, or 64. This interpretation is simple: The total accumulated data are, all together, 64 times more probable under basket B than basket A. This number represents a simple Bayes factor, or likelihood ratio.
+
+\subsection{How to interpret a Bayes factor}
+
+In one sense, the Bayes factor always has the same interpretation in every problem: It is a ratio formed by the probability of the data under each hypothesis. It's all about prediction. The bigger the Bayes factor the more one hypothesis outpredicted the other.
+
+But in another sense the interpretation, and our reaction, necessarily depends on the context of the problem, and that is represented by another piece of the Bayesian machinery: The prior odds. The Bayes factor is the factor by which the data shift the balance of evidence from one hypothesis to another, and thus the amount by which the prior odds shift to posterior odds.
+
+Imagine that before you brought me one of the baskets you told me you would draw a card from a standard, shuffled deck of cards. You have a rule: Bring me basket B if the card drawn is a black suit and bring basket A if it is a red suit. You pick a card and, without telling me what it was, bring me a basket. Which basket did you bring me? What information do I have about the basket before I get to draw a sample from it?
+
+I know that there is a 50\% chance that you choose a black card, so there is a 50\% chance that you bring me basket B. Likewise for basket A. The prior probabilities in this scenario are 50\% for each basket, so the prior odds for basket A vs basket B are 1-to-1. (To calculate odds you just divide the probability of one hypothesis by the other.)
+
+
+\begin{figure}[h]
+\centering
+\includegraphics[width=0.3\textwidth]{pic/p05c03-snip19.png}
+\caption{Bayes factor baskets}
+\label{fig:p05c03-snip19}
+\end{figure}
+
+Let's say we draw our sample and get the same results as before: {W, W, W, W, W, W}. The evidence is the same: {2, 2, 2, 2, 2, 2} and the Bayes factor is the same, $2^6$=64. What do we conclude from this? Should we conclude we have basket A or basket B?
+
+The conclusion is not represented by the Bayes factor, but by the posterior odds. The Bayes factor is just one piece of the puzzle, namely the evidence contained in our sample. In order to come to a conclusion the Bayes factor has to be combined with the prior odds to obtain posterior odds. We have to take into account the information we had before we started sampling. I repeat: The posterior odds are where the conclusion resides. Not the Bayes factor.
+
+\subsection{Posterior odds (or probabilities) and conclusions}
+
+In the example just given, the posterior odds happen to equal the Bayes factor. Since the prior odds were 1-to-1, we multiply by the Bayes factor of 1-to-64, to obtain posterior odds of 1-to-64 favoring basket B. This means that, when these are the only two possible baskets, the probability of basket A has shrunk from 50\% to 2\% and the probability of basket B has grown from 50\% to 98\%. (To convert odds to probabilities divide the odds by odds+1.) This is the conclusion, and it necessarily depends on the prior odds we assign. 
+
+\begin{figure}[h]
+\centering
+\includegraphics[width=0.3\textwidth]{pic/p05c03-snip20.png}
+\caption{Bayes factor baskets}
+\label{fig:p05c03-snip20}
+\end{figure}
+
+
+Say you had a different rule for picking the baskets. Let's say that this time you draw a card and bring me basket B if you draw a King (of any suit) and you bring me basket A if you draw any other card. Now the prior odds are 48-to-4, or 12-to-1, in favor of basket A.
+
+The data from our sample are the same, {W, W, W, W, W, W}, and so is the Bayes factor, $2^6$= 64. The conclusion is qualitatively the same, with posterior odds of 1-to-5.3 that favor basket B. This means that, again when considering these as the only two possible baskets, the probability of basket A has been shrunk from 92\% to 16\% and the probability of basket B has grown from 8\% to 84\%. The Bayes factor is the same, but we are less confident in our conclusion. The prior odds heavily favored basket A, so it takes more evidence to overcome this handicap and reach as strong a conclusion as before.
+
+\begin{figure}[h]
+\centering
+\includegraphics[width=0.3\textwidth]{pic/p05c03-snip21.png}
+\caption{Bayes factor baskets}
+\label{fig:p05c03-snip21}
+\end{figure}
+
+
+What happens when we change the rule once again: Bring me basket B if you draw a King of Hearts and basket A if you draw any other card. Now the prior odds are 51-to-1 in favor of basket A. The data are the same again, and the Bayes factor is still 64. Now the posterior odds are 1-to-1.3 in favor of basket B. This means that the probability of basket A has been shrunk from 98\% to 43\% and the probability of basket B has grown from 2\% to 57\%. The evidence, and the Bayes factor, is exactly the same — but the conclusion is totally ambiguous. 
+
+
+\begin{figure}[h]
+\centering
+\includegraphics[width=0.3\textwidth]{pic/p05c03-snip22.png}
+\caption{Bayes factor baskets}
+\label{fig:p05c03-snip22}
+\end{figure}
+
+
+\subsection{Evidence vs. Conclusions}
+
+In each case I've considered, the evidence has been exactly the same: 6 draws, all white. As a corollary to the discussion above, if you try to come to conclusions based only on the Bayes factor then you are implicitly assuming prior odds of 1-to-1. I think this is unreasonable in most circumstances. When someone looks at a medium-to-large Bayes factor in a study claiming ``sadness impairs color perception'' (or some other ‘cute' metaphor study published in Psych Science) and thinks, ``I don't buy this,'' they are injecting their prior odds into the equation. Their implicit conclusion is: ``My posterior odds for this study are not favorable.'' This is the conclusion. The Bayes factor is not the conclusion.
+
+Many studies follow-up on earlier work, so we might give favorable prior odds; thus, when we see a Bayes factor of 5 or 10 we ``buy what the study is selling,'' so to speak. Or the study might be testing something totally new, so we might give unfavorable prior odds; thus, when we see a Bayes factor of 5 or 10 we remain skeptical. This is just another way of saying that we may reasonably require more evidence for extraordinary claims.
+
+\subsection{When to stop collecting data}
+
+It also follows from the above discussion that sometimes enough is enough. What I mean is that sometimes the conclusion for any reasonable prior odds assignment is strong enough that collecting more data is not worth the time, money, or energy. In the Bayesian framework the stopping rules don't affect the Bayes factor, and subsequently they don't affect the posterior odds. Take the second example above, where you gave me basket B if you drew any King. I had prior odds of 12-to-1 in favor of basket A, drew 6 white balls in a row, and ended up with 1-to-5.3 posterior odds in favor of basket B. This translated to a posterior probability of 84\% for basket B. If I draw 2 more balls and they are both white, my Bayes factor increases to $2^8$=256 (and this should not be corrected for multiple comparisons or so-called ``topping up''). My posterior odds increase to roughly 1-to-21 in favor of basket B, and the probability for basket B shoots up from 84\% to 99\%. I would say that's enough data for me to make a firm conclusion. But someone else might have other relevant information about the problem I'm studying, and they can come to a different conclusion.
+
+\subsection{Conclusions are personal}
+
+There's no reason another observer has to come to the same conclusion as me. She might have talked to you and you told her that you actually drew three cards (with replacement and reshuffle) and that you would only have brought me basket B if you drew three kings in a row. She has different information than I do, so naturally she has different prior odds (1728-to-1 in favor of basket A). She would come to a different conclusion than I would, namely that I was actually probably sampling from basket A — her posterior odds are roughly 7-to-1 in favor of basket A. We use the same evidence, a Bayes factor of $2^8$=256, but come to different conclusions. 
+
+Conclusions are personal. I can't tell you what to conclude because I don't know all the information you have access to. But I can tell you what the evidence is, and you can use that to come to your own conclusion. In this post I used a mechanism to generate prior odds that are intuitive and obvious, but we come to our scientific judgments through all sorts of ways that aren't always easily expressed or quantified. The idea is the same however you come to your prior odds: If you're skeptical of a study that has a large Bayes factor, then you assigned it strongly unfavorable prior odds.
+
+This is why I, and other Bayesians, advocate for reporting the Bayes factor in experiments. It is not because it tells someone what to conclude from the study, but that it lets them take the information contained in your data to come to their own conclusion. When you report your own Bayes factors for your experiments, in your discussion you might consider how people with different prior odds will react to your evidence. If your Bayes factor is not strong enough to overcome a skeptic's prior odds, then you may consider collecting more data until it is. If you're out of resources and the Bayes factor is not strong enough to overcome the prior odds of a moderate skeptic, then there is nothing wrong with acknowledging that other people may reasonably come to different conclusions about your study. Isn't that how science works?
+
+\subsection{Bottom line}
+
+If you want to come to a conclusion you need the posterior. If you want to make predictions about future sampling you need the posterior. If you want to make decisions you need the posterior (and a utility function; a topic for future blog). If you try to do all this with only the Bayes factor then you are implicitly assuming equal prior odds — which I maintain are almost never appropriate. (Insofar as you do ignore the prior and posterior, then do not be surprised when your Bayes factor simulations find strange results.) In the Bayesian framework each piece has its place. Bayes factors are an important piece of the puzzle, but they are not the only piece. They are simply the most basic piece from my perspective (after the sum and product rules) because they represent the evidence you accumulated in your sample. When you need to do something other than summarize evidence you have to expand your statistical arsenal.
+
+For more introductory material on Bayesian inference, see the Understanding Bayes hub here.
+
+\subsection{Technical caveat}
+
+It's important to remember that everything is relative and conditional in the Bayesian framework. The posterior probabilities I mention in this post are simply the probabilities of the baskets under the assumption that those are the only relevant hypotheses. They are not absolute probabilities. In other words, instead of writing the posterior probability as P(H|D), it should really be written P(H|D,M), where M is the conditional that the only hypotheses considered are in the following model index: M= {A, B, … K). This is why I personally prefer to use odds notation, since it makes the relativity explicit.
 
 
 \section{How to become a Bayesian in eight easy steps}
 \label{sec:HowtobecomeaBayesianineighteasysteps}
+
+Taken from  \cite{etz2016a}. 
+
+We wrote an annotated reading list to get you started in learning Bayesian statistics \cite{etz2018a}.
+
+It can be hard to know where to start when you want to learn about Bayesian statistics. I am frequently asked to share my favorite introductory resources to Bayesian statistics, and my go-to answer has been to share a dropbox folder with a bunch of PDFs that aren't really sorted or cohesive. In some sense I was acting as little more than a glorified Google Scholar search bar.
+
+It seems like there is some tension out there with regard to Bayes, in that many people want to know more about it, but when they pick up, say, Andrew Gelman and colleagues' \textit{Bayesian Data Analysis} they get totally overwhelmed. And then they just think, ``Screw this esoteric B.S.'' and give up because it doesn't seem like it is worth their time or effort.
+
+I think this happens a lot. Introductory Bayesian texts usually assume a level of training in mathematical statistics that most researchers simply don't have time (or otherwise don't need) to learn. There are actually a lot of accessible Bayesian resources out there that don't require much math stat background at all, but it just so happens that they are not consolidated anywhere so people don't necessarily know about them.
+
+\subsection{Enter the eight step program}
+
+Beth Baribault, Peter Edelsbrunner (@peter1328), Fabian Dablander (@fdabl), Quentin Gronau, and I have just finished a new paper \cite{etz2018a} that tries to remedy this situation, titled, ``How to become a Bayesian in eight easy steps: An annotated reading list.'' 
+ Each paper in the special issue addresses a specific question we often hear about Bayesian statistics, and ours was the following:
+
+\begin{quote}
+    I am a reviewer/editor handling a manuscript that uses Bayesian methods; which articles should I read to get a quick idea of what that means?
+\end{quote}
+
+So the paper‘s goal is not so much to teach readers how to actually perform Bayesian data analysis — there are other papers in the special issue for that — but to facilitate readers in their quest to understand basic Bayesian concepts. We think it will serve as a nice introductory reading list for any interested researcher.
+
+The format of the paper is straightforward. We highlight eight papers that had a big impact on our own understanding of Bayesian statistics, as well as short descriptions of an additional 28 resources in the \textit{Further reading} appendix. The first four papers are focused on theoretical introductions, and the second four have a slightly more applied focus.
+
+We also give every resource a ranking from 1–9 on two dimensions: Focus (theoretical vs. applied) and Difficulty (easy vs. hard). We tried to provide a wide range of resources, from easy applications (\#14: Wagenmakers, Lee, and Morey's ``Bayesian benefits for the pragmatic researcher'') to challenging theoretical discussions (\#12: Edwards, Lindman and Savage's ``Bayesian statistical inference for psychological research'') and others in between.
+
+The figure below  summarizes our rankings:
+
+\begin{figure}[h]
+\centering
+\includegraphics[width=0.3\textwidth]{pic/p05c03-snip23.png}
+\caption{Reading list}
+\label{fig:p05c03-snip23}
+\end{figure}
+
+
+The emboldened numbers (1–8) are the papers that we've commented on in detail, numbers in light text (9–30) are papers we briefly describe in the appendix, and the italicized numbers (31–36) are our recommended introductory books (also listed in the appendix).
+
+This is how we chose to frame the paper,
+
+\begin{quote}
+    Overall, the guide is designed such that a researcher might be able to read all eight of the highlighted articles and some supplemental readings within a few days. After readers acquaint themselves with these sources, they should be well-equipped both to interpret existing research and to evaluate new research that relies on Bayesian methods.
+\end{quote}
+
+\subsection{The list}
+
+Here's the list of papers we chose to cover in detail:
+
+\begin{enumerate}
+\item Lindley (1993) \cite{Lindley1993} The analysis of experimental data: The appreciation of tea and wine.
+
+\item Kruschke (2015) \cite{Kruschke2015} chapter 2: Introduction: Credibility, models, and parameters.
+
+\item Dienes (2011) \cite{Dienes2011}: Bayesian versus orthodox statistics: Which side are you on?
+
+\item Rouder, Speckman, Sun, Morey, \& Iverson (2009) \cite{Rouder2009}: Bayesian t tests for accepting and rejecting the null hypothesis.
+
+\item Vandekerckhove, Matzke, \& Wagenmakers (2014) \cite[Chapter 14]{Busemeyer2015}: Model comparison and the principle of parsimony. 
+
+\item van de Schoot, Kaplan, Denissen, Asendorpf, Neyer, \& Aken (2014) \cite{vandeSchoot2013,ZondervanZwijnenburg2017}: A gentle introduction to Bayesian analysis: Applications to developmental research.
+    
+    
+    
+\item Lee and Vanpaemel \cite{LeeVanpaemel2017}: Determining priors for cognitive models.
+
+\item Lee (2008) \cite{MdLee2008}: Three case studies in the Bayesian analysis of cognitive models.
+\end{enumerate}
+
+
+You'll have to check out the paper to see our commentary and to find out what other articles we included in the \textit{Further reading} appendix. We provide urls (web archived when possible; \lstinline{archive.org/web/}) to PDFs of the eight main papers (except \#2, that's on the DBDA website), and wherever possible for the rest of the resources (some did not have free copies online; see the References).
+
+I thought this was a fun paper to write, and if you think you might want to learn some Bayesian basics I hope you will consider reading it.
